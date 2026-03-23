@@ -4,7 +4,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -12,7 +18,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -26,6 +32,7 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
+    // Atributos de gamificação
     private Integer xp = 0;
     private Integer level = 1;
     private Integer coins = 0;
@@ -33,11 +40,57 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+
+    //Dispara automaticamente antes de salvar no banco.
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.xp == null) this.xp = 0;
         if (this.level == null) this.level = 1;
         if (this.coins == null) this.coins = 0;
+    }
+
+    /**
+     * Aqui se define as permisões do usuário.
+     * Quem logar ganha a permissão "USER".
+     * No futuro, pode ter "ADMIN", "MODERADOR", etc.
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    // Travas de segurança
+    // Se algum retornar 'false', o usuário não consegue logar.
+    // Por enquanto, todo mundo liberado (true).
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // A conta nunca expira
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // A conta nunca tá bloqueada
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // A senha nunca expira
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // O usuário tá sempre ativo
     }
 }
