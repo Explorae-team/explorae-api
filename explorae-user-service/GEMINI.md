@@ -25,5 +25,25 @@ O projeto avançou na Sprint 1 do MVP. Temos os endpoints de saúde (Health) e c
 - **Resposta Padrão**: Uso do `StandardResponseDTO` em todos os endpoints para consistência na comunicação com o Frontend.
 - **Segurança**: Endpoint de cadastro liberado no `SecurityConfig`, demais endpoints exigirão autenticação JWT.
 
+## 📝 Padrão de Comentários (Humano & Direto)
+Para facilitar o aprendizado do time, os comentários devem ser objetivos, humanos e focar no "porquê" ou na "função" do código, evitando termos robóticos.
+
+**Exemplos de Referência:**
+```java
+// Regras de Segurança: Quem entra, quem precisa de token e como as portas são vigiadas.
+@Configuration
+public class SecurityConfig { ... }
+
+// Valida o email e senha, comparando com o banco.
+@Bean
+public AuthenticationManager authenticationManager(...) { ... }
+
+// 1. Pega o cabeçalho 'Authorization' da requisição.
+String authHeader = request.getHeader("Authorization");
+
+// Se estiver ok, cria um crachá de autenticação.
+UsernamePasswordAuthenticationToken authToken = ...
+```
+
 ---
-*Última atualização: 22 de março de 2026*
+*Última atualização: 23 de março de 2026*

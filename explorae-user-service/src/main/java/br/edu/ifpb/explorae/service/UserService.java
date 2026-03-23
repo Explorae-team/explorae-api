@@ -3,12 +3,15 @@ package br.edu.ifpb.explorae.service;
 import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -17,11 +20,18 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+    // Busca o User e entrega pro Spring Security.
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("O e-mail não está cadastrado."));
+    }
 
+    //Registra o User
     @Transactional
     public User registerUser(UserRegistrationDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new RuntimeException("Este e-mail já está cadastrado.");
+            throw new RuntimeException("Esse e-mail já tá sendo usado, tente outro.");
         }
 
         User user = new User();
@@ -29,7 +39,7 @@ public class UserService {
         user.setEmail(dto.email());
         user.setPasswordHash(passwordEncoder.encode(dto.password()));
         
-        // Os valores padrão (xp, level, coins) já são tratados no @PrePersist da entidade User
+        // Os valores iniciais de XP e level são definidos lá no User.java pelo @PrePersist.
 
         return userRepository.save(user);
     }
