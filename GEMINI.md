@@ -59,5 +59,8 @@ O integrante deve substituir as tags HTML por componentes nativos:
 - [ ] Configurar o `app.json` com as propriedades `web` e `pwa`.
 - [ ] Gerar ícones e splash screen usando o `npx expo prebuild`.
 
+## 📈 Oportunidades de Otimização (Pós-MVP)
+- **Performance de Autenticação:** Atualmente, o `JwtAuthenticationFilter` realiza uma consulta ao banco (`loadUserByUsername`) em **cada requisição**. Para escalar, podemos migrar para um modelo onde o filtro valida as permissões (Claims) diretamente do Token JWT, reduzindo a carga no banco de dados.
+
 ---
 *Última atualização: 25 de março de 2026*

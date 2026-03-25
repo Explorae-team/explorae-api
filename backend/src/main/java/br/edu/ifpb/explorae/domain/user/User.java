@@ -40,6 +40,10 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    // Perfil de Preferências: Conhecendo melhor o usuário.
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TravelPreference travelPreference;
+
 
     //Dispara automaticamente antes de salvar no banco.
     @PrePersist
