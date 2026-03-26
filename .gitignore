@@ -1,0 +1,87 @@
+# Arquivos de Sistema (OS)
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.lock-wscript
+
+# IDEs e Editores
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+.sts4-cache
+.apt_generated/
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Build e Dependências (Geral)
+node_modules/
+target/
+build/
+bin/
+dist/
+out/
+.gradle/
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variáveis de Ambiente e Segredos
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.envrc
+auth.json
+
+# Ferramentas e Cache
+/.agent
+.agent/
+.temp/
+.tmp/
+coverage/
+.nyc_output/
+.parcel-cache/
+.vite/
+.next/
+
+# Mobile (React Native / Expo)
+.expo/
+*.jks
+*.p12
+*.key
+*.mobileprovision
+*.entitlements
+
+# Testes
+reports/
+test-results/
+
+# Documentação e outras exceções
+HELP.md
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Específicos do Monorepo
+/backend/target/
+/frontend/dist/
+/frontend/node_modules/
+/explorae-user-service/target/

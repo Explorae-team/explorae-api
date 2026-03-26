@@ -12,6 +12,9 @@
         <module name="explorae-user-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="25">
+      <module name="explorae-user-service" target="25" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
