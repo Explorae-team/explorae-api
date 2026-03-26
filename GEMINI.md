@@ -14,6 +14,7 @@ O projeto foi unificado em um **Monorepo** para acelerar a entrega do MVP. O Bac
 - [x] **Banco de Dados**: Liquibase configurado com UUIDs.
 - [x] **Segurança**: JWT funcional com login e registro de usuários.
 - [x] **CORS**: Configurado para integração com o frontend.
+- [x] **Preferências de Viagem**: Entidade `TravelPreference` e relacionamento com Usuário implementados (SDGEU-23).
 
 ### Infraestrutura/Organização
 - [x] **Monorepo Setup**: Unificação dos repositórios para facilitar a sincronia de features.

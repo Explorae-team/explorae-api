@@ -40,10 +40,32 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Perfil de Preferências: Conhecendo melhor o usuário.
+    // Perfil de Preferências.
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TravelPreference travelPreference;
 
+    /**
+     * Adiciona XP e verifica se subiu de nível.
+     * Retorna true se houve level up.
+     */
+    public boolean addXp(Integer amount) {
+        if (amount == null || amount <= 0) return false;
+        this.xp += amount;
+        return checkLevelUp();
+    }
+
+    private boolean checkLevelUp() {
+        int oldLevel = this.level;
+        // XP necessário para o próximo nível = nivel * 100
+        while (this.xp >= getXpForNextLevel()) {
+            this.level++;
+        }
+        return this.level > oldLevel;
+    }
+
+    public int getXpForNextLevel() {
+        return this.level * 100;
+    }
 
     //Dispara automaticamente antes de salvar no banco.
     @PrePersist
