@@ -1,15 +1,16 @@
 {
   "expo": {
-    "name": "Explorae App",
+    "name": "Exploraê",
     "slug": "explorae-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F4F4F9" 
     },
     "ios": {
       "supportsTablet": true
@@ -17,16 +18,32 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#F4F4F9"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "Exploraê",
+      "shortName": "Exploraê",
+      "themeColor": "#FF6B35",
+      "backgroundColor": "#F4F4F9",
+      "description": "Exploraê - A jornada é o prêmio. Transforme cada passo em uma conquista.",
+      "display": "standalone",
+      "orientation": "portrait",
+      "icons": [
+        {
+          "src": "./assets/icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
     "plugins": [
       "expo-router"
     ],
-    "scheme": "explorae-app"
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
