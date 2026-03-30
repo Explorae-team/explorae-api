@@ -6,6 +6,7 @@ public record UserResponseDTO(
     UUID id,
     String name,
     String email,
+    String phone,
     Integer xp,
     Integer level,
     Integer coins

@@ -9,5 +9,6 @@
     <include file="db/changelog/changes/002-create-travel-preferences-table.xml"/>
     <include file="db/changelog/changes/003-create-gamification-tables.xml"/>
     <include file="db/changelog/changes/004-create-attractions-table.xml"/>
+    <include file="db/changelog/changes/005-add-phone-to-users.xml"/>
 
 </databaseChangeLog>

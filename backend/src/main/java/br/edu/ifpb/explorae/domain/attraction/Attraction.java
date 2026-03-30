@@ -41,7 +41,7 @@ public class Attraction {
     private String openingHours;
 
     @Column(name = "price_range")
-    private Integer priceRange; // 1 to 4 ($ to $$$$)
+    private Integer priceRange; // 1 para 4 ($ para $$$$)
 
     @Column(name = "average_rating")
     private Double averageRating = 0.0;

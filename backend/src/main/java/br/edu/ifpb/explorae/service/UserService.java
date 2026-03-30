@@ -1,6 +1,7 @@
 package br.edu.ifpb.explorae.service;
 
 import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
+import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +42,13 @@ public class UserService implements UserDetailsService {
         
         // Os valores iniciais de XP e level são definidos lá no User.java pelo @PrePersist.
 
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateUser(User user, UserUpdateDTO dto) {
+        user.setName(dto.name());
+        user.setPhone(dto.phone());
         return userRepository.save(user);
     }
 }

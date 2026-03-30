@@ -3,16 +3,15 @@ package br.edu.ifpb.explorae.api.controller;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
 import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
+import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.api.mapper.UserMapper;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -33,5 +32,22 @@ public class UserController {
         
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(StandardResponseDTO.success("Usuário cadastrado com sucesso", responseDTO));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User user) {
+        UserResponseDTO responseDTO = userMapper.toResponseDTO(user);
+        return ResponseEntity.ok(StandardResponseDTO.success("Perfil recuperado com sucesso", responseDTO));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> updateMe(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody UserUpdateDTO dto) {
+        
+        User updatedUser = userService.updateUser(user, dto);
+        UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
+        
+        return ResponseEntity.ok(StandardResponseDTO.success("Perfil atualizado com sucesso", responseDTO));
     }
 }
