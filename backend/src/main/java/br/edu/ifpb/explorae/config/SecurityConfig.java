@@ -53,7 +53,7 @@ public class SecurityConfig {
                         // Porta da Saúde: Aberta para o monitoramento saber se o sistema tá vivo.
                         .requestMatchers("/api/v1/health").permitAll()
                         // Porta de Cadastro: Aberta porque o usuário ainda não tem conta.
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                         // Porta de Login: Aberta para o usuário trocar a senha pelo Token.
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.

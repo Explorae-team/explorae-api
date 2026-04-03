@@ -1,11 +1,16 @@
 package br.edu.ifpb.explorae.api.controller;
 
+import br.edu.ifpb.explorae.api.dto.AuthLoginResponseDTO;
 import br.edu.ifpb.explorae.api.dto.LoginDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
-import br.edu.ifpb.explorae.api.dto.TokenResponseDTO;
+import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
+import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
+import br.edu.ifpb.explorae.api.mapper.UserMapper;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.service.TokenService;
+import br.edu.ifpb.explorae.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,10 +30,27 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
-    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService) {
+    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService, UserService userService, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.userService = userService;
+        this.userMapper = userMapper;
+    }
+
+    /**
+     * Endpoint de Cadastro:
+     * Recebe os dados, valida, e cadastra o usuário.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegistrationDTO dto) {
+        User registeredUser = userService.registerUser(dto);
+        UserResponseDTO responseDTO = userMapper.toResponseDTO(registeredUser);
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(StandardResponseDTO.success("Usuário cadastrado com sucesso", responseDTO));
     }
 
     /**
@@ -38,7 +60,7 @@ public class AuthController {
      * 3. Cria e devolve o Token JWT.
      */
     @PostMapping("/login")
-    public ResponseEntity<StandardResponseDTO<TokenResponseDTO>> login(@RequestBody @Valid LoginDTO loginDTO) {
+    public ResponseEntity<StandardResponseDTO<AuthLoginResponseDTO>> login(@RequestBody @Valid LoginDTO loginDTO) {
 
         // Cria um envelope com as credenciais.
         UsernamePasswordAuthenticationToken authToken = 
@@ -53,11 +75,14 @@ public class AuthController {
         
         // Fabrica o Token pra esse usuário.
         String token = tokenService.generateToken(user);
+        
+        // Mapeia os dados do Usuário
+        UserResponseDTO userResponse = userMapper.toResponseDTO(user);
 
-        // Devolve o Token pra ele usar nas próximas requisições.
+        // Devolve o Token e os dados pra ele usar nas próximas requisições.
         return ResponseEntity.ok(StandardResponseDTO.success(
                 "Show! Login realizado com sucesso. Bem-vindo de volta!",
-                new TokenResponseDTO(token)
+                new AuthLoginResponseDTO(token, userResponse)
         ));
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.edu.ifpb.explorae.api.exception.BusinessException;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -32,7 +33,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User registerUser(UserRegistrationDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
-            throw new RuntimeException("Esse e-mail já tá sendo usado, tente outro.");
+            throw new BusinessException("Esse e-mail já tá sendo usado, tente outro.");
         }
 
         User user = new User();

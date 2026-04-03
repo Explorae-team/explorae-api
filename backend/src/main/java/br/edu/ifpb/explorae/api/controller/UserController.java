@@ -1,7 +1,7 @@
 package br.edu.ifpb.explorae.api.controller;
 
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
-import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
+
 import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
 import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.api.mapper.UserMapper;
@@ -25,14 +25,6 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping
-    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegistrationDTO dto) {
-        User registeredUser = userService.registerUser(dto);
-        UserResponseDTO responseDTO = userMapper.toResponseDTO(registeredUser);
-        
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(StandardResponseDTO.success("Usuário cadastrado com sucesso", responseDTO));
-    }
 
     @GetMapping("/me")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User user) {
