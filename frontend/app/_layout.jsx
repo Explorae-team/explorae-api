@@ -1,7 +1,56 @@
 import React, { useEffect } from 'react';
-import { Platform } from 'react-native';
-import { Stack } from 'expo-router';
-import { AuthProvider } from '../src/contexts/AuthContext';
+import { Platform, ActivityIndicator, View } from 'react-native';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { AuthProvider, useAuth } from '../src/contexts/AuthContext';
+
+function InitialLayout() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    // Detecta se o usuário está tentando acessar o dashboard
+    const inAppGroup = segments[0] === 'dashboard';
+
+    if (!isAuthenticated && inAppGroup) {
+      // Se não está logado e tenta acessar o dashboard, redireciona para login
+      router.replace('/login');
+    } else if (isAuthenticated && (segments[0] === 'login' || segments[0] === 'cadastro')) {
+      // Se já está logado e tenta acessar login/cadastro, redireciona para dashboard
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, segments]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#007AFF', // Azul Royal do Explorce
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerBackTitle: 'Voltar',
+      }}
+    >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ title: 'Login', headerShown: false }} />
+      <Stack.Screen name="cadastro" options={{ title: 'Criar Conta', headerShown: false }} />
+      <Stack.Screen name="dashboard/index" options={{ title: 'Dashboard' }} />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   // Registro de Service Worker para PWA (Task [S1-P2-T4])
@@ -17,22 +66,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#FF6B35', // Laranja Horizonte
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        <Stack.Screen name="index" options={{ title: 'Exploraê' }} />
-        <Stack.Screen name="login" options={{ title: 'Login' }} />
-        <Stack.Screen name="cadastro" options={{ title: 'Cadastro' }} />
-        <Stack.Screen name="dashboard/index" options={{ title: 'Exploraê Dashboard' }} />
-      </Stack>
+      <InitialLayout />
     </AuthProvider>
   );
 }

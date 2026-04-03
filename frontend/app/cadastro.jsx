@@ -7,21 +7,24 @@ import {
   StyleSheet, 
   KeyboardAvoidingView, 
   Platform, 
-  ScrollView 
+  ScrollView,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { useRouter, Link } from 'expo-router';
 import { useAuth } from '../src/contexts/AuthContext';
 
 /**
- * Tela de Cadastro
- * Implementação Mobile-First com validações, acessibilidade e design premium.
+ * Tela de Cadastro - Task [SDGEU-19]
+ * Integrada com backend real para criação de novas contas.
  */
 export default function Register() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { register, login } = useAuth();
 
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -30,12 +33,12 @@ export default function Register() {
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const { name, email, password, confirmPassword } = formData;
     let newErrors = { name: '', email: '', password: '', confirmPassword: '' };
     let isValid = true;
 
-    if (!name || name.trim().length < 3) {
+    if (!name || name.trim().length * 1 < 3) {
       newErrors.name = 'Nome deve ter pelo menos 3 caracteres';
       isValid = false;
     }
@@ -48,8 +51,8 @@ export default function Register() {
       isValid = false;
     }
 
-    if (!password || password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+    if (!password || password.length < 8) {
+      newErrors.password = 'Senha deve ter pelo menos 8 caracteres (requisito backend)';
       isValid = false;
     }
 
@@ -63,8 +66,26 @@ export default function Register() {
       return;
     }
 
-    login();
-    router.replace('/dashboard');
+    setLoading(true);
+    
+    // 1. Registrar o usuário
+    const regResult = await register({ name, email, password });
+    
+    if (regResult.success) {
+      // 2. Fazer login automático após registro bem-sucedido
+      const loginResult = await login(email, password);
+      setLoading(false);
+      
+      if (loginResult.success) {
+        router.replace('/dashboard');
+      } else {
+        Alert.alert('Sucesso', 'Cadastro realizado, mas falha no login automático. Por favor, tente entrar manualmente.');
+        router.replace('/login');
+      }
+    } else {
+      setLoading(false);
+      Alert.alert('Erro no Cadastro', regResult.message);
+    }
   };
 
   return (
@@ -78,20 +99,19 @@ export default function Register() {
           <Text style={styles.subtitle}>Junte-se à jornada no Exploraê!</Text>
 
           <View style={styles.form}>
-            {/* Campo Nome */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Nome Completo</Text>
               <TextInput 
                 style={[styles.input, errors.name ? styles.inputError : null]}
-                placeholder="Seu nome"
+                placeholder="Como quer ser chamado?"
                 value={formData.name}
                 onChangeText={(val) => handleInputChange('name', val)}
-                accessibilityLabel="Campo de entrada de nome completo"
+                accessibilityLabel="Seu nome"
+                editable={!loading}
               />
               {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
             </View>
 
-            {/* Campo E-mail */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>E-mail</Text>
               <TextInput 
@@ -101,56 +121,59 @@ export default function Register() {
                 placeholder="exemplo@email.com"
                 value={formData.email}
                 onChangeText={(val) => handleInputChange('email', val)}
-                accessibilityLabel="Campo de entrada de e-mail"
+                accessibilityLabel="Seu e-mail"
+                editable={!loading}
               />
               {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
             </View>
 
-            {/* Campo Senha */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Senha</Text>
               <TextInput 
                 style={[styles.input, errors.password ? styles.inputError : null]}
                 secureTextEntry
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 8 caracteres"
                 value={formData.password}
                 onChangeText={(val) => handleInputChange('password', val)}
-                accessibilityLabel="Campo de entrada de senha"
+                accessibilityLabel="Crie uma senha forte"
+                editable={!loading}
               />
               {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
             </View>
 
-            {/* Campo Confirmar Senha */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Confirmar Senha</Text>
               <TextInput 
                 style={[styles.input, errors.confirmPassword ? styles.inputError : null]}
                 secureTextEntry
-                placeholder="Repita a senha"
+                placeholder="Repita a mesma senha"
                 value={formData.confirmPassword}
                 onChangeText={(val) => handleInputChange('confirmPassword', val)}
-                accessibilityLabel="Campo de entrada para confirmar senha"
+                accessibilityLabel="Confirme sua senha"
+                editable={!loading}
               />
               {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
             </View>
 
-            {/* Botão de Registro */}
             <TouchableOpacity 
-              style={styles.button} 
+              style={[styles.button, loading && styles.buttonDisabled]} 
               onPress={handleRegister}
               activeOpacity={0.8}
+              disabled={loading}
               accessibilityRole="button"
-              accessibilityLabel="Botão de Cadastrar e Entrar"
             >
-              <Text style={styles.buttonText}>Cadastrar e Entrar</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Começar Aventura</Text>
+              )}
             </TouchableOpacity>
           </View>
 
-          {/* Link para Login */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>Já tem uma conta?</Text>
             <Link href="/login" asChild>
-              <TouchableOpacity>
+              <TouchableOpacity disabled={loading}>
                 <Text style={styles.link}> Faça login</Text>
               </TouchableOpacity>
             </Link>
@@ -166,41 +189,46 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  title: { fontSize: 28, fontWeight: '800', color: '#34C759', textAlign: 'center' }, // Verde para cadastro
-  subtitle: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginBottom: 32 },
-  form: { gap: 20 },
-  inputGroup: { gap: 8 },
-  label: { fontSize: 14, fontWeight: '600', color: '#495057' },
+  title: { fontSize: 32, fontWeight: '900', color: '#34C759', textAlign: 'center', letterSpacing: -0.5 },
+  subtitle: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginBottom: 28, fontWeight: '500' },
+  form: { gap: 16 },
+  inputGroup: { gap: 6 },
+  label: { fontSize: 13, fontWeight: '700', color: '#495057', marginLeft: 4 },
   input: {
     height: 52,
     borderWidth: 1.5,
     borderColor: '#E9ECEF',
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 16,
     fontSize: 16,
     color: '#212529',
     backgroundColor: '#F8F9FA',
   },
   inputError: { borderColor: '#FF3B30' },
-  errorText: { color: '#FF3B30', fontSize: 12, fontWeight: '500' },
+  errorText: { color: '#FF3B30', fontSize: 11, fontWeight: '600', marginLeft: 4 },
   button: {
     backgroundColor: '#34C759',
     height: 56,
-    borderRadius: 12,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 10,
+    shadowColor: '#34C759',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  buttonDisabled: { backgroundColor: '#A9E2B8' },
+  buttonText: { color: '#fff', fontSize: 17, fontWeight: '800' },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
   footerText: { color: '#6C757D', fontSize: 14 },
-  link: { color: '#007AFF', fontSize: 14, fontWeight: '700' },
+  link: { color: '#007AFF', fontSize: 14, fontWeight: '800' },
 });

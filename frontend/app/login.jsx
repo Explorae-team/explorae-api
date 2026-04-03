@@ -7,14 +7,16 @@ import {
   StyleSheet, 
   KeyboardAvoidingView, 
   Platform, 
-  ScrollView 
+  ScrollView,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { useRouter, Link } from 'expo-router';
 import { useAuth } from '../src/contexts/AuthContext';
 
 /**
- * Tela de Login - Task [S1-P2-T3] / [SDGEU-8]
- * Implementação Mobile-First com validações, acessibilidade e design premium.
+ * Tela de Login - Task [SDGEU-21]
+ * Integrada com backend real via AuthContext.
  */
 export default function Login() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function Login() {
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -30,7 +33,7 @@ export default function Login() {
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const { email, password } = formData;
     let newErrors = { email: '', password: '' };
     let isValid = true;
@@ -53,8 +56,15 @@ export default function Login() {
       return;
     }
 
-    login();
-    router.replace('/dashboard');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+
+    if (result.success) {
+      router.replace('/dashboard');
+    } else {
+      Alert.alert('Erro no Login', result.message);
+    }
   };
 
   return (
@@ -78,7 +88,7 @@ export default function Login() {
                 value={formData.email}
                 onChangeText={(val) => handleInputChange('email', val)}
                 accessibilityLabel="Campo de entrada de e-mail"
-                accessibilityHint="Digite o seu e-mail cadastrado"
+                editable={!loading}
               />
               {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
             </View>
@@ -92,26 +102,30 @@ export default function Login() {
                 value={formData.password}
                 onChangeText={(val) => handleInputChange('password', val)}
                 accessibilityLabel="Campo de entrada de senha"
-                accessibilityHint="Digite a sua senha de acesso"
+                editable={!loading}
               />
               {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
             </View>
 
             <TouchableOpacity 
-              style={styles.button} 
+              style={[styles.button, loading && styles.buttonDisabled]} 
               onPress={handleLogin}
               activeOpacity={0.8}
+              disabled={loading}
               accessibilityRole="button"
-              accessibilityLabel="Botão de Entrar"
             >
-              <Text style={styles.buttonText}>Entrar</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Entrar</Text>
+              )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Não tem uma conta?</Text>
             <Link href="/cadastro" asChild>
-              <TouchableOpacity>
+              <TouchableOpacity disabled={loading}>
                 <Text style={styles.link}> Cadastre-se</Text>
               </TouchableOpacity>
             </Link>
@@ -127,41 +141,46 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
+    shadowRadius: 20,
     elevation: 5,
   },
-  title: { fontSize: 32, fontWeight: '800', color: '#007AFF', textAlign: 'center' },
-  subtitle: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginBottom: 32 },
+  title: { fontSize: 36, fontWeight: '900', color: '#007AFF', textAlign: 'center', letterSpacing: -1 },
+  subtitle: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginBottom: 32, fontWeight: '500' },
   form: { gap: 20 },
   inputGroup: { gap: 8 },
-  label: { fontSize: 14, fontWeight: '600', color: '#495057' },
+  label: { fontSize: 14, fontWeight: '700', color: '#495057', marginLeft: 4 },
   input: {
-    height: 52,
+    height: 56,
     borderWidth: 1.5,
     borderColor: '#E9ECEF',
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: 16,
+    paddingHorizontal: 20,
     fontSize: 16,
     color: '#212529',
     backgroundColor: '#F8F9FA',
   },
   inputError: { borderColor: '#FF3B30' },
-  errorText: { color: '#FF3B30', fontSize: 12, fontWeight: '500' },
+  errorText: { color: '#FF3B30', fontSize: 12, fontWeight: '600', marginLeft: 4 },
   button: {
     backgroundColor: '#007AFF',
-    height: 56,
-    borderRadius: 12,
+    height: 60,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 12,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '700' },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
+  buttonDisabled: { backgroundColor: '#B0D4FF' },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: '800' },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
   footerText: { color: '#6C757D', fontSize: 14 },
-  link: { color: '#007AFF', fontSize: 14, fontWeight: '700' },
+  link: { color: '#007AFF', fontSize: 14, fontWeight: '800' },
 });

@@ -1,102 +1,135 @@
+// Mocks antecipados para isolar o ambiente (Ordem Crítica)
+jest.mock('axios', () => {
+  const mockAxios = {
+    create: jest.fn(() => mockAxios),
+    interceptors: {
+      request: { use: jest.fn(), eject: jest.fn() },
+      response: { use: jest.fn(), eject: jest.fn() },
+    },
+    post: jest.fn(),
+    get: jest.fn(),
+  };
+  return mockAxios;
+});
+
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
 import Register from '../app/cadastro';
 import { useAuth } from '../src/contexts/AuthContext';
 
-// Mock das dependências principais (Expo Router e AuthContext)
+// Mock das dependências que causam efeitos colaterais
 jest.mock('expo-router', () => ({
   useRouter: jest.fn(),
-  Link: ({ children }) => children, // Simplificando o compoente Link
+  Link: ({ children }) => children,
 }));
 
 jest.mock('../src/contexts/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
-describe('Tela de Cadastro (Register Screen)', () => {
+describe('Tela de Cadastro (Register Screen) - Task SDGEU-21', () => {
   const mockReplace = jest.fn();
+  const mockRegister = jest.fn();
   const mockLogin = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     useRouter.mockReturnValue({ replace: mockReplace });
-    useAuth.mockReturnValue({ login: mockLogin });
+    useAuth.mockReturnValue({ 
+      register: mockRegister,
+      login: mockLogin 
+    });
   });
 
-  it('Deve renderizar os componentes do formulário corretamente', () => {
+  it('Deve renderizar os componentes do formulário com os novos placeholders', () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
     expect(getByText('Crie sua conta')).toBeTruthy();
-    expect(getByPlaceholderText('Seu nome')).toBeTruthy();
+    expect(getByPlaceholderText('Como quer ser chamado?')).toBeTruthy();
     expect(getByPlaceholderText('exemplo@email.com')).toBeTruthy();
-    expect(getByPlaceholderText('Mínimo 6 caracteres')).toBeTruthy();
-    expect(getByPlaceholderText('Repita a senha')).toBeTruthy();
+    expect(getByPlaceholderText('Mínimo 8 caracteres')).toBeTruthy();
+    expect(getByPlaceholderText('Repita a mesma senha')).toBeTruthy();
   });
 
-  it('Deve exibir bloqueio e erro de nome vazio ou menor que 3 letras', () => {
+  it('Deve exibir erro de nome curto (< 3 caracteres)', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    // Preenche com falha o campo nome
-    fireEvent.changeText(getByPlaceholderText('Seu nome'), 'Ab');
-    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'teste@email.com');
-    fireEvent.changeText(getByPlaceholderText('Mínimo 6 caracteres'), 'senha123');
-    fireEvent.changeText(getByPlaceholderText('Repita a senha'), 'senha123');
-    
-    fireEvent.press(getByText('Cadastrar e Entrar'));
+    fireEvent.changeText(getByPlaceholderText('Como quer ser chamado?'), 'Ab');
+    fireEvent.press(getByText('Começar Aventura'));
 
-    // Verifica erro visual
-    expect(getByText('Nome deve ter pelo menos 3 caracteres')).toBeTruthy();
-    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getByText('Nome deve ter pelo menos 3 caracteres')).toBeTruthy();
+    });
   });
 
-  it('Deve exibir bloqueio se o e-mail não pussuir formato válido', () => {
+  it('Deve exibir erro de e-mail inválido', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    fireEvent.changeText(getByPlaceholderText('Seu nome'), 'Explorador');
-    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'email-sem-arroba');
-    fireEvent.changeText(getByPlaceholderText('Mínimo 6 caracteres'), 'senha123');
-    fireEvent.changeText(getByPlaceholderText('Repita a senha'), 'senha123');
-    
-    fireEvent.press(getByText('Cadastrar e Entrar'));
+    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'email-invalido');
+    fireEvent.press(getByText('Começar Aventura'));
 
-    expect(getByText('Formato de e-mail inválido')).toBeTruthy();
-    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getByText('Formato de e-mail inválido')).toBeTruthy();
+    });
   });
 
-  it('Deve exibir erro caso as senhas digitadas sejam diferentes (Confirmação)', () => {
+  it('Deve exibir erro se as senhas não coincidirem', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    fireEvent.changeText(getByPlaceholderText('Seu nome'), 'Explorador');
-    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'teste@email.com');
-    // Digitou as senhas trocadas
-    fireEvent.changeText(getByPlaceholderText('Mínimo 6 caracteres'), 'mypass123');
-    fireEvent.changeText(getByPlaceholderText('Repita a senha'), 'mypass321');
-    
-    fireEvent.press(getByText('Cadastrar e Entrar'));
+    fireEvent.changeText(getByPlaceholderText('Mínimo 8 caracteres'), 'senha12345');
+    fireEvent.changeText(getByPlaceholderText('Repita a mesma senha'), 'senha54321');
+    fireEvent.press(getByText('Começar Aventura'));
 
-    // Exibe o erro focado na Confirmação que construimos!
-    expect(getByText('As senhas devem ser iguais')).toBeTruthy();
-    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getByText('As senhas devem ser iguais')).toBeTruthy();
+    });
   });
 
-  it('Deve registrar e redirecionar para o /dashboard se os dados forem perfeitos', () => {
-    const { getByText, getByPlaceholderText, queryByText } = render(<Register />);
+  it('Deve completar o fluxo de registro e login automático com sucesso', async () => {
+    mockRegister.mockResolvedValue({ success: true });
+    mockLogin.mockResolvedValue({ success: true });
 
-    // Happy Path!
-    fireEvent.changeText(getByPlaceholderText('Seu nome'), 'Julio Silva');
-    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'julio@email.com');
-    fireEvent.changeText(getByPlaceholderText('Mínimo 6 caracteres'), 'minhasenhaforte');
-    fireEvent.changeText(getByPlaceholderText('Repita a senha'), 'minhasenhaforte');
+    const { getByText, getByPlaceholderText } = render(<Register />);
+
+    fireEvent.changeText(getByPlaceholderText('Como quer ser chamado?'), 'Novo Viajante');
+    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'novo@viajante.com');
+    fireEvent.changeText(getByPlaceholderText('Mínimo 8 caracteres'), 'senhafortissima');
+    fireEvent.changeText(getByPlaceholderText('Repita a mesma senha'), 'senhafortissima');
     
-    fireEvent.press(getByText('Cadastrar e Entrar'));
+    fireEvent.press(getByText('Começar Aventura'));
 
-    // Certifique que NENHUMA string de erro pipocou na tela
-    expect(queryByText('As senhas devem ser iguais')).toBeNull();
-    expect(queryByText('Nome deve ter pelo menos 3 caracteres')).toBeNull();
+    await waitFor(() => {
+      expect(mockRegister).toHaveBeenCalledWith({
+        name: 'Novo Viajante',
+        email: 'novo@viajante.com',
+        password: 'senhafortissima'
+      });
+      expect(mockLogin).toHaveBeenCalled();
+      expect(mockReplace).toHaveBeenCalledWith('/dashboard');
+    });
+  });
 
-    // Verica a ação da base do projeto
-    expect(mockLogin).toHaveBeenCalledTimes(1);
-    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
+  it('Deve exibir erro amigável se o registro falhar no backend', async () => {
+    mockRegister.mockResolvedValue({ 
+      success: false, 
+      message: 'Este e-mail já está em uso' 
+    });
+
+    const { getByText, getByPlaceholderText } = render(<Register />);
+
+    fireEvent.changeText(getByPlaceholderText('Como quer ser chamado?'), 'Teste');
+    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'duplicado@email.com');
+    fireEvent.changeText(getByPlaceholderText('Mínimo 8 caracteres'), 'senha12345678');
+    fireEvent.changeText(getByPlaceholderText('Repita a mesma senha'), 'senha12345678');
+    
+    fireEvent.press(getByText('Começar Aventura'));
+
+    // Note: O Alert.alert não é capturado facilmente em testes de unidade simples
+    // mas verificamos se o login NÃO foi chamado.
+    await waitFor(() => {
+      expect(mockRegister).toHaveBeenCalled();
+      expect(mockLogin).not.toHaveBeenCalled();
+    });
   });
 });
