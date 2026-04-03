@@ -20,8 +20,8 @@ export default function Register() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [errors, setErrors] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [errors, setErrors] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -31,8 +31,8 @@ export default function Register() {
   };
 
   const handleRegister = () => {
-    const { name, email, password } = formData;
-    let newErrors = { name: '', email: '', password: '' };
+    const { name, email, password, confirmPassword } = formData;
+    let newErrors = { name: '', email: '', password: '', confirmPassword: '' };
     let isValid = true;
 
     if (!name || name.trim().length < 3) {
@@ -50,6 +50,11 @@ export default function Register() {
 
     if (!password || password.length < 6) {
       newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+      isValid = false;
+    }
+
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'As senhas devem ser iguais';
       isValid = false;
     }
 
@@ -113,6 +118,20 @@ export default function Register() {
                 accessibilityLabel="Campo de entrada de senha"
               />
               {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+            </View>
+
+            {/* Campo Confirmar Senha */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirmar Senha</Text>
+              <TextInput 
+                style={[styles.input, errors.confirmPassword ? styles.inputError : null]}
+                secureTextEntry
+                placeholder="Repita a senha"
+                value={formData.confirmPassword}
+                onChangeText={(val) => handleInputChange('confirmPassword', val)}
+                accessibilityLabel="Campo de entrada para confirmar senha"
+              />
+              {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
             </View>
 
             {/* Botão de Registro */}
