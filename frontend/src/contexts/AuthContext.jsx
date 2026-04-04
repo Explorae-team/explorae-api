@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
 import api from '../services/api';
 
 const AuthContext = createContext({});
@@ -10,10 +9,11 @@ export const AuthProvider = ({ children }) => {
 
   // Carrega os dados persistidos no app launch
   useEffect(() => {
-    async function loadStoredData() {
+    function loadStoredData() {
       try {
-        const storedToken = await SecureStore.getItemAsync('auth_token');
-        const storedUser = await SecureStore.getItemAsync('user_data');
+        // Substituído SecureStore por localStorage
+        const storedToken = localStorage.getItem('auth_token');
+        const storedUser = localStorage.getItem('user_data');
 
         if (storedToken && storedUser) {
           // Re-hidrata o estado do usuário
@@ -35,9 +35,9 @@ export const AuthProvider = ({ children }) => {
       // O backend retorna StandardResponseDTO<AuthLoginResponseDTO>
       const { token, user: userData } = response.data.data;
 
-      // Salva token e user no storage seguro
-      await SecureStore.setItemAsync('auth_token', token);
-      await SecureStore.setItemAsync('user_data', JSON.stringify(userData));
+      // Salva token e user no localStorage da Web
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user_data', JSON.stringify(userData));
 
       setUser(userData);
       return { success: true };
@@ -68,8 +68,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await SecureStore.deleteItemAsync('auth_token');
-      await SecureStore.deleteItemAsync('user_data');
+      // Remove do localStorage ao deslogar
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
       setUser(null);
     } catch (error) {
       console.error('Erro ao deslogar:', error);
