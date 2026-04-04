@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
     private final UserService userService;
 
-    public JwtAuthenticationFilter(TokenService tokenService, UserService userService) {
+    public JwtAuthenticationFilter(TokenService tokenService, @Lazy UserService userService) {
         this.tokenService = tokenService;
         this.userService = userService;
     }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import storage from '../utils/storage';
 
 /**
  * Configuração centralizada do Axios para o Exploraê.
@@ -19,7 +19,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     try {
-      const token = await SecureStore.getItemAsync('auth_token');
+      const token = await storage.getItem('auth_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -38,8 +38,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expirado ou inválido - poderia disparar um logout global aqui
       console.warn('Sessão expirada. Redirecionando para login...');
-      await SecureStore.deleteItemAsync('auth_token');
-      await SecureStore.deleteItemAsync('user_data');
+      await storage.removeItem('auth_token');
+      await storage.removeItem('user_data');
     }
     return Promise.reject(error);
   }

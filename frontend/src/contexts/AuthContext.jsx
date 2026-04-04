@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
+import storage from '../utils/storage';
+
 
 const AuthContext = createContext({});
 
@@ -9,14 +11,13 @@ export const AuthProvider = ({ children }) => {
 
   // Carrega os dados persistidos no app launch
   useEffect(() => {
-    function loadStoredData() {
+    async function loadStoredData() {
       try {
-        // Substituído SecureStore por localStorage
-        const storedToken = localStorage.getItem('auth_token');
-        const storedUser = localStorage.getItem('user_data');
+        // Usando o wrapper local
+        const storedToken = await storage.getItem('auth_token');
+        const storedUser = await storage.getItem('user_data');
 
         if (storedToken && storedUser) {
-          // Re-hidrata o estado do usuário
           setUser(JSON.parse(storedUser));
         }
       } catch (error) {
@@ -35,9 +36,9 @@ export const AuthProvider = ({ children }) => {
       // O backend retorna StandardResponseDTO<AuthLoginResponseDTO>
       const { token, user: userData } = response.data.data;
 
-      // Salva token e user no localStorage da Web
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem('user_data', JSON.stringify(userData));
+      // Salva de forma persistente e segura
+      await storage.setItem('auth_token', token);
+      await storage.setItem('user_data', JSON.stringify(userData));
 
       setUser(userData);
       return { success: true };
@@ -68,9 +69,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Remove do localStorage ao deslogar
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
+      // Remove de forma segura ao deslogar
+      await storage.removeItem('auth_token');
+      await storage.removeItem('user_data');
       setUser(null);
     } catch (error) {
       console.error('Erro ao deslogar:', error);
