@@ -4,11 +4,11 @@
     "slug": "explorae-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/branding/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/branding/logo-main.png",
       "resizeMode": "contain",
       "backgroundColor": "#F4F4F9" 
     },
@@ -17,12 +17,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/branding/app-icon.png",
         "backgroundColor": "#F4F4F9"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/branding/favicon.png",
       "bundler": "metro",
       "name": "Exploraê",
       "shortName": "Exploraê",
@@ -33,7 +33,7 @@
       "orientation": "portrait",
       "icons": [
         {
-          "src": "./assets/icon.png",
+          "src": "./assets/branding/app-icon.png",
           "sizes": "512x512",
           "type": "image/png"
         }

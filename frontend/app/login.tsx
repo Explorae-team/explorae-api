@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   StatusBar,
+  Image
 } from "react-native";
 import { useAuth } from "../src/contexts/AuthContext";
 import { useRouter, Link } from "expo-router";
@@ -71,17 +72,16 @@ export default function LoginScreen() {
         {/* Decorative Background Elements (Representação simplificada de UI em Native) */}
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-[#fd6c28]/10 rounded-full blur-[80px]" />
         
-        <View className="items-center mb-10">
-          <View className="w-20 h-20 bg-[#fd6c28] rounded-3xl items-center justify-center shadow-lg -rotate-3">
-            <Ionicons name="compass-outline" size={48} color="#003646" />
-          </View>
-          <Text className="mt-4 font-bold text-3xl tracking-widest text-[#fd6c28] uppercase">
-            Exploraê
-          </Text>
-        </View>
-
         {/* Central Card */}
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
+          <View className="items-center mb-6">
+            <Image 
+              source={require("../assets/branding/logo-main.png")} 
+              style={{ width: 180, height: 60 }}
+              resizeMode="contain"
+            />
+          </View>
+
           <View className="mb-8">
             <Text className="text-[#003646] font-bold text-2xl mb-1">
               Bem-vindo de volta!

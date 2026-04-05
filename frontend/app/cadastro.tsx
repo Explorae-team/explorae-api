@@ -96,17 +96,15 @@ export default function CadastroScreen() {
         
         <Stack.Screen options={{ headerShown: false }} />
 
-        {/* Header / Brand */}
-        <View className="items-center mt-8 mb-6 z-10">
-          <View className="w-16 h-16 bg-[#fd6c28] rounded-2xl items-center justify-center shadow-lg transform rotate-3 mb-4">
-            <Ionicons name="compass" size={40} color="white" />
-          </View>
-          <Text className="text-[#fd6c28] font-black text-3xl tracking-[4px] uppercase mb-1">EXPLORAÊ</Text>
-          <Text className="text-[#bde9fe] font-medium tracking-widest opacity-80">DIGITAL WAYFINDER</Text>
-        </View>
-
         {/* Main Card */}
         <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
+          <View className="items-center mb-6">
+            <Image 
+              source={require("../assets/branding/logo-main.png")} 
+              style={{ width: 180, height: 60 }}
+              resizeMode="contain"
+            />
+          </View>
           <View className="mb-6 items-center">
             <Text className="text-[#003646] font-black text-2xl text-center leading-7">
               Crie sua conta para começar a aventura!
