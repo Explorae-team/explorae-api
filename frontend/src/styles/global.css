@@ -1,11 +1,27 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-scheme: light; /* Forçando modo claro para evitar conflitos de 'media' no CSS Interop */
+  }
+  
+  body {
+    background-color: #003646;
+    color: #bde9fe;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+/* Glassmorphism conforme seu HTML Ref */
+.glass-panel {
+  background-color: rgba(13, 62, 78, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
 }

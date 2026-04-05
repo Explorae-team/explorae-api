@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import '../src/styles/global.css'; // Importando Tailwind globalmente para o ambiente Web/Native
+
 import { Platform, ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../src/contexts/AuthContext';
