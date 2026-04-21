@@ -7,6 +7,8 @@ public record UserResponseDTO(
     String name,
     String email,
     String phone,
+    String bio,
+    String photoUrl,
     Integer xp,
     Integer level,
     Integer coins

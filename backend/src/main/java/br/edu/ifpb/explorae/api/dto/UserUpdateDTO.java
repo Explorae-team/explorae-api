@@ -9,5 +9,10 @@ public record UserUpdateDTO(
     String name,
 
     @Size(max = 20, message = "O telefone deve ter no máximo 20 caracteres")
-    String phone
+    String phone,
+
+    String bio,
+
+    @Size(max = 255, message = "A URL da foto deve ter no máximo 255 caracteres")
+    String photoUrl
 ) {}

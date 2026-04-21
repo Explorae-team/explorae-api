@@ -46,10 +46,21 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
+    public User findById(java.util.UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException("Usuário não encontrado"));
+    }
+
     @Transactional
-    public User updateUser(User user, UserUpdateDTO dto) {
+    public User updateUser(java.util.UUID userId, UserUpdateDTO dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException("Usuário não encontrado"));
+        
         user.setName(dto.name());
         user.setPhone(dto.phone());
+        user.setBio(dto.bio());
+        user.setPhotoUrl(dto.photoUrl());
         return userRepository.save(user);
     }
 }

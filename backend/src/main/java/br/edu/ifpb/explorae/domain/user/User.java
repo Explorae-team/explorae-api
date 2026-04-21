@@ -35,6 +35,12 @@ public class User implements UserDetails {
     @Column(length = 20)
     private String phone;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(name = "photo_url")
+    private String photoUrl;
+
     // Atributos de gamificação
     private Integer xp = 0;
     private Integer level = 1;

@@ -25,17 +25,18 @@ public class UserController {
     private final TravelPreferenceService travelPreferenceService;
 
     @GetMapping("/me")
-    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User user) {
+    public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User principal) {
+        User user = userService.findById(principal.getId());
         UserResponseDTO responseDTO = userMapper.toResponseDTO(user);
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil recuperado com sucesso", responseDTO));
     }
 
     @PutMapping("/me")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> updateMe(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal User principal,
             @Valid @RequestBody UserUpdateDTO dto) {
         
-        User updatedUser = userService.updateUser(user, dto);
+        User updatedUser = userService.updateUser(principal.getId(), dto);
         UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
         
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil atualizado com sucesso", responseDTO));
