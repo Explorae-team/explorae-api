@@ -6,6 +6,7 @@ import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
 import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.api.mapper.UserMapper;
 import br.edu.ifpb.explorae.domain.user.User;
+import br.edu.ifpb.explorae.service.FileStorageService;
 import br.edu.ifpb.explorae.service.TravelPreferenceService;
 import br.edu.ifpb.explorae.service.UserService;
 import jakarta.validation.Valid;
@@ -23,12 +24,32 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final TravelPreferenceService travelPreferenceService;
+    private final FileStorageService fileStorageService;
 
     @GetMapping("/me")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User principal) {
         User user = userService.findById(principal.getId());
         UserResponseDTO responseDTO = userMapper.toResponseDTO(user);
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil recuperado com sucesso", responseDTO));
+    }
+
+    @PostMapping("/me/avatar")
+    public ResponseEntity<StandardResponseDTO<String>> uploadAvatar(
+            @AuthenticationPrincipal User principal,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+
+        String photoUrl = fileStorageService.saveFile(file, "avatars");
+        
+        // Remove a foto antiga se existir e for local
+        if (principal.getPhotoUrl() != null) {
+            fileStorageService.deleteFile(principal.getPhotoUrl());
+        }
+
+        userService.updateAvatar(principal.getId(), photoUrl);
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.success("Avatar enviado com sucesso", photoUrl)
+        );
     }
 
     @PutMapping("/me")

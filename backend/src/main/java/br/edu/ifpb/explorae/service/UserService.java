@@ -53,6 +53,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public void updateAvatar(java.util.UUID userId, String photoUrl) {
+        User user = findById(userId);
+        user.setPhotoUrl(photoUrl);
+        userRepository.save(user);
+    }
+
+    @Transactional
     public User updateUser(java.util.UUID userId, UserUpdateDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException("Usuário não encontrado"));
