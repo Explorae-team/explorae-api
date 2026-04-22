@@ -11,5 +11,6 @@ public record UserResponseDTO(
     String photoUrl,
     Integer xp,
     Integer level,
-    Integer coins
+    Integer coins,
+    boolean hasPreferences
 ) {}
