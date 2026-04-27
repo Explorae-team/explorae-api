@@ -53,4 +53,10 @@ api.interceptors.response.use(
   }
 );
 
+export const saveInterests = async (interests: string[]) => {
+  // O backend espera um TravelPreferenceRequestDTO { interests: string[] }
+  const response = await api.put('/api/v1/users/me/preferences', { interests });
+  return response.data;
+};
+
 export default api;
