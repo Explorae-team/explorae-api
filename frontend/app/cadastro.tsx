@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Stack, Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { CadastroFormData, CadastroErrorMap } from './cadastro.types';
+import { CadastroFormData, CadastroErrorMap } from '../types/cadastro.types';
 import { useAuth } from '../src/contexts/AuthContext';
 
 /**

@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../src/contexts/AuthContext";
 import { useRouter, Link } from "expo-router";
 import { useState } from "react";
-import { LoginForm, LoginErrors } from "./login.types";
+import { LoginForm, LoginErrors } from '../types/login.types';
 import { Ionicons } from "@expo/vector-icons";
 
 export default function LoginScreen() {
