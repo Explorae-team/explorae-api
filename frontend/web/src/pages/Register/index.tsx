@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+import Logo from '../../assets/screen.png'
+
 export default function Registro() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -34,16 +36,14 @@ export default function Registro() {
 
     setLoading(true);
     try {
-      // 1. Registro
       await axios.post('http://localhost:8080/api/v1/auth/register', {
-        name: formData.fullName, // O Java espera 'name', não 'fullName'
+        name: formData.fullName,
         email: formData.email,
         password: formData.password
       })
 
       console.log("Deu certo")
 
-      // 2. Login Automático
       const loginRes = await axios.post('http://localhost:8080/api/v1/auth/login', {
         email: formData.email,
         password: formData.password
@@ -54,10 +54,10 @@ export default function Registro() {
       if (loginRes.data.data.token) {
         localStorage.setItem('@ExploraE:token', loginRes.data.data.token);
         localStorage.setItem('@ExploraE:user', JSON.stringify(loginRes.data.data.user));
-        navigate('/interests'); // Ou sua rota principal
+        navigate('/interests');
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || "Erro na central de comando.");
+      alert("Erro");
     } finally {
       setLoading(false);
     }
@@ -71,10 +71,18 @@ export default function Registro() {
 
       {/* Header */}
       <header className="mb-10 text-center z-10">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-16 h-16 bg-[#fd6c28] rounded-xl flex items-center justify-center shadow-lg transform rotate-3 mb-4">
-            <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>explore</span>
-          </div>
+        <div className="flex flex-col items-center gap-2">  
+            <img 
+              src={Logo} 
+              alt="Exploraê Logo" 
+              className="w-30 h-20 object-contain"
+              onError={(e) => {
+                // Fallback caso a imagem não carregue: mostra um ícone padrão
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = '<span class="material-symbols-outlined text-white text-4xl">login</span>';
+              }}
+            />
+          
           <h1 className="font-headline font-black text-3xl tracking-widest uppercase text-[#fd6c28]">Exploraê</h1>
           <p className="text-[#91bbcf] font-medium tracking-wide">Digital Wayfinder</p>
         </div>

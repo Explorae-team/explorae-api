@@ -6,18 +6,9 @@ import Register from '../pages/Register';
 import InterestsPage from '../pages/InterestsPage';
 import Dashboard from '../pages/Dashboard';
 
-
-// 1. Criamos uma interface para definir as propriedades do componente
-interface ProtectedRouteProps {
-  children: ReactNode;
-}
-
-// 2. Aplicamos a tipagem no parâmetro das props
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  // 1. Enquanto o useEffect do Contexto estiver lendo o localStorage, 
-  // nós não podemos decidir se o usuário está logado ou não.
   if (isLoading) {
     return (
       <div className="bg-[#00161e] min-h-screen flex items-center justify-center">
@@ -26,23 +17,22 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // 2. Agora que o carregamento acabou, se não tiver usuário, aí sim manda pro login.
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
-  // 3. Se passou pelos dois acima, o usuário está logado.
   return <>{children}</>;
 };
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Redireciona a raiz (/) para o login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
-      
-       <Route 
+      <Route 
         path="/dashboard" 
         element={
           <ProtectedRoute>
@@ -50,15 +40,18 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
-      <Route
-  path="/interests" // Remova qualquer '/' extra aqui
-  element={
-    <ProtectedRoute>
-      <InterestsPage />
-    </ProtectedRoute>
-  }
-/>
       
+      <Route
+        path="/interests"
+        element={
+          <ProtectedRoute>
+            <InterestsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all: Redireciona qualquer rota inexistente para o login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };

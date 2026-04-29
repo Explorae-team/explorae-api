@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InterestCard } from '../../utils/InterestCard';
-import api, { saveInterests } from '../../services/api';
+import { saveInterests } from '../../services/api';
 
 // Interface do dado que viria da sua API
 interface InterestItem {
