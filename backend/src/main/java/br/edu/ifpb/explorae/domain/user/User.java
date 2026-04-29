@@ -1,0 +1,131 @@
+package br.edu.ifpb.explorae.domain.user;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(length = 20)
+    private String phone;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(name = "photo_url")
+    private String photoUrl;
+
+    // Atributos de gamificação
+    private Integer xp = 0;
+    private Integer level = 1;
+    private Integer coins = 0;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // Perfil de Preferências.
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TravelPreference travelPreference;
+
+    /**
+     * Adiciona XP e verifica se subiu de nível.
+     * Retorna true se houve level up.
+     */
+    public boolean addXp(Integer amount) {
+        if (amount == null || amount <= 0) return false;
+        this.xp += amount;
+        return checkLevelUp();
+    }
+
+    private boolean checkLevelUp() {
+        int oldLevel = this.level;
+        // XP necessário para o próximo nível = nivel * 100
+        while (this.xp >= getXpForNextLevel()) {
+            this.level++;
+        }
+        return this.level > oldLevel;
+    }
+
+    public int getXpForNextLevel() {
+        return this.level * 100;
+    }
+
+    //Dispara automaticamente antes de salvar no banco.
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        if (this.xp == null) this.xp = 0;
+        if (this.level == null) this.level = 1;
+        if (this.coins == null) this.coins = 0;
+    }
+
+    /**
+     * Aqui se define as permisões do usuário.
+     * Quem logar ganha a permissão "USER".
+     * No futuro, pode ter "ADMIN", "MODERADOR", etc.
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    // Travas de segurança
+    // Se algum retornar 'false', o usuário não consegue logar.
+    // Por enquanto, todo mundo liberado (true).
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // A conta nunca expira
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // A conta nunca tá bloqueada
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // A senha nunca expira
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // O usuário tá sempre ativo
+    }
+}

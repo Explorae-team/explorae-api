@@ -1,0 +1,17 @@
+{
+  "name": "Exploraê",
+  "short_name": "Exploraê",
+  "description": "Exploraê - A jornada é o prêmio. Transforme cada passo em uma conquista.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F4F9",
+  "theme_color": "#FF6B35",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
