@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
+import Logo from '../../assets/screen.png'
 
 export default function Login() {
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -12,25 +13,24 @@ export default function Login() {
   const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const result = await login(email, password);
+    try {
+      const result = await login(email, password);
 
-    if (result.success) {
-      console.log("Login autorizado!");
-      navigate('/interests');
-    } else {
-      // O seu context já retorna a mensagem de erro formatada
-      alert(result.message || "Credenciais inválidas.");
+      if (result.success) {
+        console.log("Login autorizado!");
+        navigate('/interests');
+      } else {
+        alert(result.message || "Credenciais inválidas.");
+      }
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Erro inesperado:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="bg-[#003646] font-body text-[#bde9fe] min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -41,12 +41,20 @@ export default function Login() {
       {/* Header */}
       <header className="mb-10 text-center z-10">
         <div className="flex flex-col items-center gap-2">
-          <div className="w-16 h-16 bg-[#fd6c28] rounded-xl flex items-center justify-center shadow-lg transform -rotate-3 mb-4">
-            <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>login</span>
-          </div>
+          {/* Logo Container */}
+          <img 
+              src={Logo} 
+              alt="Exploraê Logo" 
+              className="w-30 h-20 object-contain"
+              onError={(e) => {
+                // Fallback caso a imagem não carregue: mostra um ícone padrão
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = '<span class="material-symbols-outlined text-white text-4xl">login</span>';
+              }}
+            />
           <h1 className="font-headline font-black text-3xl tracking-widest uppercase text-[#fd6c28]">Exploraê</h1>
           <p className="text-[#91bbcf] font-medium tracking-wide">Bem-vindo de volta!</p>
-        </div>
+          </div>
       </header>
 
       {/* Main Login Card */}
@@ -104,7 +112,7 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Remember Me (Opcional, estilo similar ao checkbox do Registro) */}
+            {/* Remember Me */}
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center">
                 <input 
