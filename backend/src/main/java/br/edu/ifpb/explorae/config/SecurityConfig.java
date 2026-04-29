@@ -23,7 +23,8 @@ import java.util.List;
  * Regras de Segurança
  * Quem entra, quem precisa de token e como as portas são vigiadas.
  */
-@Configuration
+// proxyBeanMethods=false: evita CGLIB proxy que conflita com o RestartClassLoader do DevTools no Spring Boot 4.
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -50,6 +51,8 @@ public class SecurityConfig {
                 
                 // Aqui configuramos os "portões" da nossa API:
                 .authorizeHttpRequests(auth -> auth
+                        // Preflight OPTIONS: Deve passar livre antes de qualquer filtro JWT.
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Porta da Saúde: Aberta para o monitoramento saber se o sistema tá vivo.
                         .requestMatchers("/api/v1/health").permitAll()
                         // Porta de Cadastro: Aberta porque o usuário ainda não tem conta.
@@ -84,10 +87,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Em desenvolvimento deixar geral ("*"), mas em produção trocar por os domínios reais.
-        configuration.setAllowedOrigins(List.of("*"));
+        // Origens permitidas em desenvolvimento. Em produção, trocar pelos domínios reais.
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

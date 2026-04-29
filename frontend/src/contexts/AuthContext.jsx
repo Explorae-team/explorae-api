@@ -34,7 +34,13 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/api/v1/auth/login', { email, password });
       
       // O backend retorna StandardResponseDTO<AuthLoginResponseDTO>
-      const { token, user: userData } = response.data.data;
+      const responseData = response.data?.data;
+
+      if (!responseData?.token) {
+        return { success: false, message: 'Resposta inválida do servidor' };
+      }
+
+      const { token, user: userData } = responseData;
 
       // Salva de forma persistente e segura
       await storage.setItem('auth_token', token);
