@@ -22,6 +22,7 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+
     // Busca o User e entrega pro Spring Security.
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -29,7 +30,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("O e-mail não está cadastrado."));
     }
 
-    //Registra o User
+    // Registra o User
     @Transactional
     public User registerUser(UserRegistrationDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
@@ -40,16 +41,17 @@ public class UserService implements UserDetailsService {
         user.setName(dto.name());
         user.setEmail(dto.email());
         user.setPasswordHash(passwordEncoder.encode(dto.password()));
-        
-        // Os valores iniciais de XP e level são definidos lá no User.java pelo @PrePersist.
+
+        // Os valores iniciais de XP e level são definidos lá no User.java pelo
+        // @PrePersist.
 
         return userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public User findById(java.util.UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException(
+                        "Usuário não encontrado"));
     }
 
     @Transactional
@@ -62,8 +64,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User updateUser(java.util.UUID userId, UserUpdateDTO dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException("Usuário não encontrado"));
-        
+                .orElseThrow(() -> new br.edu.ifpb.explorae.api.exception.ResourceNotFoundException(
+                        "Usuário não encontrado"));
+
         user.setName(dto.name());
         user.setPhone(dto.phone());
         user.setBio(dto.bio());

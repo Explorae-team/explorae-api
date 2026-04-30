@@ -18,12 +18,13 @@ public class TravelPreferenceService {
     private final TravelPreferenceRepository travelPreferenceRepository;
     private final UserRepository userRepository;
 
+    // Trigger DevTools restart
     @Transactional
     public void updatePreferences(UUID userId, TravelPreferenceRequestDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        TravelPreference preference = travelPreferenceRepository.findByUser(user)
+        TravelPreference preference = travelPreferenceRepository.findByUserId(userId)
                 .orElse(new TravelPreference());
 
         if (preference.getUser() == null) {

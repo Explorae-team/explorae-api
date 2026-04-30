@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="008-drop-budget-safely" author="explorae">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="travel_preferences" columnName="budget"/>
+        </preConditions>
+        <dropColumn tableName="travel_preferences" columnName="budget"/>
+    </changeSet>
+
+    <changeSet id="008-drop-transport-safely" author="explorae">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="travel_preferences" columnName="preferred_transport"/>
+        </preConditions>
+        <dropColumn tableName="travel_preferences" columnName="preferred_transport"/>
+    </changeSet>
+
+</databaseChangeLog>

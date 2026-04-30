@@ -12,5 +12,6 @@
     <include file="db/changelog/changes/005-add-phone-to-users.xml"/>
     <include file="db/changelog/changes/006-remove-unused-fields-from-travel-preferences.xml"/>
     <include file="db/changelog/changes/007-add-bio-and-photo-to-users.xml"/>
+    <include file="db/changelog/changes/008-drop-unused-fields-safely.xml"/>
 
 </databaseChangeLog>

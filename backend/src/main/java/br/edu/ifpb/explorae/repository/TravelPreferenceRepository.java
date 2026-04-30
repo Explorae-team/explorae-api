@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface TravelPreferenceRepository extends JpaRepository<TravelPreference, UUID> {
     Optional<TravelPreference> findByUser(User user);
+    Optional<TravelPreference> findByUserId(UUID userId);
 }

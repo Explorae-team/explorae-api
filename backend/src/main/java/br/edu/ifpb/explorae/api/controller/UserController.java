@@ -66,9 +66,7 @@ public class UserController {
     @PutMapping("/me/preferences")
     public ResponseEntity<StandardResponseDTO<Void>> updateMyPreferences(
             @Valid @RequestBody TravelPreferenceRequestDTO dto,
-            Authentication authentication) {
-
-        User currentUser = (User) authentication.getPrincipal();
+            @AuthenticationPrincipal User currentUser) {
 
         travelPreferenceService.updatePreferences(currentUser.getId(), dto);
 
