@@ -5,9 +5,7 @@ import br.edu.ifpb.explorae.api.dto.LoginDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
 import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
-import br.edu.ifpb.explorae.api.mapper.UserMapper;
-import br.edu.ifpb.explorae.domain.user.User;
-import br.edu.ifpb.explorae.service.TokenService;
+import br.edu.ifpb.explorae.service.AuthService;
 import br.edu.ifpb.explorae.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,17 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final TokenService tokenService;
+    private final AuthService authService;
     private final UserService userService;
-    private final UserMapper userMapper;
 
-    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService,
-            UserService userService, UserMapper userMapper) {
-        this.authenticationManager = authenticationManager;
-        this.tokenService = tokenService;
+    public AuthController(AuthService authService, UserService userService) {
+        this.authService = authService;
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
     /**
@@ -47,8 +40,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegistrationDTO dto) {
-        User registeredUser = userService.registerUser(dto);
-        UserResponseDTO responseDTO = userMapper.toResponseDTO(registeredUser);
+        UserResponseDTO responseDTO = userService.registerUser(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(StandardResponseDTO.success("Usuário cadastrado com sucesso", responseDTO));
@@ -62,27 +54,9 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<StandardResponseDTO<AuthLoginResponseDTO>> login(@RequestBody @Valid LoginDTO loginDTO) {
+        AuthLoginResponseDTO responseDTO = authService.login(loginDTO);
 
-        // Cria o envelope com as credenciais.
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDTO.email(),
-                loginDTO.password());
-
-        // Spring vê se o envelope confere com o banco.
-        // Se não confere, lança exceção.
-        Authentication authentication = authenticationManager.authenticate(authToken);
-
-        // Se passar pelo authenticate, pegamos os dados do usuário.
-        User user = (User) authentication.getPrincipal();
-
-        // gera o Token pro usuário.
-        String token = tokenService.generateToken(user);
-
-        // Mapeia os dados do Usuário
-        UserResponseDTO userResponse = userMapper.toResponseDTO(user);
-
-        // Devolve o Token e os dados pra ele usar nas requisições.
         return ResponseEntity.ok(StandardResponseDTO.success(
-                "Show! Login realizado com sucesso. Bem-vindo de volta!",
-                new AuthLoginResponseDTO(token, userResponse)));
+                "Show! Login realizado com sucesso. Bem-vindo de volta!", responseDTO));
     }
 }

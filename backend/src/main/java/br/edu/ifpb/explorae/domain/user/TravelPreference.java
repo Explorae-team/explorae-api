@@ -2,8 +2,11 @@ package br.edu.ifpb.explorae.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
@@ -13,13 +16,17 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "travel_preferences")
-@Data
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class TravelPreference {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     // Relaciona com o Usuário. Cada usuário tem sua preferência única.

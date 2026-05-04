@@ -4,7 +4,6 @@ import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.TravelPreferenceRequestDTO;
 import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
 import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
-import br.edu.ifpb.explorae.api.mapper.UserMapper;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.service.FileStorageService;
 import br.edu.ifpb.explorae.service.TravelPreferenceService;
@@ -23,14 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
     private final TravelPreferenceService travelPreferenceService;
     private final FileStorageService fileStorageService;
 
     @GetMapping("/me")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User principal) {
-        User user = userService.findById(principal.getId());
-        UserResponseDTO responseDTO = userMapper.toResponseDTO(user);
+        UserResponseDTO responseDTO = userService.getUserProfile(principal.getId());
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil recuperado com sucesso", responseDTO));
     }
 
@@ -57,8 +54,7 @@ public class UserController {
             @AuthenticationPrincipal User principal,
             @Valid @RequestBody UserUpdateDTO dto) {
 
-        User updatedUser = userService.updateUser(principal.getId(), dto);
-        UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
+        UserResponseDTO responseDTO = userService.updateUser(principal.getId(), dto);
 
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil atualizado com sucesso", responseDTO));
     }
