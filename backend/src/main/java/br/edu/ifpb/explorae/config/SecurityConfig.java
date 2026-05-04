@@ -36,55 +36,50 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desativamos o CSRF porque em APIs REST com JWT não usamos Cookies/Sessão,
-                // então esse tipo de ataque não faz sentido aqui.
+                // Desativamos o CSRF, API REST com JWT não usa Cookies/Sessão.
                 .csrf(AbstractHttpConfigurer::disable)
-                
-                // Aplicamos as regras de quem pode acessar o quê (CORS) lá de baixo.
+
+                // Aplica as regras de quem pode acessar o quê (CORS).
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                
-                // IMPORTANTE: Definimos que nossa API é STATELESS (sem estado).
-                // Isso significa que o servidor não guarda "quem está logado". 
-                // Cada requisição tem que se identificar do zero usando o Token JWT.
+
+                // API é STATELESS, o servidor não guarda "quem está logado", cada requisição
+                // tem que se identificar do zero usando o Token JWT.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                
-                // Aqui configuramos os "portões" da nossa API:
+
+                // Portas da API
                 .authorizeHttpRequests(auth -> auth
-                        // Porta da Saúde: Aberta para o monitoramento saber se o sistema tá vivo.
+                        // Porta da Saúde: Aberta para o monitoramento.
                         .requestMatchers("/api/v1/health").permitAll()
-                        // Porta de Cadastro: Aberta porque o usuário ainda não tem conta.
+                        // Porta de Cadastro: Aberta para o cadastro do novo usuário.
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
-                        // Porta de Login: Aberta para o usuário trocar a senha pelo Token.
+                        // Porta de Login: Aberta para o login do usuário.
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.
-                        .anyRequest().authenticated()
-                )
-                
-                // Aqui dizemos ao Spring: "Antes de checar qualquer coisa, 
-                // passa pelo jwtAuthFilter para ver se ele tem um Token".
+                        .anyRequest().authenticated())
+                // O filtro JWT valida o Token.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    //Valida o email e senha, comparando com o banco
+    // Valida o email e senha, comparando com o banco
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-
-     // hash BCrypt.
+    // hash BCrypt.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //Configurações de CORS: Permite que o Frontend converse com a API
+    // Configurações de CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Em desenvolvimento deixar geral ("*"), mas em produção trocar por os domínios reais.
+        // Em desenvolvimento deixar geral ("*"), mas em produção trocar por os domínios
+        // reais
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));

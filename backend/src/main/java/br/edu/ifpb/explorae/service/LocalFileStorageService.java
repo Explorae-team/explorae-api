@@ -21,7 +21,7 @@ public class LocalFileStorageService implements FileStorageService {
     public LocalFileStorageService(@Value("${app.upload.dir:uploads}") String uploadDir) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         try {
-            // Garante a existência do diretório raiz para evitar erros de I/O na primeira execução.
+            // Garante a existência do diretório raiz para evitar erros de E/S na primeira execução.
             Files.createDirectories(this.fileStorageLocation);
         } catch (IOException ex) {
             throw new BusinessException("Não foi possível criar o diretório de uploads.");

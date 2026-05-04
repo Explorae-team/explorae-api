@@ -58,7 +58,8 @@ public class User implements UserDetails {
      * Retorna true se houve level up.
      */
     public boolean addXp(Integer amount) {
-        if (amount == null || amount <= 0) return false;
+        if (amount == null || amount <= 0)
+            return false;
         this.xp += amount;
         return checkLevelUp();
     }
@@ -76,18 +77,21 @@ public class User implements UserDetails {
         return this.level * 100;
     }
 
-    //Dispara automaticamente antes de salvar no banco.
+    // Dispara automaticamente antes de salvar no banco.
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        if (this.xp == null) this.xp = 0;
-        if (this.level == null) this.level = 1;
-        if (this.coins == null) this.coins = 0;
+        if (this.xp == null)
+            this.xp = 0;
+        if (this.level == null)
+            this.level = 1;
+        if (this.coins == null)
+            this.coins = 0;
     }
 
     /**
-     * Aqui se define as permisões do usuário.
-     * Quem logar ganha a permissão "USER".
+     * Define as permisões do usuário.
+     * Ao logar ganha a permissão "USER".
      * No futuro, pode ter "ADMIN", "MODERADOR", etc.
      */
     @Override

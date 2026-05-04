@@ -27,7 +27,7 @@ public class TravelPreference {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    // Interesses: Natureza, História, Gastronomia, etc. (Separados por vírgula)
+    // Interesses (Separados por vírgula)
     @Column(length = 500)
     private String interests;
 }

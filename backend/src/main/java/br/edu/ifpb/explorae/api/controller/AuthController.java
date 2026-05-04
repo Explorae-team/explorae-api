@@ -33,7 +33,8 @@ public class AuthController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService, UserService userService, UserMapper userMapper) {
+    public AuthController(AuthenticationManager authenticationManager, TokenService tokenService,
+            UserService userService, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.userService = userService;
@@ -48,7 +49,7 @@ public class AuthController {
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegistrationDTO dto) {
         User registeredUser = userService.registerUser(dto);
         UserResponseDTO responseDTO = userMapper.toResponseDTO(registeredUser);
-        
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(StandardResponseDTO.success("Usuário cadastrado com sucesso", responseDTO));
     }
@@ -62,27 +63,26 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<StandardResponseDTO<AuthLoginResponseDTO>> login(@RequestBody @Valid LoginDTO loginDTO) {
 
-        // Cria um envelope com as credenciais.
-        UsernamePasswordAuthenticationToken authToken = 
-                new UsernamePasswordAuthenticationToken(loginDTO.email(), loginDTO.password());
+        // Cria o envelope com as credenciais.
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDTO.email(),
+                loginDTO.password());
 
-        // Pede pro Spring conferir se esse envelope confere com o banco.
-        // Se não confere, lançauma exceção.
+        // Spring vê se o envelope confere com o banco.
+        // Se não confere, lança exceção.
         Authentication authentication = authenticationManager.authenticate(authToken);
 
-        // Se passamr pelo authenticate, pegamos os dados do usuário.
+        // Se passar pelo authenticate, pegamos os dados do usuário.
         User user = (User) authentication.getPrincipal();
-        
-        // Fabrica o Token pra esse usuário.
+
+        // gera o Token pro usuário.
         String token = tokenService.generateToken(user);
-        
+
         // Mapeia os dados do Usuário
         UserResponseDTO userResponse = userMapper.toResponseDTO(user);
 
-        // Devolve o Token e os dados pra ele usar nas próximas requisições.
+        // Devolve o Token e os dados pra ele usar nas requisições.
         return ResponseEntity.ok(StandardResponseDTO.success(
                 "Show! Login realizado com sucesso. Bem-vindo de volta!",
-                new AuthLoginResponseDTO(token, userResponse)
-        ));
+                new AuthLoginResponseDTO(token, userResponse)));
     }
 }

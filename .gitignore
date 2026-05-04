@@ -53,6 +53,8 @@ auth.json
 # Ferramentas e Cache
 /.agent
 .agent/
+/.agents/
+.agents/
 .temp/
 .tmp/
 coverage/
