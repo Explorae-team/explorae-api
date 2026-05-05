@@ -1,0 +1,87 @@
+# 📖 Guia de Identidade Visual: Exploraê
+
+[cite_start]Este guia detalha os fundamentos visuais para a criação de uma experiência de turismo gamificada, segura e recompensadora[cite: 143, 145].
+
+---
+
+## 1. Paleta de Cores (The Explorer Palette)
+[cite_start]As cores foram selecionadas para equilibrar a confiança tecnológica com a energia da aventura[cite: 153].
+
+### **Cores Primárias**
+* **Azul Explora (`#004E64`):** Utilizado para o Header, Bottom Navigation e fundos principais para passar segurança e profundidade.
+* **Laranja Horizonte (`#FF6B35`):** Cor de ação (Call to Action). Usada em botões principais, pins de localização e destaques de gamificação.
+* **Branco Puro (`#FFFFFF`):** Usado para superfícies de cards e áreas de leitura limpa.
+
+### **Cores de Gamificação e Status**
+* [cite_start]**Ouro Recompensa (`#FFB700`):** Exclusivo para ícones de XP, medalhas de nível Ouro e saldos de pontos[cite: 155, 156].
+* [cite_start]**Sucesso (`#2DCE89`):** Mensagens de check-in concluído e desafios validados[cite: 198, 199].
+* [cite_start]**Erro/Atenção (`#F5365C`):** Alertas de segurança ou erros de validação de GPS[cite: 162].
+
+---
+
+## 2. Tipografia
+[cite_start]A tipografia deve ser moderna e altamente legível em dispositivos móveis (Mobile First)[cite: 159, 161].
+
+* **Fonte Principal:** **Inter** (ou Montserrat para títulos da marca).
+* **Escala Tipográfica:**
+    * **H1 (Títulos de Seção):** 24px, SemiBold, Azul Explora.
+    * **H2 (Subtítulos/Cards):** 18px, Bold, Azul Explora.
+    * **Body (Texto Geral):** 16px, Regular, Cinza Escuro (`#333333`).
+    * [cite_start]**Caption (Distâncias/Preços):** 12px, Medium, Laranja Horizonte[cite: 180].
+
+---
+
+## 3. Componentes de Interface (UI Elements)
+
+### **Botões (Buttons)**
+* **Primary:** Fundo Laranja Horizonte, texto Branco, `border-radius: 12px`. Efeito de sombra `shadow-md`.
+* [cite_start]**Social Login:** Botões circulares com ícones (Google, Apple, Facebook) sobre fundo branco[cite: 56, 152].
+
+### **Cards de Atrações**
+* [cite_start]**Layout:** Imagem superior (aspect-ratio 16:9), corpo inferior com Nome, Categoria e Distância[cite: 64, 180].
+* **Estilo:** Borda arredondada (`rounded-2xl`), fundo branco e sombra suave (`shadow-sm`) para destacar do fundo cinza claro.
+
+### **Barra de Progresso (XP)**
+* Fundo cinza claro com preenchimento em gradiente (Laranja para Amarelo).
+* [cite_start]Exibe o nível atual (ex: "Explorador Prata") e o XP necessário para o próximo nível[cite: 92, 155].
+
+---
+
+## 4. Iconografia e Gamificação
+* **Estilo:** Ícones de linha (Outline) para navegação comum; [cite_start]Ícones preenchidos (Solid) e coloridos para Badges de conquista[cite: 103, 155].
+* [cite_start]**Categorias:** Ícones circulares para representar Interesses: Sabores Locais (Prato), Ecoturismo (Árvore), História (Coluna Grega)[cite: 152, 153].
+
+---
+
+## 5. Implementação Técnica (Tailwind Config)
+[cite_start]Para os desenvolvedores, adicione estas definições ao arquivo `tailwind.config.js` para garantir a fidelidade visual[cite: 44]:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'explora-blue': '#004E64',
+        'explora-orange': '#FF6B35',
+        'explora-gold': '#FFB700',
+        'background-light': '#F8F9FA',
+      },
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+    },
+  },
+}
+```
+
+---
+
+## 6. Fluxos Visuais Críticos
+1.  [cite_start]**Onboarding:** Uso de cores vibrantes e ilustrações para manter o engajamento no quiz de preferências[cite: 59, 164].
+2.  [cite_start]**Modo Mapa:** Pins laranja sobre base de mapa limpa (Google Maps Embed), com bottom sheets para detalhes rápidos[cite: 70, 83].
+3.  [cite_start]**Check-in:** Tela com foco na câmera/leitor de QR Code, seguida de uma explosão visual de confetes (Feedback de Sucesso)[cite: 89, 202].
+
