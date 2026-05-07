@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../src/contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Dashboard() {
   const { logout } = useAuth();

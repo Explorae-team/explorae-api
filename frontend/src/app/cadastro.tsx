@@ -102,7 +102,7 @@ export default function CadastroScreen() {
         <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
           <View className="items-center mb-6">
             <Image 
-              source={require("../assets/branding/logo-main.png")} 
+              source={require("../../assets/branding/logo-main.png")} 
               style={{ width: 180, height: 60 }}
               resizeMode="contain"
             />
