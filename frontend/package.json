@@ -8,7 +8,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "vite",
+    "web": "expo start --web",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "jest"
   },
@@ -38,7 +38,6 @@
     "@types/react-dom": "~19.1.7",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.0",
-    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.27",
     "eslint": "^8.55.0",
     "eslint-plugin-react": "^7.33.2",
@@ -49,8 +48,7 @@
     "postcss": "^8.5.8",
     "react-test-renderer": "19.2.0",
     "tailwindcss": "^3.4.17",
-    "typescript": "~5.9.2",
-    "vite": "^5.4.15"
+    "typescript": "~5.9.2"
   },
   "jest": {
     "preset": "jest-expo"
