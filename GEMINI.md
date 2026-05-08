@@ -41,6 +41,7 @@ O projeto foi unificado em um **Monorepo** para acelerar a entrega do MVP. O Bac
 - **Commits**: Todas as mensagens de commit devem ser escritas em **Português**, seguindo o padrão de prefixos (feat, fix, chore, etc).
 - **Gamificação**: Fórmula de nível baseada em `nível * 500` XP para o próximo nível.
 - **Integridade**: Chaves estrangeiras de gamificação configuradas com `ON DELETE CASCADE`.
+- **Workflow**: Sempre aguardar instruções do usuário após concluir uma fase antes de iniciar a próxima.
 
 ## 📝 Padrão de Comentários (Humano & Direto)
 
