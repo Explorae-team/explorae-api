@@ -87,3 +87,5 @@ HELP.md
 /frontend/dist/
 /frontend/node_modules/
 /explorae-user-service/target/
+# GSD / Planning
+.planning/
