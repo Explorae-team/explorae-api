@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import InterestsGrid from '../components/preferences/InterestsGrid';
-import PrimaryButton from '../components/PrimaryButton';
 import preferenceService from '../services/preferenceService';
 
 export default function PreferencesScreen() {
-  const { user, logout, updateUserPreferences } = useAuth();
+  const { logout, updateUserPreferences } = useAuth() as any;
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleToggleInterest = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(item => item !== id) 
+  const handleToggleInterest = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
         : [...prev, id]
     );
   };
@@ -32,17 +31,18 @@ export default function PreferencesScreen() {
     setIsSubmitting(false);
 
     if (result.success) {
-      // Atualiza o estado global para hasPreferences: true
       await updateUserPreferences();
-      // O _layout.jsx cuidará do redirecionamento para o dashboard
     } else {
       Alert.alert('Erro', result.message);
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#00161e]">
-      <Stack.Screen 
+    <SafeAreaView
+      className="flex-1 bg-[#00161e]"
+      style={{ flex: 1 }}
+    >
+      <Stack.Screen
         options={{
           headerShown: true,
           headerTitle: 'Selecionar Interesses',
@@ -53,15 +53,20 @@ export default function PreferencesScreen() {
               <MaterialCommunityIcons name="logout" size={24} color="#fd6c28" />
             </TouchableOpacity>
           )
-        }} 
+        }}
       />
 
-      <ScrollView 
-        className="flex-1" 
-        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 140, backgroundColor: '#00161e' }}
-        showsVerticalScrollIndicator={false}
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingTop: 24,
+          paddingBottom: 140, // Espaço para o rodapé
+          flexGrow: 1
+        }}
       >
-        {/* Progress Indicator (Simulado do design do Stitch) */}
+        {/* Progress Indicator */}
         <View className="flex-row gap-2 mb-8">
           <View className="h-1.5 w-12 rounded-full bg-[#fd6c28]" />
           <View className="h-1.5 w-12 rounded-full bg-[#053a4a]" />
@@ -78,32 +83,38 @@ export default function PreferencesScreen() {
           </Text>
         </View>
 
-        {/* Bento Grid */}
-        <InterestsGrid 
-          selectedIds={selectedIds} 
-          onToggle={handleToggleInterest} 
+        <InterestsGrid
+          selectedIds={selectedIds}
+          onToggle={handleToggleInterest}
         />
 
-        <View className="h-32" />
+
       </ScrollView>
 
-      {/* Bottom Navigation */}
-      <View className="absolute bottom-0 left-0 w-full px-6 pb-10 pt-6 bg-[#00161e]/90 backdrop-blur-xl rounded-t-[40px] flex-row justify-between items-center border-t border-white/5">
-        <TouchableOpacity 
-          onPress={() => router.back()}
-          className="flex-row items-center gap-2 px-4"
+      {/* Footer Navigation - Premium Glassmorphism Fixo na Base */}
+      <View 
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
+        className="px-8 pb-10 pt-6 bg-[#00161e]/80 backdrop-blur-md border-t border-white/5 flex-row justify-between items-center"
+      >
+        <TouchableOpacity
+          onPress={() => logout()}
+          className="flex-row items-center"
         >
-          <MaterialCommunityIcons name="chevron-left" size={24} color="#bde9fe" />
-          <Text className="text-[#bde9fe] font-medium text-lg">Voltar</Text>
+          <Ionicons name="chevron-back" size={20} color="#bde9fe" />
+          <Text className="text-[#bde9fe] ml-1 font-medium">Sair</Text>
         </TouchableOpacity>
 
-        <PrimaryButton
-          title="Concluir"
+        <TouchableOpacity
           onPress={handleFinish}
-          loading={isSubmitting}
-          rightIcon={<MaterialCommunityIcons name="arrow-right" size={20} color="white" />}
-          className="px-10"
-        />
+          disabled={isSubmitting}
+          className={`px-8 py-4 rounded-2xl flex-row items-center ${selectedIds.length > 0 ? 'bg-[#fd6c28]' : 'bg-slate-800'
+            }`}
+        >
+          <Text className="text-white font-bold mr-2">
+            {isSubmitting ? 'SALVANDO...' : 'CONCLUIR'}
+          </Text>
+          <MaterialCommunityIcons name="check-circle" size={20} color="white" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

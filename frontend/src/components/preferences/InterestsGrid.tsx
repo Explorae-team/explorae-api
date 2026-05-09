@@ -39,7 +39,6 @@ export default function InterestsGrid({ selectedIds, onToggle }: InterestsGridPr
           />
         </View>
       ))}
-      
     </View>
   );
 }

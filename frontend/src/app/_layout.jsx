@@ -2,13 +2,23 @@ import React, { useEffect } from 'react';
 import '../styles/global.css'; // Importando Tailwind globalmente para o ambiente Web/Native
 
 import { Platform, ActivityIndicator, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { useFonts } from 'expo-font';
+import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
 function InitialLayout() {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
+  const [fontsLoaded, fontError] = useFonts({
+    ...MaterialCommunityIcons.font,
+    ...Ionicons.font,
+    ...MaterialIcons.font,
+  });
   const segments = useSegments();
   const router = useRouter();
+
+  const isLoading = isAuthLoading || (!fontsLoaded && !fontError);
 
   useEffect(() => {
     if (isLoading) return;
@@ -50,6 +60,7 @@ function InitialLayout() {
           fontWeight: 'bold',
         },
         headerBackTitle: 'Voltar',
+        contentStyle: { backgroundColor: '#00161e' },
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -73,8 +84,12 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <AuthProvider>
-      <InitialLayout />
-    </AuthProvider>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: '#00161e' }}>
+      <View style={{ flex: 1, height: Platform.OS === 'web' ? '100vh' : '100%', backgroundColor: '#00161e', overflow: 'hidden' }}>
+        <AuthProvider>
+          <InitialLayout />
+        </AuthProvider>
+      </View>
+    </SafeAreaProvider>
   );
 }

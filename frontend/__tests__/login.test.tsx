@@ -32,7 +32,7 @@ describe('LoginScreen', () => {
   it('deve exibir erros de validação quando campos estão vazios', async () => {
     const { getByText } = render(<LoginScreen />);
     
-    const loginButton = getByText('Inicia Jornada');
+    const loginButton = getByText('LOGIN');
     fireEvent.press(loginButton);
 
     await waitFor(() => {
@@ -46,9 +46,9 @@ describe('LoginScreen', () => {
     
     const { getByPlaceholderText, getByText } = render(<LoginScreen />);
     
-    const emailInput = getByPlaceholderText('seu@dominio.com');
+    const emailInput = getByPlaceholderText('aventureiro@explorae.com');
     const passwordInput = getByPlaceholderText('••••••••');
-    const loginButton = getByText('Inicia Jornada');
+    const loginButton = getByText('LOGIN');
 
     fireEvent.changeText(emailInput, 'test@explorae.com');
     fireEvent.changeText(passwordInput, 'senha123');
@@ -65,9 +65,9 @@ describe('LoginScreen', () => {
     
     const { getByPlaceholderText, getByText } = render(<LoginScreen />);
     
-    fireEvent.changeText(getByPlaceholderText('seu@dominio.com'), 'wrong@test.com');
+    fireEvent.changeText(getByPlaceholderText('aventureiro@explorae.com'), 'wrong@test.com');
     fireEvent.changeText(getByPlaceholderText('••••••••'), 'wrongpass');
-    fireEvent.press(getByText('Inicia Jornada'));
+    fireEvent.press(getByText('LOGIN'));
 
     await waitFor(() => {
       expect(getByText('Credenciais inválidas')).toBeTruthy();
