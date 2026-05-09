@@ -6,24 +6,30 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
 function InitialLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
 
-    // Detecta se o usuário está tentando acessar o dashboard
-    const inAppGroup = segments[0] === 'dashboard';
+    const inAppGroup = segments[0] === 'dashboard' || segments[0] === 'preferences';
+    const isAuthRoute = segments[0] === 'login' || segments[0] === 'cadastro';
 
     if (!isAuthenticated && inAppGroup) {
-      // Se não está logado e tenta acessar o dashboard, redireciona para login
+      // Se não está logado e tenta acessar área restrita, vai pro login
       router.replace('/login');
-    } else if (isAuthenticated && (segments[0] === 'login' || segments[0] === 'cadastro')) {
-      // Se já está logado e tenta acessar login/cadastro, redireciona para dashboard
-      router.replace('/dashboard');
+    } else if (isAuthenticated) {
+      // Se está logado...
+      if (!user?.hasPreferences && segments[0] !== 'preferences') {
+        // ...mas não tem preferências e não está na tela de preferências, redireciona pra lá
+        router.replace('/preferences');
+      } else if (user?.hasPreferences && (isAuthRoute || segments[0] === 'preferences' || segments[0] === undefined)) {
+        // ...e tem preferências, se tentar ir pra login/cadastro ou preferences, vai pro dashboard
+        router.replace('/dashboard');
+      }
     }
-  }, [isAuthenticated, isLoading, segments]);
+  }, [isAuthenticated, user?.hasPreferences, isLoading, segments]);
 
   if (isLoading) {
     return (

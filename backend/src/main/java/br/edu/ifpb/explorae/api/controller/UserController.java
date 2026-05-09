@@ -59,6 +59,16 @@ public class UserController {
         return ResponseEntity.ok(StandardResponseDTO.success("Perfil atualizado com sucesso", responseDTO));
     }
 
+    @GetMapping("/me/preferences")
+    public ResponseEntity<StandardResponseDTO<java.util.List<String>>> getMyPreferences(
+            @AuthenticationPrincipal User principal) {
+
+        java.util.List<String> interests = travelPreferenceService.getPreferences(principal.getId());
+
+        return ResponseEntity.ok(
+                StandardResponseDTO.success("Preferências recuperadas com sucesso", interests));
+    }
+
     @PutMapping("/me/preferences")
     public ResponseEntity<StandardResponseDTO<Void>> updateMyPreferences(
             @Valid @RequestBody TravelPreferenceRequestDTO dto,

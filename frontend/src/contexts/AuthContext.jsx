@@ -67,6 +67,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserPreferences = async () => {
+    try {
+      const response = await api.get('/api/v1/users/me');
+      const userData = response.data.data;
+      await storage.setItem('user_data', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Erro ao atualizar dados do usuário:', error);
+    }
+  };
+
   const logout = async () => {
     try {
       // Remove de forma segura ao deslogar
@@ -85,6 +96,7 @@ export const AuthProvider = ({ children }) => {
       isLoading,
       login, 
       register,
+      updateUserPreferences,
       logout 
     }}>
       {children}
