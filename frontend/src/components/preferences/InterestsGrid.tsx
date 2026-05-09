@@ -40,10 +40,6 @@ export default function InterestsGrid({ selectedIds, onToggle }: InterestsGridPr
         </View>
       ))}
       
-      {/* Elemento visual para manter o grid elegante */}
-      <View style={{ width: 160, height: 160 }} className="bg-white/5 border border-white/10 rounded-3xl items-center justify-center opacity-40">
-         <MaterialCommunityIcons name="plus-circle-outline" size={40} color="#bde9fe50" />
-      </View>
     </View>
   );
 }
