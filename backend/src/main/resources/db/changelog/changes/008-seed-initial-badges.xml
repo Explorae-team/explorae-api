@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="008-seed-initial-badges" author="explorae-team">
+        <insert tableName="badges">
+            <column name="id" value="a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6"/>
+            <column name="name" value="PIONEIRO"/>
+            <column name="description" value="Completou o perfil de preferências e iniciou sua jornada."/>
+            <column name="category" value="ONBOARDING"/>
+            <column name="icon_url" value="/uploads/badges/pioneiro.png"/>
+        </insert>
+        <insert tableName="badges">
+            <column name="id" value="b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e"/>
+            <column name="name" value="COLECIONADOR"/>
+            <column name="description" value="Salvou seu primeiro destino favorito."/>
+            <column name="category" value="EXPLORACAO"/>
+            <column name="icon_url" value="/uploads/badges/colecionador.png"/>
+        </insert>
+        <insert tableName="badges">
+            <column name="id" value="c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f"/>
+            <column name="name" value="DESBRAVADOR"/>
+            <column name="description" value="Visitou seu primeiro destino turístico."/>
+            <column name="category" value="JORNADA"/>
+            <column name="icon_url" value="/uploads/badges/desbravador.png"/>
+        </insert>
+        <insert tableName="badges">
+            <column name="id" value="d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a"/>
+            <column name="name" value="EXPLORADOR"/>
+            <column name="description" value="Visitou 3 destinos diferentes."/>
+            <column name="category" value="JORNADA"/>
+            <column name="icon_url" value="/uploads/badges/explorador.png"/>
+        </insert>
+        <insert tableName="badges">
+            <column name="id" value="e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b"/>
+            <column name="name" value="CRITICO"/>
+            <column name="description" value="Realizou sua primeira avaliação de um destino."/>
+            <column name="category" value="SOCIAL"/>
+            <column name="icon_url" value="/uploads/badges/critico.png"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -19,7 +19,7 @@ public class GamificationListener {
 
     @EventListener
     public void handlePreferenceCompleted(PreferenceCompletedEvent event) {
-        gamificationService.addXp(event.userId(), 100, "Conclusão do perfil de preferências");
+        gamificationService.addXp(event.userId(), 100, "Conclusão do Onboarding de Preferências");
         gamificationService.awardBadge(event.userId(), "PIONEIRO");
     }
 

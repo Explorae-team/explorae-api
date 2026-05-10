@@ -1,5 +1,6 @@
 package br.edu.ifpb.explorae.api.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 public record UserResponseDTO(
@@ -12,5 +13,6 @@ public record UserResponseDTO(
     Integer xp,
     Integer level,
     Integer coins,
-    boolean hasPreferences
+    boolean hasPreferences,
+    List<BadgeResponseDTO> badges
 ) {}
