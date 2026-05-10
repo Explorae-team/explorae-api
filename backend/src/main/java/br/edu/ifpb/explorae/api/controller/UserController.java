@@ -24,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final TravelPreferenceService travelPreferenceService;
     private final FileStorageService fileStorageService;
+    private final br.edu.ifpb.explorae.service.GamificationService gamificationService;
 
     @GetMapping("/me")
     public ResponseEntity<StandardResponseDTO<UserResponseDTO>> getMe(@AuthenticationPrincipal User principal) {
@@ -89,6 +90,17 @@ public class UserController {
 
         return ResponseEntity.ok(
                 StandardResponseDTO.success("Conta deletada com sucesso", null));
+    }
 
+    @GetMapping("/me/xp-history")
+    public ResponseEntity<StandardResponseDTO<java.util.List<br.edu.ifpb.explorae.api.dto.XpHistoryResponseDTO>>> getXpHistory(
+            @AuthenticationPrincipal User principal) {
+        
+        // GamificationService é injetado ou acessado via UserService?
+        // Vou injetar GamificationService no UserController para acesso direto aos stats de gamificação.
+        return ResponseEntity.ok(StandardResponseDTO.success(
+            "Histórico de XP recuperado com sucesso", 
+            gamificationService.getXpHistory(principal.getId())
+        ));
     }
 }

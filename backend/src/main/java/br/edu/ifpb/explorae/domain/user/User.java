@@ -64,6 +64,9 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TravelPreference travelPreference;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<br.edu.ifpb.explorae.domain.gamification.UserBadge> userBadges;
+
     /**
      * Adiciona XP e verifica se subiu de nível.
      * Retorna true se houve level up.

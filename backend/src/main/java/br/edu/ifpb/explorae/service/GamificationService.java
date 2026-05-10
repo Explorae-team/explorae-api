@@ -70,4 +70,19 @@ public class GamificationService {
             userBadgeRepository.save(userBadge);
         }
     }
+    @Transactional(readOnly = true)
+    public java.util.List<br.edu.ifpb.explorae.api.dto.XpHistoryResponseDTO> getXpHistory(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return xpHistoryRepository.findByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(h -> new br.edu.ifpb.explorae.api.dto.XpHistoryResponseDTO(
+                        h.getId(),
+                        h.getAmount(),
+                        h.getReason(),
+                        h.getCreatedAt()
+                ))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
