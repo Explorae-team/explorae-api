@@ -3,7 +3,7 @@ import '../styles/global.css'; // Importando Tailwind globalmente para o ambient
 
 import { Platform, ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useGlobalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
@@ -17,6 +17,8 @@ function InitialLayout() {
   });
   const segments = useSegments();
   const router = useRouter();
+  const params = useGlobalSearchParams();
+  const isEditMode = params.mode === 'edit';
 
   const isLoading = isAuthLoading || (!fontsLoaded && !fontError);
 
@@ -34,12 +36,12 @@ function InitialLayout() {
       if (!user?.hasPreferences && segments[0] !== 'preferences') {
         // ...mas não tem preferências e não está na tela de preferências, redireciona pra lá
         router.replace('/preferences');
-      } else if (user?.hasPreferences && (isAuthRoute || segments[0] === 'preferences' || segments[0] === undefined)) {
-        // ...e tem preferências, se tentar ir pra login/cadastro ou preferences, vai pro dashboard
+      } else if (user?.hasPreferences && (isAuthRoute || (segments[0] === 'preferences' && !isEditMode) || segments[0] === undefined)) {
+        // ...e tem preferências, se tentar ir pra login/cadastro ou preferences (sem ser modo edit), vai pro dashboard
         router.replace('/dashboard');
       }
     }
-  }, [isAuthenticated, user?.hasPreferences, isLoading, segments]);
+  }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode]);
 
   if (isLoading) {
     return (
