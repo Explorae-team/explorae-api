@@ -47,22 +47,22 @@ export default function RecentActivity() {
     <View className="mt-10 mb-8">
       <Text className="text-xl font-bold tracking-tight mb-6 text-on-surface">Histórico de Conquistas</Text>
       {activities.map((item) => (
-        <View key={item.id} className="bg-white rounded-lg p-3 flex-row items-center mb-4 shadow-sm border border-gray-100">
-          <View className="bg-tertiary/10 w-12 h-12 rounded-full items-center justify-center">
+        <View key={item.id} className="bg-surface-container-high rounded-3xl p-4 flex-row items-center mb-4 border border-on-background/5">
+          <View className="bg-tertiary/20 w-12 h-12 rounded-2xl items-center justify-center">
             <MaterialIcons name="bolt" size={24} color="#ffba26" />
           </View>
           <View className="flex-1 px-4">
-            <Text className="text-gray-900 font-bold text-base leading-tight">{item.reason}</Text>
+            <Text className="text-on-surface font-bold text-base leading-tight">{item.reason}</Text>
             <View className="flex-row items-center mt-1">
-              <MaterialIcons name="event" size={14} color="#666" />
-              <Text className="text-xs font-medium text-gray-500 ml-1">
+              <MaterialIcons name="event" size={14} color="#a2cde1" />
+              <Text className="text-xs font-medium text-on-surface-variant ml-1">
                 {new Date(item.createdAt).toLocaleDateString('pt-BR')}
               </Text>
             </View>
           </View>
           <View className="items-end">
-            <Text className="text-orange-600 font-black text-lg">+{item.amount}</Text>
-            <Text className="text-[8px] font-bold text-orange-600 uppercase tracking-tighter">XP</Text>
+            <Text className="text-primary font-black text-lg">+{item.amount}</Text>
+            <Text className="text-[8px] font-bold text-primary uppercase tracking-tighter">XP</Text>
           </View>
         </View>
       ))}
