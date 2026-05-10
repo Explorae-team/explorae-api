@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="010-seed-initial-attractions-v2" author="explorae-team">
+    <changeSet id="010-seed-initial-attractions-v3" author="explorae-team">
         <insert tableName="attractions">
             <column name="id" value="f179bc95-a027-51ff-ad00-b0465d4da467"/>
             <column name="name" value="Farol do Cabo Branco"/>

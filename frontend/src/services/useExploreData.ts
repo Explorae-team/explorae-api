@@ -35,21 +35,22 @@ export const useExploreData = () => {
 
     try {
       const response = await api.get('/api/v1/attractions', {
-        params: { page: pageNum, size: 10 }
+        params: { page: pageNum, size: 5 }
       });
 
       const pageData = response.data?.data;
+      console.log('API Response PageData:', JSON.stringify(pageData, null, 2));
       const content = pageData?.content || [];
       
       const mappedAttractions = content.map((item: any) => ({
         id: item.id,
-        title: item.name || item.title,
-        tagline: item.description || item.tagline,
-        imageUrl: item.imageUrl,
-        rating: item.rating || 4.5,
-        distance: item.distance || '2.5km',
-        type: item.type || 'Lazer',
-        tags: item.tags || []
+        title: item.name,
+        tagline: item.shortDescription,
+        imageUrl: item.mainImageUrl,
+        rating: item.averageRating || 4.5,
+        distance: item.distance || '2.4 km',
+        type: item.category || 'Sightseeing',
+        tags: item.tags || ['Cultural', 'Histórico'] // Fallback tags se não houver no banco
       }));
 
       if (refresh) {

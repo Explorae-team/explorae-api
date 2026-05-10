@@ -1,24 +1,22 @@
 package br.edu.ifpb.explorae.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-/**
- * Runner para limpar colunas legadas no banco de dados local que estão com restrições NOT NULL
- * e impedem o salvamento de novos registros via JPA.
- */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class DatabaseCleanupRunner implements CommandLineRunner {
 
     private final JdbcTemplate jdbcTemplate;
 
+    public DatabaseCleanupRunner(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         log.info("🛠️ [DatabaseCleanupRunner] Iniciando limpeza de colunas legadas...");
 
         try {

@@ -12,15 +12,24 @@ interface AttractionCardProps {
   type: string;
   tags: string[];
   isFavorite?: boolean;
-  variant?: 'default' | 'compact' | 'full';
+  isPopular?: boolean;
+  isNew?: boolean;
+  variant?: 'default' | 'compact';
   onPress?: () => void;
   onFavoritePress?: () => void;
 }
 
-/**
- * AttractionCard - Componente de card para exibição de atrações.
- * Implementado com base no design "Default Variant" do Horizon Design System.
- */
+// Tokens de Cor do Design System Exploraê
+const colors = {
+  surfaceContainerHigh: '#002e3c',
+  surfaceBright: '#0d3e4e',
+  surfaceContainer: '#00232f',
+  onSurface: '#bde9fe',
+  onSurfaceVariant: '#c1c7cc',
+  onPrimaryContainer: '#fd6c28',
+  tertiary: '#ffba26',
+};
+
 export const AttractionCard: React.FC<AttractionCardProps> = ({
   title,
   tagline,
@@ -30,99 +39,126 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   type,
   tags,
   isFavorite = false,
+  isPopular = false,
+  isNew = false,
+  variant = 'default',
   onPress,
   onFavoritePress,
 }) => {
+  // --- VARIANT: COMPACT (Used in horizontal carousels) ---
   if (variant === 'compact') {
     return (
-      <Pressable
+      <Pressable 
         onPress={onPress}
-        className="bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/10 w-40 active:scale-95 transition-transform"
+        style={{ backgroundColor: colors.surfaceContainerHigh }}
+        className="rounded-xl overflow-hidden border border-white/5 w-40 active:scale-95 transition-transform"
       >
         <View className="h-28 w-full">
-          <Image
-            source={{ uri: imageUrl }}
-            contentFit="cover"
-            className="w-full h-full"
-          />
-          <View className="absolute top-2 right-2 bg-surface-bright/80 rounded-full p-1">
-            <MaterialIcons name="star" size={10} color="#ffba26" />
+          <Image source={{ uri: imageUrl }} contentFit="cover" className="w-full h-full" />
+          <View className="absolute top-2 right-2 bg-black/40 rounded-full p-1">
+            <MaterialIcons name="star" size={10} color={colors.tertiary} />
           </View>
         </View>
         <View className="p-2">
-          <Text numberOfLines={1} className="text-xs font-bold text-on-surface">
-            {title}
-          </Text>
-          <Text className="text-[10px] text-on-surface-variant">
-            {distance} • {type}
-          </Text>
+          <Text numberOfLines={1} style={{ color: colors.onSurface }} className="text-xs font-bold">{title}</Text>
+          <Text style={{ color: colors.onSurfaceVariant }} className="text-[10px]">{distance} • {type}</Text>
         </View>
       </Pressable>
     );
   }
 
+  // --- VARIANT: DEFAULT (Full premium layout for vertical feed) ---
   return (
-    <Pressable
+    <Pressable 
       onPress={onPress}
-      className="bg-surface-container-high rounded-2xl overflow-hidden shadow-lg border border-transparent active:border-primary/20 transition-all duration-300"
+      style={{ backgroundColor: colors.surfaceContainerHigh }}
+      className="rounded-2xl overflow-hidden shadow-2xl border border-transparent active:border-primary/20 transition-all"
     >
-      {/* Header Section: Image and Overlays */}
+      {/* SECTION 1: HERO IMAGE */}
       <View className="h-40 w-full relative">
-        <Image
-          source={{ uri: imageUrl }}
-          contentFit="cover"
-          transition={500}
-          className="w-full h-full"
+        <Image 
+          source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500' }} 
+          contentFit="cover" 
+          transition={500} 
+          className="w-full h-full" 
         />
-
-        {/* Type Badge (Top-Left) */}
-        <View className="absolute top-3 left-3 bg-surface-bright/80 rounded-full px-3 py-1 flex-row items-center space-x-1.5 shadow-sm">
-          <MaterialIcons name="visibility" size={12} color="#fd6c28" />
-          <Text className="text-[10px] font-black uppercase tracking-widest text-on-surface">
-            {type}
+        
+        {/* Category Badge (Top-Left) */}
+        <View 
+          style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
+          className="absolute top-3 left-3 px-3 py-1 rounded-full flex-row items-center space-x-1.5 shadow-sm"
+        >
+          <MaterialIcons name="visibility" size={12} color={colors.onPrimaryContainer} />
+          <Text 
+            style={{ color: colors.onSurface, letterSpacing: 2 }} 
+            className="text-[10px] font-black uppercase"
+          >
+            {type.toUpperCase()}
           </Text>
         </View>
 
         {/* Favorite Button (Top-Right) */}
-        <Pressable
-          testID="favorite-button"
+        <Pressable 
           onPress={onFavoritePress}
-          className="absolute top-3 right-3 w-8 h-8 bg-surface-bright/80 rounded-full items-center justify-center active:scale-110 transition-transform"
+          style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
+          className="absolute top-3 right-3 w-8 h-8 rounded-full items-center justify-center shadow-sm active:scale-110"
         >
-          <MaterialIcons
-            name={isFavorite ? "favorite" : "favorite-border"}
-            size={18}
-            color="#fd6c28"
+          <MaterialIcons 
+            name={isFavorite ? "favorite" : "favorite-border"} 
+            size={18} 
+            color={colors.onPrimaryContainer} 
           />
         </Pressable>
+
+        {/* Status Badges (Top-Left - Below Category) */}
+        <View className="absolute top-12 left-3 flex-col space-y-1.5">
+          {isPopular && (
+            <View 
+              style={{ backgroundColor: colors.tertiary }} 
+              className="px-2 py-0.5 rounded-sm shadow-sm self-start"
+            >
+              <Text className="text-[8px] font-black text-black uppercase">POPULAR</Text>
+            </View>
+          )}
+          {isNew && (
+            <View 
+              style={{ backgroundColor: colors.onPrimaryContainer }} 
+              className="px-2 py-0.5 rounded-sm shadow-sm self-start"
+            >
+              <Text className="text-[8px] font-black text-white uppercase">NOVO</Text>
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Content Section */}
-      <View className="p-4 flex-col gap-2">
-        {/* Metadata: Rating and Distance */}
-        <View className="flex-row items-center space-x-4">
+      {/* SECTION 2: CONTENT AREA (padding: 16px, gap: 8px) */}
+      <View className="p-4 flex-col">
+        {/* Metadata Row (Rating & Distance) */}
+        <View className="flex-row items-center space-x-4 mb-2">
           <View className="flex-row items-center space-x-1">
-            <MaterialIcons name="star" size={14} color="#ffba26" />
-            <Text className="text-xs font-bold text-tertiary">{rating.toFixed(1)}</Text>
+            <MaterialIcons name="star" size={14} color={colors.tertiary} />
+            <Text style={{ color: colors.tertiary }} className="text-xs font-bold">{rating.toFixed(1)}</Text>
           </View>
-
+          
           <View className="flex-row items-center space-x-1">
-            <MaterialIcons name="location-on" size={14} color="#8b9296" />
-            <Text className="text-xs font-medium text-on-surface-variant">{distance}</Text>
+            <MaterialIcons name="location-on" size={14} color={colors.onSurfaceVariant} />
+            <Text style={{ color: colors.onSurfaceVariant }} className="text-xs font-medium">{distance}</Text>
           </View>
         </View>
 
-        {/* Title and Tagline */}
-        <View>
-          <Text
-            numberOfLines={2}
-            className="text-lg font-bold text-on-surface leading-tight mb-1"
+        {/* Title + Tagline */}
+        <View className="mb-2">
+          <Text 
+            numberOfLines={2} 
+            style={{ color: colors.onSurface, lineHeight: 22 }} 
+            className="text-lg font-bold mb-1"
           >
             {title}
           </Text>
-          <Text
-            numberOfLines={1}
-            className="text-sm text-on-surface-variant"
+          <Text 
+            numberOfLines={1} 
+            style={{ color: colors.onSurfaceVariant }} 
+            className="text-sm font-normal"
           >
             {tagline}
           </Text>
@@ -130,12 +166,16 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
 
         {/* Tags Row */}
         <View className="flex-row flex-wrap gap-2 mt-1">
-          {tags.map((tag, index) => (
-            <View
-              key={index}
-              className="bg-surface-container-lowest px-2 py-1 rounded-md"
+          {tags.slice(0, 3).map((tag, index) => (
+            <View 
+              key={index} 
+              style={{ backgroundColor: colors.surfaceContainer }} 
+              className="px-2 py-1 rounded-md"
             >
-              <Text className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+              <Text 
+                style={{ color: colors.onSurfaceVariant, letterSpacing: 0.5 }} 
+                className="text-[10px] font-bold uppercase"
+              >
                 {tag}
               </Text>
             </View>
