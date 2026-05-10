@@ -41,8 +41,9 @@ export default function ExplorerProfile() {
         className="flex-1" 
         contentContainerStyle={{ 
           paddingTop: 80, 
-          paddingBottom: 120, 
-          paddingHorizontal: 24 
+          paddingBottom: 160, 
+          paddingHorizontal: 24,
+          flexGrow: 1
         }} 
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
