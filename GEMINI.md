@@ -33,7 +33,7 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [X] **Perfil do Explorador**: Interface integrada com dados reais, XP, Nível, Medalhas e Histórico (SDGEU-203).
 - [X] **Configurações & Preferências**: Central de configurações, logout e re-onboarding de interesses (SDGEU-205).
 - [X] **Componentes UI**: Componente `AttractionCard` (Variant: Default) implementado e testado (SDGEU-213).
-- [X] **Dashboard Explore**: Tela principal integrada com o backend, carregando atrações reais com paginação (Phase 5).
+- [X] **Dashboard Explore**: Tela principal integrada com o backend, carregando atrações reais com paginação, preço e selo de parceiro (SDGEU-154).
 - [X] **Infraestrutura de Testes (Frontend)**: Estabilização de mocks do Axios e Jest para ambiente Expo (Phase 14-FE).
 
 ## 📌 Próximos Passos (Sprint 03)
