@@ -20,18 +20,19 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [x] **Preferências de Viagem**: Entidade `TravelPreference` e relacionamento com Usuário (SDGEU-23).
 - [x] **Serviço de Preferências**: Recuperação e atualização de interesses via API (SDGEU-191).
 - [x] **Gamificação**: Modelagem de XP, Nível, Medalhas (Badge) e Histórico concluída (SDGEU-82).
+- [x] **XP & Level Up**: Serviço de XP e progressão de nível implementado (SDGEU-83).
 
 ### Frontend (Mobile - Expo)
 - [X] **Setup Expo**: Inicialização com Expo Router e TypeScript (SDGEU-19-FE).
 - [X] **Auth Flow**: Login e Registro integrados com o backend.
 - [X] **Onboarding**: Tela de Preferências com seleção de interesses e redirecionamento forçado (SDGEU-22-FE).
+- [x] **Perfil do Explorador**: Interface integrada com dados reais, XP, Nível, Medalhas e Histórico (SDGEU-203).
 
 ## 📌 Próximos Passos (Backlog Imediato)
 
-1. **SDGEU-83**: Criar serviço de XP e level up no backend.
-2. **SDGEU-45**: Popular banco com atrações iniciais (Seeds/Migrations).
-3. **Dashboard**: Iniciar a construção da tela principal consumindo as preferências.
-4. **Docker**: Criar `docker-compose.yml` para subir o ambiente completo.
+1. **SDGEU-45**: Popular banco com atrações iniciais (Seeds/Migrations).
+2. **Dashboard**: Iniciar a construção da tela principal (Explore) consumindo as preferências.
+3. **Docker**: Criar `docker-compose.yml` para subir o ambiente completo.
 
 ## 🛠 Decisões Técnicas (Monorepo)
 - **Sincronia**: Mudanças que afetam Back e Front devem ser feitas no mesmo PR.
