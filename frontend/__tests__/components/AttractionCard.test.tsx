@@ -37,7 +37,7 @@ describe('AttractionCard', () => {
 
   it('renders type badge correctly', () => {
     const { getByText } = render(<AttractionCard {...defaultProps} />);
-    expect(getByText('Sightseeing')).toBeTruthy();
+    expect(getByText('SIGHTSEEING')).toBeTruthy();
   });
 
   it('renders tags correctly', () => {

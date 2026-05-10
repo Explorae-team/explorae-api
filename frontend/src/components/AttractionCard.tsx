@@ -100,6 +100,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         {/* Favorite Button (Top-Right) */}
         <Pressable 
           onPress={onFavoritePress}
+          testID="favorite-button"
           style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
           className="absolute top-3 right-3 w-8 h-8 rounded-full items-center justify-center shadow-sm active:scale-110"
         >

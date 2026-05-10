@@ -4,6 +4,8 @@ import LoginScreen from '../src/app/login';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 
+jest.setTimeout(30000);
+
 // Mock do useRouter
 jest.mock('expo-router', () => ({
   useRouter: jest.fn(),

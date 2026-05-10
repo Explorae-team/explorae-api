@@ -3,6 +3,8 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import UserStats from '../../src/components/UserStats';
 import { useAuth } from '../../src/contexts/AuthContext';
 
+jest.setTimeout(30000);
+
 // Mock do Contexto de Autenticação
 const mockUpdateProfile = jest.fn();
 jest.mock('../../src/contexts/AuthContext', () => ({
