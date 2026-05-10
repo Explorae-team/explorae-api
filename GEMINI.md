@@ -21,6 +21,9 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [X] **Serviço de Preferências**: Recuperação e atualização de interesses via API (SDGEU-191).
 - [X] **Gamificação**: Modelagem de XP, Nível, Medalhas (Badge) e Histórico concluída (SDGEU-82).
 - [X] **XP & Level Up**: Serviço de XP e progressão de nível implementado (SDGEU-83).
+- [X] **Modelo de Atração**: Entidade `Attraction` e Repositório configurados (SDGEU-209).
+- [X] **Seeds de Dados**: Banco populado com 20 atrações iniciais via Liquibase (SDGEU-211).
+- [X] **API de Listagem**: Criar endpoint paginado para o Feed (Phase 4).
 
 ### Frontend (Mobile - Expo)
 - [X] **Setup Expo**: Inicialização com Expo Router e TypeScript (SDGEU-19-FE).
@@ -28,12 +31,12 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [X] **Onboarding**: Tela de Preferências com seleção de interesses e redirecionamento forçado (SDGEU-22-FE).
 - [X] **Perfil do Explorador**: Interface integrada com dados reais, XP, Nível, Medalhas e Histórico (SDGEU-203).
 - [X] **Configurações & Preferências**: Central de configurações, logout e re-onboarding de interesses (SDGEU-205).
+- [X] **Componentes UI**: Componente `AttractionCard` (Variant: Default) implementado e testado (SDGEU-213).
 
 ## 📌 Próximos Passos (Sprint 03)
 
-1. **SDGEU-45**: Popular banco com atrações iniciais (Seeds/Migrations).
-2. **Dashboard**: Iniciar a construção da tela principal (Explore) consumindo as preferências.
-3. **Docker**: Criar `docker-compose.yml` para subir o ambiente completo.
+1. **Dashboard**: Iniciar a construção da tela principal (Explore) consumindo as preferências.
+2. [ ] **Docker**: Criar `docker-compose.yml` para subir o ambiente completo.
 
 ## 🛠 Decisões Técnicas (Monorepo)
 - **Sincronia**: Mudanças que afetam Back e Front devem ser feitas no mesmo PR.

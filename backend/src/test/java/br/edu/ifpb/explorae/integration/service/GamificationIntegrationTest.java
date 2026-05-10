@@ -3,7 +3,6 @@ package br.edu.ifpb.explorae.integration.service;
 import br.edu.ifpb.explorae.api.dto.TravelPreferenceRequestDTO;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.repository.BadgeRepository;
-import br.edu.ifpb.explorae.repository.UserBadgeRepository;
 import br.edu.ifpb.explorae.repository.UserRepository;
 import br.edu.ifpb.explorae.repository.XpHistoryRepository;
 import br.edu.ifpb.explorae.service.TravelPreferenceService;
@@ -15,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,9 +30,6 @@ class GamificationIntegrationTest {
 
     @Autowired
     private XpHistoryRepository xpHistoryRepository;
-
-    @Autowired
-    private UserBadgeRepository userBadgeRepository;
 
     @Autowired
     private BadgeRepository badgeRepository;

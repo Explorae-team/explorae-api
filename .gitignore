@@ -89,3 +89,4 @@ HELP.md
 /explorae-user-service/target/
 # GSD / Planning
 .planning/
+backend/.m2/
