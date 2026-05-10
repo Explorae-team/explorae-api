@@ -13,6 +13,7 @@ public record UserResponseDTO(
     Integer xp,
     Integer level,
     Integer coins,
+    String levelName,
     boolean hasPreferences,
     List<BadgeResponseDTO> badges
 ) {}
