@@ -121,6 +121,7 @@ export default function UserStats() {
       <View className="relative">
         {/* Borda dinâmica baseada no tier de XP */}
         <TouchableOpacity 
+          testID="avatar-touchable"
           activeOpacity={0.8}
           onPress={pickImage}
           disabled={isSaving}

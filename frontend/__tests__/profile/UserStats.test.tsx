@@ -10,8 +10,11 @@ jest.mock('../../src/contexts/AuthContext', () => ({
 }));
 
 // Mock do expo-image-picker
+const mockLaunchImageLibraryAsync = jest.fn();
+const mockRequestMediaLibraryPermissionsAsync = jest.fn();
 jest.mock('expo-image-picker', () => ({
-  launchImageLibraryAsync: jest.fn(),
+  launchImageLibraryAsync: (...args) => mockLaunchImageLibraryAsync(...args),
+  requestMediaLibraryPermissionsAsync: () => mockRequestMediaLibraryPermissionsAsync(),
   MediaTypeOptions: {
     Images: 'Images',
   },
@@ -110,5 +113,23 @@ describe('UserStats Component', () => {
 
     expect(queryByTestId('name-input')).toBeNull();
     expect(getByText('Explorador Teste')).toBeTruthy();
+  });
+
+  it('deve chamar ImagePicker ao clicar no avatar', async () => {
+    mockRequestMediaLibraryPermissionsAsync.mockResolvedValue({ status: 'granted' });
+    mockLaunchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://test-image.jpg' }]
+    });
+
+    const { getByTestId } = render(<UserStats />);
+    
+    const avatar = getByTestId('avatar-touchable');
+    fireEvent.press(avatar);
+
+    await waitFor(() => {
+      expect(mockRequestMediaLibraryPermissionsAsync).toHaveBeenCalled();
+      expect(mockLaunchImageLibraryAsync).toHaveBeenCalled();
+    });
   });
 });

@@ -13,9 +13,11 @@
     "test": "jest"
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
     "axios": "^1.14.0",
     "expo": "^55.0.8",
     "expo-font": "^55.0.0",
+    "expo-image-picker": "~16.0.0",
     "expo-linking": "^55.0.8",
     "expo-router": "^55.0.7",
     "expo-secure-store": "^55.0.11",
