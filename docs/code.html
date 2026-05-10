@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#bde9fe",
+                    "inverse-on-surface": "#003545",
+                    "on-secondary-fixed": "#001f29",
+                    "surface-dim": "#00161e",
+                    "on-secondary": "#003545",
+                    "on-secondary-fixed-variant": "#1f4c5d",
+                    "inverse-surface": "#bde9fe",
+                    "tertiary-fixed-dim": "#ffba26",
+                    "surface": "#00161e",
+                    "primary-container": "#5b1d00",
+                    "on-surface": "#bde9fe",
+                    "surface-tint": "#ffb598",
+                    "surface-container-low": "#001f29",
+                    "outline-variant": "#41484b",
+                    "on-tertiary-fixed": "#271900",
+                    "on-background": "#bde9fe",
+                    "surface-container-highest": "#053a4a",
+                    "secondary-container": "#1f4c5d",
+                    "error-container": "#93000a",
+                    "tertiary-container": "#432d00",
+                    "on-error": "#690005",
+                    "surface-bright": "#0d3e4e",
+                    "on-tertiary-fixed-variant": "#5e4100",
+                    "on-secondary-container": "#91bbcf",
+                    "primary": "#ffb598",
+                    "on-tertiary": "#422d00",
+                    "inverse-primary": "#a63b00",
+                    "surface-variant": "#053a4a",
+                    "on-primary-fixed-variant": "#7e2b00",
+                    "tertiary-fixed": "#ffdea9",
+                    "tertiary": "#ffba26",
+                    "on-error-container": "#ffdad6",
+                    "error": "#ffb4ab",
+                    "background": "#00161e",
+                    "secondary-fixed-dim": "#a2cde1",
+                    "surface-container": "#00232f",
+                    "surface-container-high": "#002e3c",
+                    "outline": "#8b9296",
+                    "primary-fixed-dim": "#ffb598",
+                    "on-surface-variant": "#c1c7cc",
+                    "on-primary-container": "#fd6c28",
+                    "on-primary": "#591c00",
+                    "on-tertiary-container": "#c88f00",
+                    "on-primary-fixed": "#370e00",
+                    "surface-container-lowest": "#001017",
+                    "secondary": "#a2cde1",
+                    "primary-fixed": "#ffdbce"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#00161e] dark:bg-[#00161e] flex justify-between items-center px-6 h-16 w-full bg-gradient-to-b from-[#0d3e4e] to-transparent">
+<button class="hover:bg-[#0d3e4e]/50 transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#fd6c28]">arrow_back</span>
+</button>
+<h1 class="font-['Inter'] font-bold text-lg tracking-tight text-[#fd6c28]">Explorer Profile</h1>
+<button class="hover:bg-[#0d3e4e]/50 transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#fd6c28]">settings</span>
+</button>
+</header>
+<main class="pt-20 px-6 max-w-2xl mx-auto">
+<!-- User Section -->
+<section class="flex flex-col items-center mt-6">
+<div class="relative">
+<div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-tertiary via-on-primary-container to-tertiary shadow-xl">
+<img alt="Marina Silva" class="w-full h-full rounded-full object-cover border-4 border-surface" data-alt="Close-up portrait of a vibrant woman traveler with a warm smile, natural lighting, wearing outdoor gear against a soft blurred forest background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL6rf3HvpVtMjNf8HlRbjw9eRQK-_TpCO3Z_LOIAws6t-h76MHvjXHoEFWGMjnUf-wdSMqWTXeKbbngsGy8fZVxhss6YbkhrgRVyrucI4PVrEoOvKGzEYZR-FxT_Y1yhaXgpSYSZGOtWOcS95hxGopFks6I2YSnljAtGqnMLz7OLCMojfD7J0X5RnruFkH1Qhjqn2pd_R2GC79ziVnq9Gn11biKGLYmx58xczOQnlvMkE9BFR0YkwkwiY5Ut1POtqiQkegnNhp6tU"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-tertiary text-on-tertiary font-black px-3 py-1 rounded-full shadow-lg border-2 border-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                    24
+                </div>
+</div>
+<div class="mt-4 text-center">
+<h2 class="text-3xl font-black tracking-tight">Marina Silva</h2>
+<p class="text-on-surface-variant font-medium mt-1">Trailblazer Enthusiast</p>
+</div>
+<!-- XP Progress Bar -->
+<div class="w-full mt-8 bg-surface-container-highest rounded-full h-4 relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-tertiary rounded-full shadow-[0_0_15px_rgba(255,186,38,0.4)]" style="width: 85%;"></div>
+</div>
+<div class="w-full flex justify-between mt-2 px-1">
+<span class="text-xs font-bold text-tertiary uppercase tracking-widest">4,250 XP</span>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">5,000 XP</span>
+</div>
+</section>
+<!-- Stats Grid -->
+<section class="mt-10 grid grid-cols-2 gap-4">
+<div class="bg-surface-container-high p-5 rounded-lg flex flex-col items-start gap-1">
+<span class="material-symbols-outlined text-tertiary mb-1" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="text-2xl font-black">128</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Check-ins</span>
+</div>
+<div class="bg-surface-container-high p-5 rounded-lg flex flex-col items-start gap-1">
+<span class="material-symbols-outlined text-tertiary mb-1" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="text-2xl font-black">42</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Routes</span>
+</div>
+<div class="bg-surface-container-high p-5 rounded-lg flex flex-col items-start gap-1">
+<span class="material-symbols-outlined text-tertiary mb-1" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="text-2xl font-black">15</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Quests</span>
+</div>
+<div class="bg-surface-container-high p-5 rounded-lg flex flex-col items-start gap-1">
+<span class="material-symbols-outlined text-tertiary mb-1" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-2xl font-black">24</span>
+<span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Friends</span>
+</div>
+</section>
+<!-- Achievements Section -->
+<section class="mt-12">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold tracking-tight">My Badges</h3>
+<span class="text-tertiary text-xs font-bold uppercase tracking-widest">View All</span>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
+<div class="flex flex-col items-center gap-3 min-w-[80px]">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center border-2 border-tertiary shadow-[0_0_15px_rgba(255,186,38,0.2)]">
+<span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+</div>
+<span class="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter">Early Bird</span>
+</div>
+<div class="flex flex-col items-center gap-3 min-w-[80px]">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center border-2 border-on-primary-container shadow-[0_0_15px_rgba(253,108,40,0.2)]">
+<span class="material-symbols-outlined text-on-primary-container text-3xl" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<span class="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter">Gourmet</span>
+</div>
+<div class="flex flex-col items-center gap-3 min-w-[80px]">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center border-2 border-primary shadow-[0_0_15px_rgba(255,181,152,0.2)]">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">explore</span>
+</div>
+<span class="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter">Pathfinder</span>
+</div>
+<div class="flex flex-col items-center gap-3 min-w-[80px]">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center border-2 border-secondary shadow-[0_0_15px_rgba(162,205,225,0.2)]">
+<span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">landscape</span>
+</div>
+<span class="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter">Peak Master</span>
+</div>
+<div class="flex flex-col items-center gap-3 min-w-[80px]">
+<div class="w-16 h-16 rounded-full bg-surface-bright flex items-center justify-center border-2 border-outline-variant opacity-50">
+<span class="material-symbols-outlined text-outline-variant text-3xl">lock</span>
+</div>
+<span class="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter">Locked</span>
+</div>
+</div>
+</section>
+<!-- Recent Activity Section -->
+<section class="mt-10 mb-8">
+<h3 class="text-xl font-bold tracking-tight mb-6">Recent Adventures</h3>
+<div class="space-y-4">
+<!-- Activity Card 1 -->
+<div class="bg-white rounded-lg p-3 flex items-center gap-4 group">
+<div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+<img alt="Farol do Cabo Branco" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Majestic lighthouse on a rugged cliffside at sunset with golden orange light reflecting on the ocean waves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwS_8mqv-FvvB4ubgtBZMAmaI6bRNZU8Tl2zOBldaUSjZ7TfySJNSALTHZk4N7SXoLFwWjhstgPgZwzEIwxWrIyOVKdSnez7pkWYsbqgYpxGV1fLPcmHZ3qc3enXggYmyGzm1W-jF8OnXUpw3lrKVrDcVKIP6sMmnX_eG9oDPGuG6IRQRfzcNtXzka6oU1nWpCAnGWLOnJnzbXHU6Y2vyuFVCNsfHUIcc1xC5Yo4qrNmHpIlY9ZlhYFpVZJbqbaDPNj_uh1x5Jai0"/>
+</div>
+<div class="flex-grow">
+<h4 class="text-surface-container-lowest font-extrabold text-lg leading-tight">Farol do Cabo Branco</h4>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px] text-surface-container-lowest/60">schedule</span>
+<span class="text-xs font-bold text-surface-container-lowest/60">2 days ago</span>
+</div>
+</div>
+<div class="pr-2">
+<span class="material-symbols-outlined text-on-primary-container text-2xl">chevron_right</span>
+</div>
+</div>
+<!-- Activity Card 2 -->
+<div class="bg-white rounded-lg p-3 flex items-center gap-4 group">
+<div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+<img alt="Mercado Municipal" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Interior of a classic municipal market with high vaulted ceilings, colorful fruit stalls, and atmospheric morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC28YN3o5-O2GGVSuuDxJadkOzpWI7P_5htytdkDFo1Gn0OozQLutocMppCeaVwEe00gjT_V8K4FiL4hPRdvX796qKtJm6Mf3xqHJDSOuP0eb4N8tDH9jgoQ0o1WEWL-g7UpKsSHUFB9em4p7P4Cpdi8m5M5wlVA3PO2KQ_YV-TIz8_IlRGecSubNgUlzcy4EZ6-TuIFk-43Gze4cGUhg1DTCx1-qOBfl3N6ZmNFl2TPvO8Vyt24voCLHRbkI-kOp8-OC6P1x56Fss"/>
+</div>
+<div class="flex-grow">
+<h4 class="text-surface-container-lowest font-extrabold text-lg leading-tight">Mercado Municipal</h4>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px] text-surface-container-lowest/60">schedule</span>
+<span class="text-xs font-bold text-surface-container-lowest/60">5 days ago</span>
+</div>
+</div>
+<div class="pr-2">
+<span class="material-symbols-outlined text-on-primary-container text-2xl">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-6 bg-[#0d3e4e]/80 backdrop-blur-xl dark:bg-[#0d3e4e]/80 rounded-t-[32px] z-50 border-t border-[#bde9fe]/15 shadow-[0_-10px_40px_rgba(0,22,30,0.5)]">
+<a class="flex flex-col items-center justify-center text-[#bde9fe] p-2 hover:text-[#ffba26] transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#bde9fe] p-2 hover:text-[#ffba26] transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Routes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#bde9fe] p-2 hover:text-[#ffba26] transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Rankings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#fd6c28] text-[#00161e] rounded-2xl p-2 min-w-[64px] active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-widest mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

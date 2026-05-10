@@ -1,0 +1,22 @@
+Starting project at /home/italo/Área de trabalho/explorae/frontend
+/home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/src/utils/errors.js:130
+    throw error;
+    ^
+
+Error: ENOENT: no such file or directory, mkdir '/home/italo/.expo'
+    at Object.mkdirSync (node:fs:1386:26)
+    at write (/home/italo/Área de trabalho/explorae/frontend/node_modules/@expo/json-file/build/JsonFile.js:227:27)
+    at setSync (/home/italo/Área de trabalho/explorae/frontend/node_modules/@expo/json-file/build/JsonFile.js:275:12)
+    at JsonFile.set (/home/italo/Área de trabalho/explorae/frontend/node_modules/@expo/json-file/build/JsonFile.js:107:16)
+    at getAnonymousId (/home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/src/api/user/UserSettings.js:178:18)
+    at new Telemetry (/home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/src/utils/telemetry/Telemetry.js:30:66)
+    at getTelemetry (/home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/src/utils/telemetry/index.js:43:21)
+    at recordCommand (/home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/src/utils/telemetry/index.js:64:26)
+    at /home/italo/Área de trabalho/explorae/frontend/node_modules/expo/node_modules/@expo/cli/build/bin/cli:274:9 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: '/home/italo/.expo'
+}
+
+Node.js v20.20.2

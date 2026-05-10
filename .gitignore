@@ -53,6 +53,8 @@ auth.json
 # Ferramentas e Cache
 /.agent
 .agent/
+/.agents/
+.agents/
 .temp/
 .tmp/
 coverage/
@@ -85,3 +87,5 @@ HELP.md
 /frontend/dist/
 /frontend/node_modules/
 /explorae-user-service/target/
+# GSD / Planning
+.planning/

@@ -73,6 +73,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserPreferences = async () => {
+    try {
+      const response = await api.get('/api/v1/users/me');
+      const userData = response.data.data;
+      await storage.setItem('user_data', JSON.stringify(userData));
+      setUser(userData);
+    } catch (error) {
+      console.error('Erro ao atualizar dados do usuário:', error);
+    }
+  };
+
+  const updateProfile = async (profileData) => {
+    try {
+      const response = await api.put('/api/v1/users/me', profileData);
+      const userData = response.data.data;
+      await storage.setItem('user_data', JSON.stringify(userData));
+      setUser(userData);
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Erro ao atualizar perfil' 
+      };
+    }
+  };
+
   const logout = async () => {
     try {
       // Remove de forma segura ao deslogar
@@ -91,6 +118,8 @@ export const AuthProvider = ({ children }) => {
       isLoading,
       login, 
       register,
+      updateUserPreferences,
+      updateProfile,
       logout 
     }}>
       {children}

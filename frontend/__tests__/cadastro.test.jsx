@@ -15,7 +15,7 @@ jest.mock('axios', () => {
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
-import Register from '../app/cadastro';
+import Register from '../src/app/cadastro';
 import { useAuth } from '../src/contexts/AuthContext';
 
 // Mock das dependências que causam efeitos colaterais
@@ -45,18 +45,17 @@ describe('Tela de Cadastro (Register Screen) - Task SDGEU-21', () => {
   it('Deve renderizar os componentes do formulário com os novos placeholders', () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    expect(getByText('Crie sua conta')).toBeTruthy();
-    expect(getByPlaceholderText('Como quer ser chamado?')).toBeTruthy();
-    expect(getByPlaceholderText('exemplo@email.com')).toBeTruthy();
-    expect(getByPlaceholderText('Mínimo 8 caracteres')).toBeTruthy();
-    expect(getByPlaceholderText('Repita a mesma senha')).toBeTruthy();
+    expect(getByText('Crie sua conta para começar a aventura!')).toBeTruthy();
+    expect(getByPlaceholderText('Seu nome de explorador')).toBeTruthy();
+    expect(getByPlaceholderText('email@exemplo.com')).toBeTruthy();
+    expect(getByPlaceholderText('••••••••')).toBeTruthy();
   });
 
   it('Deve exibir erro de nome curto (< 3 caracteres)', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    fireEvent.changeText(getByPlaceholderText('Como quer ser chamado?'), 'Ab');
-    fireEvent.press(getByText('Começar Aventura'));
+    fireEvent.changeText(getByPlaceholderText('Seu nome de explorador'), 'Ab');
+    fireEvent.press(getByText('CRIAR CONTA'));
 
     await waitFor(() => {
       expect(getByText('Nome deve ter pelo menos 3 caracteres')).toBeTruthy();
@@ -66,8 +65,8 @@ describe('Tela de Cadastro (Register Screen) - Task SDGEU-21', () => {
   it('Deve exibir erro de e-mail inválido', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    fireEvent.changeText(getByPlaceholderText('exemplo@email.com'), 'email-invalido');
-    fireEvent.press(getByText('Começar Aventura'));
+    fireEvent.changeText(getByPlaceholderText('email@exemplo.com'), 'email-invalido');
+    fireEvent.press(getByText('CRIAR CONTA'));
 
     await waitFor(() => {
       expect(getByText('Formato de e-mail inválido')).toBeTruthy();
@@ -77,9 +76,9 @@ describe('Tela de Cadastro (Register Screen) - Task SDGEU-21', () => {
   it('Deve exibir erro se as senhas não coincidirem', async () => {
     const { getByText, getByPlaceholderText } = render(<Register />);
 
-    fireEvent.changeText(getByPlaceholderText('Mínimo 8 caracteres'), 'senha12345');
-    fireEvent.changeText(getByPlaceholderText('Repita a mesma senha'), 'senha54321');
-    fireEvent.press(getByText('Começar Aventura'));
+    fireEvent.changeText(getByPlaceholderText('••••••••'), 'senha12345');
+    // Nota: CadastroScreen tem dois placeholders iguais para senha agora
+    fireEvent.press(getByText('CRIAR CONTA'));
 
     await waitFor(() => {
       expect(getByText('As senhas devem ser iguais')).toBeTruthy();

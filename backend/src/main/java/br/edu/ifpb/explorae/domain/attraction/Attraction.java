@@ -2,21 +2,28 @@ package br.edu.ifpb.explorae.domain.attraction;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "attractions")
-@Data
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Attraction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(nullable = false)
@@ -43,19 +50,15 @@ public class Attraction {
     @Column(name = "price_range")
     private Integer priceRange; // 1 para 4 ($ para $$$$)
 
+    @Builder.Default
     @Column(name = "average_rating")
     private Double averageRating = 0.0;
 
+    @Builder.Default
     @Column(name = "is_partner")
     private Boolean isPartner = false;
 
+    @Builder.Default
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        if (this.averageRating == null) this.averageRating = 0.0;
-        if (this.isPartner == null) this.isPartner = false;
-    }
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

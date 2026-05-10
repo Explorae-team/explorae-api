@@ -34,36 +34,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
-        // 1. Pega o cabeçalho 'Authorization' da requisição.
+
         String authHeader = request.getHeader("Authorization");
-        
-        // 2. Se o cabeçalho estiver vazio ou não começar com "Bearer ",
-        // apenas deixa passar (pode ser uma rota pública como o login ou cadastro).
+
+        // deixa passar (pode ser uma rota pública como o login ou cadastro).
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. Extraí o token (tirando o prefixo "Bearer ").
+        // Extrai o token (tirando o prefixo "Bearer ").
         String jwt = authHeader.substring(7);
 
-        // 4.TokenService le o email que tá no token.
         String userEmail = tokenService.extractUsername(jwt);
 
-        // 5. Se tiver um email e o usuário ainda não estiver autenticado na sessão atual do Spring
+        // Se o usuário ainda não estiver autenticado
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Busca os detalhes do usuário no banco.
             UserDetails userDetails = this.userService.loadUserByUsername(userEmail);
 
-            // 6. Valida se o token é original e não expirou.
+            // Valida se o token é original e não expirou.
             if (tokenService.isTokenValid(jwt)) {
                 // Se estiver ok, cria um crachá de autenticação.
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities()
-                );
+                        userDetails.getAuthorities());
                 // Vincula os detalhes da requisição ao crachá.
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 // Colocam o crachá no contexto do Spring para que ele saiba
@@ -71,8 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        
-        // 7. Libera a requisição para seguir seu caminho até o Controller.
+
+        // Libera a requisição para seguir seu caminho até o Controller.
         filterChain.doFilter(request, response);
     }
 }

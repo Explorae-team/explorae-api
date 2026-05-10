@@ -2,8 +2,11 @@ package br.edu.ifpb.explorae.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,12 +18,16 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -42,23 +49,31 @@ public class User implements UserDetails {
     private String photoUrl;
 
     // Atributos de gamificação
+    @Builder.Default
     private Integer xp = 0;
+    @Builder.Default
     private Integer level = 1;
+    @Builder.Default
     private Integer coins = 0;
 
+    @Builder.Default
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     // Perfil de Preferências.
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TravelPreference travelPreference;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<br.edu.ifpb.explorae.domain.gamification.UserBadge> userBadges;
 
     /**
      * Adiciona XP e verifica se subiu de nível.
      * Retorna true se houve level up.
      */
     public boolean addXp(Integer amount) {
-        if (amount == null || amount <= 0) return false;
+        if (amount == null || amount <= 0)
+            return false;
         this.xp += amount;
         return checkLevelUp();
     }
@@ -76,18 +91,10 @@ public class User implements UserDetails {
         return this.level * 100;
     }
 
-    //Dispara automaticamente antes de salvar no banco.
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        if (this.xp == null) this.xp = 0;
-        if (this.level == null) this.level = 1;
-        if (this.coins == null) this.coins = 0;
-    }
 
     /**
-     * Aqui se define as permisões do usuário.
-     * Quem logar ganha a permissão "USER".
+     * Define as permisões do usuário.
+     * Ao logar ganha a permissão "USER".
      * No futuro, pode ter "ADMIN", "MODERADOR", etc.
      */
     @Override
