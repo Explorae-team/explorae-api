@@ -15,7 +15,7 @@ jest.mock('../../src/contexts/AuthContext', () => ({
 const mockLaunchImageLibraryAsync = jest.fn();
 const mockRequestMediaLibraryPermissionsAsync = jest.fn();
 jest.mock('expo-image-picker', () => ({
-  launchImageLibraryAsync: (...args) => mockLaunchImageLibraryAsync(...args),
+  launchImageLibraryAsync: (...args: any[]) => mockLaunchImageLibraryAsync(...args),
   requestMediaLibraryPermissionsAsync: () => mockRequestMediaLibraryPermissionsAsync(),
   MediaTypeOptions: {
     Images: 'Images',

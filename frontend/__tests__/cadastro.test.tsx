@@ -8,7 +8,7 @@ jest.setTimeout(30000);
 
 // Mocks
 jest.mock('axios', () => {
-  const mockAxios = {
+  const mockAxios: any = {
     create: jest.fn(() => mockAxios),
     interceptors: {
       request: { use: jest.fn(), eject: jest.fn() },
