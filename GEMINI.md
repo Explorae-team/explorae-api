@@ -28,6 +28,8 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [X] **Onboarding**: Tela de Preferências com seleção de interesses e redirecionamento forçado (SDGEU-22-FE).
 - [x] **Perfil do Explorador**: Interface integrada com dados reais, XP, Nível, Medalhas e Histórico (SDGEU-203).
 
+- [x] **Configurações & Preferências**: Central de configurações, logout e re-onboarding de interesses (SDGEU-205).
+
 ## 📌 Próximos Passos (Backlog Imediato)
 
 1. **SDGEU-45**: Popular banco com atrações iniciais (Seeds/Migrations).
@@ -49,4 +51,4 @@ Mantemos o foco em comentários que explicam o "porquê" de forma objetiva e dir
 
 ---
 
-*Última atualização: 09 de maio de 2026 - Conclusão do Onboarding de Preferências no Expo.*
+*Última atualização: 10 de maio de 2026 - Conclusão da Central de Configurações & Preferências.*
