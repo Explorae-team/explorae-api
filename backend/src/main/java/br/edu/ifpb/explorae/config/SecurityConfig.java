@@ -54,6 +54,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                         // Porta de Login: Aberta para o login do usuário.
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        // Imagens de Upload: Aberta para visualização pública.
+                        .requestMatchers("/uploads/**").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.
                         .anyRequest().authenticated())
                 // O filtro JWT valida o Token.
@@ -82,7 +84,7 @@ public class SecurityConfig {
         // reais
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

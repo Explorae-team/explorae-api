@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
@@ -78,8 +78,19 @@ export default function UserStats() {
       const match = /\.(\w+)$/.exec(filename || '');
       const type = match ? `image/${match[1]}` : `image`;
 
-      // @ts-ignore
-      formData.append('file', { uri, name: filename, type });
+      if (Platform.OS === 'web') {
+        const response = await fetch(uri);
+        const blob = await response.blob();
+        
+        // Extrai a extensão do tipo MIME (ex: image/png -> png)
+        const extension = blob.type.split('/')[1] || 'jpg';
+        const webFilename = `avatar-${Date.now()}.${extension}`;
+        
+        formData.append('file', blob, webFilename);
+      } else {
+        // @ts-ignore
+        formData.append('file', { uri, name: filename, type });
+      }
 
       await api.post('/api/v1/users/me/avatar', formData, {
         headers: {
