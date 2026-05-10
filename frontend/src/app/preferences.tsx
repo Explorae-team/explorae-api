@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
+import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import InterestsGrid from '../components/preferences/InterestsGrid';
 import preferenceService from '../services/preferenceService';
 
 export default function PreferencesScreen() {
-  const { logout, updateUserPreferences } = useAuth() as any;
+  const { logout, updateUserPreferences, user } = useAuth() as any;
   const router = useRouter();
+  const { mode } = useLocalSearchParams();
+  const isEditMode = mode === 'edit';
+
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchPrefs = async () => {
+        const result = await preferenceService.getPreferences();
+        if (result.success) {
+          setSelectedIds(result.data);
+        }
+      };
+      fetchPrefs();
+    }
+  }, [isEditMode]);
 
   const handleToggleInterest = (id: string) => {
     setSelectedIds(prev =>
@@ -32,6 +47,9 @@ export default function PreferencesScreen() {
 
     if (result.success) {
       await updateUserPreferences();
+      if (isEditMode) {
+        router.back();
+      }
     } else {
       Alert.alert('Erro', result.message);
     }
@@ -45,12 +63,16 @@ export default function PreferencesScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: 'Selecionar Interesses',
+          headerTitle: isEditMode ? 'Editar Interesses' : 'Selecionar Interesses',
           headerStyle: { backgroundColor: '#00161e' },
           headerTintColor: '#fd6c28',
           headerLeft: () => (
-            <TouchableOpacity onPress={logout} className="ml-2">
-              <MaterialCommunityIcons name="logout" size={24} color="#fd6c28" />
+            <TouchableOpacity onPress={() => isEditMode ? router.back() : logout()} className="ml-2">
+              <MaterialIcons 
+                name={isEditMode ? "arrow-back" : "logout"} 
+                size={24} 
+                color="#fd6c28" 
+              />
             </TouchableOpacity>
           )
         }}
@@ -97,11 +119,13 @@ export default function PreferencesScreen() {
         className="px-8 pb-10 pt-6 bg-[#00161e]/80 backdrop-blur-md border-t border-white/5 flex-row justify-between items-center"
       >
         <TouchableOpacity
-          onPress={() => logout()}
+          onPress={() => isEditMode ? router.back() : logout()}
           className="flex-row items-center"
         >
           <Ionicons name="chevron-back" size={20} color="#bde9fe" />
-          <Text className="text-[#bde9fe] ml-1 font-medium">Sair</Text>
+          <Text className="text-[#bde9fe] ml-1 font-medium">
+            {isEditMode ? 'Cancelar' : 'Sair'}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -111,7 +135,7 @@ export default function PreferencesScreen() {
             }`}
         >
           <Text className="text-white font-bold mr-2">
-            {isSubmitting ? 'SALVANDO...' : 'CONCLUIR'}
+            {isSubmitting ? 'SALVANDO...' : isEditMode ? 'SALVAR' : 'CONCLUIR'}
           </Text>
           <MaterialCommunityIcons name="check-circle" size={20} color="white" />
         </TouchableOpacity>
