@@ -55,7 +55,7 @@ public class SecurityConfig {
                         // Porta de Login: Aberta para o login do usuário.
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // Feed de Atrações: Público para o Explore.
-                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/attractions", "/api/v1/attractions/**").permitAll()
                         // Imagens de Upload: Aberta para visualização pública.
                         .requestMatchers("/uploads/**").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.
