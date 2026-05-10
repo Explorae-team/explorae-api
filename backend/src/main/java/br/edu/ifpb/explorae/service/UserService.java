@@ -78,10 +78,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuário não encontrado"));
 
-        user.setName(dto.name());
-        user.setPhone(dto.phone());
-        user.setBio(dto.bio());
-        user.setPhotoUrl(dto.photoUrl());
+        if (dto.name() != null) user.setName(dto.name());
+        if (dto.phone() != null) user.setPhone(dto.phone());
+        if (dto.bio() != null) user.setBio(dto.bio());
+        if (dto.photoUrl() != null) user.setPhotoUrl(dto.photoUrl());
         
         User updatedUser = userRepository.save(user);
         return userMapper.toResponseDTO(updatedUser);
