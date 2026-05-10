@@ -24,7 +24,10 @@ export default function ExplorerHeader() {
         <MaterialIcons name="arrow-back" size={24} color="#fd6c28" />
       </TouchableOpacity>
       <Text className="font-sans font-black text-lg text-on-primary-container tracking-tight">Explorer Profile</Text>
-      <TouchableOpacity className="p-2 rounded-full bg-surface-bright/10">
+      <TouchableOpacity 
+        onPress={() => router.push('/settings')} 
+        className="p-2 rounded-full bg-surface-bright/10"
+      >
         <MaterialIcons name="settings" size={24} color="#fd6c28" />
       </TouchableOpacity>
     </View>
