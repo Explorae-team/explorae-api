@@ -11,7 +11,9 @@ public record AttractionResponseDTO(
         String shortDescription,
         Double averageRating,
         String mainImageUrl,
-        String distance // Calculada ou placeholder por enquanto
+        String distance, // Calculada ou placeholder por enquanto
+        Integer priceRange,
+        Boolean isPartner
 ) {
     public static AttractionResponseDTO fromEntity(Attraction attraction) {
         String mainImage = attraction.getImages().isEmpty() ? null : attraction.getImages().get(0);
@@ -22,7 +24,9 @@ public record AttractionResponseDTO(
                 attraction.getShortDescription(),
                 attraction.getAverageRating(),
                 mainImage,
-                "2.4 km" // Placeholder conforme design showcase
+                "2.4 km", // Placeholder conforme design showcase
+                attraction.getPriceRange(),
+                attraction.getIsPartner()
         );
     }
 }

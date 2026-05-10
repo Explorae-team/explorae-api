@@ -10,6 +10,8 @@ interface Attraction {
   distance: string;
   type: string;
   tags: string[];
+  priceRange?: number;
+  isPartner?: boolean;
 }
 
 export const useExploreData = () => {
@@ -50,7 +52,9 @@ export const useExploreData = () => {
         rating: item.averageRating || 4.5,
         distance: item.distance || '2.4 km',
         type: item.category || 'Sightseeing',
-        tags: item.tags || ['Cultural', 'Histórico'] // Fallback tags se não houver no banco
+        tags: item.tags || ['Cultural', 'Histórico'], // Fallback tags se não houver no banco
+        priceRange: item.priceRange || 2,
+        isPartner: item.isPartner || false
       }));
 
       if (refresh) {

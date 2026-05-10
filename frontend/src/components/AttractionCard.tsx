@@ -14,6 +14,8 @@ interface AttractionCardProps {
   isFavorite?: boolean;
   isPopular?: boolean;
   isNew?: boolean;
+  isPartner?: boolean;
+  priceRange?: number;
   variant?: 'default' | 'compact';
   onPress?: () => void;
   onFavoritePress?: () => void;
@@ -41,6 +43,8 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   isFavorite = false,
   isPopular = false,
   isNew = false,
+  isPartner = false,
+  priceRange = 2,
   variant = 'default',
   onPress,
   onFavoritePress,
@@ -61,7 +65,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         </View>
         <View className="p-2">
           <Text numberOfLines={1} style={{ color: colors.onSurface }} className="text-xs font-bold">{title}</Text>
-          <Text style={{ color: colors.onSurfaceVariant }} className="text-[10px]">{distance} • {type}</Text>
+          <Text style={{ color: colors.onSurfaceVariant }} className="text-[10px]">{distance} • {type} • {'$'.repeat(priceRange)}</Text>
         </View>
       </Pressable>
     );
@@ -129,6 +133,15 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
               <Text className="text-[8px] font-black text-white uppercase">NOVO</Text>
             </View>
           )}
+          {isPartner && (
+            <View 
+              style={{ backgroundColor: '#4CAF50' }} 
+              className="px-2 py-0.5 rounded-sm shadow-sm self-start flex-row items-center space-x-1"
+            >
+              <MaterialIcons name="verified" size={8} color="white" />
+              <Text className="text-[8px] font-black text-white uppercase">PARCEIRO</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -144,6 +157,10 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           <View className="flex-row items-center space-x-1">
             <MaterialIcons name="location-on" size={14} color={colors.onSurfaceVariant} />
             <Text style={{ color: colors.onSurfaceVariant }} className="text-xs font-medium">{distance}</Text>
+          </View>
+
+          <View className="flex-row items-center space-x-1">
+            <Text style={{ color: colors.onPrimaryContainer }} className="text-xs font-bold">{'$'.repeat(priceRange)}</Text>
           </View>
         </View>
 
