@@ -54,6 +54,15 @@ public class Attraction {
     @Column(name = "average_rating")
     private Double averageRating = 0.0;
 
+    @Column
+    private String address;
+
+    @ElementCollection
+    @CollectionTable(name = "attraction_images", joinColumns = @JoinColumn(name = "attraction_id"))
+    @Column(name = "image_url")
+    @Builder.Default
+    private java.util.List<String> images = new java.util.ArrayList<>();
+
     @Builder.Default
     @Column(name = "is_partner")
     private Boolean isPartner = false;

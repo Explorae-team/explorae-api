@@ -13,5 +13,6 @@
     <include file="db/changelog/changes/006-remove-unused-fields-from-travel-preferences.xml"/>
     <include file="db/changelog/changes/007-add-bio-and-photo-to-users.xml"/>
     <include file="db/changelog/changes/008-seed-initial-badges.xml"/>
+    <include file="db/changelog/changes/009-add-address-and-images-to-attractions.xml"/>
 
 </databaseChangeLog>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="009-add-address-to-attractions" author="explorae-team">
+        <addColumn tableName="attractions">
+            <column name="address" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="010-create-attraction-images-table" author="explorae-team">
+        <createTable tableName="attraction_images">
+            <column name="attraction_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_attraction_images_attraction" referencedTableName="attractions" referencedColumnNames="id"/>
+            </column>
+            <column name="image_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
