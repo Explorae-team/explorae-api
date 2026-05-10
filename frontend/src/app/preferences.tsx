@@ -76,10 +76,10 @@ export default function PreferencesScreen() {
         {/* Header Section */}
         <View className="mb-10">
           <Text className="text-3xl font-black text-[#bde9fe] tracking-tight leading-tight mb-4">
-            O que faz seu coração vibrar?
+            Como você prefere explorar?
           </Text>
           <Text className="text-[#91bbcf] text-lg leading-relaxed">
-            Selecione seus interesses para que possamos curar expedições sob medida para você.
+            Escolha suas categorias favoritas para que possamos filtrar os melhores destinos para você.
           </Text>
         </View>
 
@@ -92,7 +92,7 @@ export default function PreferencesScreen() {
       </ScrollView>
 
       {/* Footer Navigation - Premium Glassmorphism Fixo na Base */}
-      <View 
+      <View
         style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
         className="px-8 pb-10 pt-6 bg-[#00161e]/80 backdrop-blur-md border-t border-white/5 flex-row justify-between items-center"
       >

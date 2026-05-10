@@ -1,27 +1,69 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import api from '../services/api';
 
 export default function RecentActivity() {
-  const activities = [
-    { id: 1, title: 'Farol do Cabo Branco', time: '2 days ago', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDwS_8mqv-FvvB4ubgtBZMAmaI6bRNZU8Tl2zOBldaUSjZ7TfySJNSALTHZk4N7SXoLFwWjhstgPgZwzEIwxWrIyOVKdSnez7pkWYsbqgYpxGV1fLPcmHZ3qc3enXggYmyGzm1W-jF8OnXUpw3lrKVrDcVKIP6sMmnX_eG9oDPGuG6IRQRfzcNtXzka6oU1nWpCAnGWLOnJnzbXHU6Y2vyuFVCNsfHUIcc1xC5Yo4qrNmHpIlY9ZlhYFpVZJbqbaDPNj_uh1x5Jai0' },
-    { id: 2, title: 'Mercado Municipal', time: '5 days ago', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC28YN3o5-O2GGVSuuDxJadkOzpWI7P_5htytdkDFo1Gn0OozQLutocMppCeaVwEe00gjT_V8K4FiL4hPRdvX796qKtJm6Mf3xqHJDSOuP0eb4N8tDH9jgoQ0o1WEWL-g7UpKsSHUFB9em4p7P4Cpdi8m5M5wlVA3PO2KQ_YV-TIz8_IlRGecSubNgUlzcy4EZ6-TuIFk-43Gze4cGUhg1DTCx1-qOBfl3N6ZmNFl2TPvO8Vyt24voCLHRbkI-kOp8-OC6P1x56Fss' }
-  ];
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchHistory() {
+      try {
+        const response = await api.get('/api/v1/users/me/xp-history');
+        setActivities(response.data.data || []);
+      } catch (error) {
+        console.error('Erro ao buscar histórico de XP:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHistory();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="mt-10 items-center">
+        <ActivityIndicator color="#fd6c28" />
+      </View>
+    );
+  }
+
+  if (activities.length === 0) {
+    return (
+      <View className="mt-10 mb-8">
+        <Text className="text-xl font-bold tracking-tight mb-6 text-on-surface">Atividade Recente</Text>
+        <View className="bg-surface-container p-6 rounded-xl border border-on-background/5 items-center">
+          <MaterialIcons name="history" size={40} color="#fd6c2820" />
+          <Text className="text-on-surface-variant text-center mt-2 font-sans">
+            Nenhuma atividade registrada ainda.
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="mt-10 mb-8">
-      <Text className="text-xl font-bold tracking-tight mb-6 text-on-surface">Recent Adventures</Text>
+      <Text className="text-xl font-bold tracking-tight mb-6 text-on-surface">Histórico de Conquistas</Text>
       {activities.map((item) => (
-        <View key={item.id} className="bg-white rounded-xl p-3 flex-row items-center mb-4">
-          <Image source={{ uri: item.img }} className="w-20 h-20 rounded-lg" />
+        <View key={item.id} className="bg-white rounded-lg p-3 flex-row items-center mb-4 shadow-sm border border-gray-100">
+          <View className="bg-tertiary/10 w-12 h-12 rounded-full items-center justify-center">
+            <MaterialIcons name="bolt" size={24} color="#ffba26" />
+          </View>
           <View className="flex-1 px-4">
-            <Text className="text-surface-container-lowest font-extrabold text-lg leading-tight">{item.title}</Text>
+            <Text className="text-gray-900 font-bold text-base leading-tight">{item.reason}</Text>
             <View className="flex-row items-center mt-1">
-              <MaterialIcons name="schedule" size={14} color="#001017" />
-              <Text className="text-xs font-bold text-surface-container-lowest ml-1">{item.time}</Text>
+              <MaterialIcons name="event" size={14} color="#666" />
+              <Text className="text-xs font-medium text-gray-500 ml-1">
+                {new Date(item.createdAt).toLocaleDateString('pt-BR')}
+              </Text>
             </View>
           </View>
-          <MaterialIcons name="chevron-right" size={24} color="#fd6c28" />
+          <View className="items-end">
+            <Text className="text-orange-600 font-black text-lg">+{item.amount}</Text>
+            <Text className="text-[8px] font-bold text-orange-600 uppercase tracking-tighter">XP</Text>
+          </View>
         </View>
       ))}
     </View>

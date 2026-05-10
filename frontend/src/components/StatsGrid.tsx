@@ -2,12 +2,17 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
+import { useAuth } from '../contexts/AuthContext';
+
 export default function StatsGrid() {
+  const { user } = useAuth();
+  const coins = user?.coins || 0;
+
   const stats = [
-    { icon: 'location-on', count: '128', label: 'Check-ins' },
-    { icon: 'map', count: '42', label: 'Routes' },
-    { icon: 'bolt', count: '15', label: 'Quests' },
-    { icon: 'group', count: '24', label: 'Friends' },
+    { icon: 'payments', count: coins.toString(), label: 'ExploraCoins' },
+    { icon: 'location-on', count: '0', label: 'Check-ins' },
+    { icon: 'map', count: '0', label: 'Rotas' },
+    { icon: 'bolt', count: '0', label: 'Quests' },
   ];
 
   return (

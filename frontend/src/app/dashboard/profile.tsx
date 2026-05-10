@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Importando nossos componentes reutilizáveis!
 import ExplorerHeader from '../../components/ExplorerHeader';
@@ -10,11 +11,42 @@ import AchievementsList from '../../components/AchievementsList';
 import RecentActivity from '../../components/RecentActivity';
 
 export default function ExplorerProfile() {
+  const { updateUserPreferences } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        await updateUserPreferences();
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  if (isRefreshing) {
+    return (
+      <SafeAreaView className="flex-1 bg-surface justify-center items-center">
+        <ActivityIndicator size="large" color="#fd6c28" />
+        <Text className="mt-4 text-primary font-sans">Carregando explorador...</Text>
+      </SafeAreaView>
+    );
+  }
   return (
-    <SafeAreaView className="flex-1 bg-surface">
+    <View className="flex-1 bg-surface">
       <ExplorerHeader />
 
-      <ScrollView className="flex-1 pt-20 px-6" contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ 
+          paddingTop: 80, 
+          paddingBottom: 120, 
+          paddingHorizontal: 24 
+        }} 
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+      >
         <UserStats />
         <StatsGrid />
         <AchievementsList />
@@ -40,6 +72,6 @@ export default function ExplorerProfile() {
            <Text className="font-sans text-[10px] font-bold uppercase tracking-widest mt-1 text-surface">Profile</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
