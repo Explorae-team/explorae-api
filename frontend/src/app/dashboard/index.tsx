@@ -115,10 +115,12 @@ export default function ExploreScreen() {
           />
 
           {/* Categories */}
-          <CategoryCarousel 
-            selectedCategoryId={selectedCategory}
-            onSelect={handleCategorySelect}
-          />
+          <View className="items-center">
+            <CategoryCarousel 
+              selectedCategoryId={selectedCategory}
+              onSelect={handleCategorySelect}
+            />
+          </View>
 
           {/* Recommendations Feed */}
           <View className="gap-y-6">
@@ -141,7 +143,7 @@ export default function ExploreScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
               >
-                {attractions.slice(0, 5).map((attraction) => (
+                {attractions.slice(0, 10).map((attraction) => (
                   <AttractionCard
                     key={attraction.id}
                     {...attraction}

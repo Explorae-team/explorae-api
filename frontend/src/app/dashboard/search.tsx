@@ -90,10 +90,12 @@ export default function SearchScreen() {
                 onFilterPress={() => setIsFilterModalVisible(true)}
               />
 
-              <CategoryCarousel 
-                selectedCategoryId={selectedCategory}
-                onSelect={handleCategorySelect}
-              />
+              <View className="items-center">
+                <CategoryCarousel 
+                  selectedCategoryId={selectedCategory}
+                  onSelect={handleCategorySelect}
+                />
+              </View>
 
               <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
                 {isLoading ? 'Buscando...' : (attractions.length > 0 ? 'Resultados Encontrados' : 'Nenhum resultado')}

@@ -28,13 +28,18 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
 }) => {
   return (
     <View className="flex-col gap-y-6">
-      <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant px-6">
+      <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant text-center">
         Categorias
       </Text>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+        contentContainerStyle={{ 
+          paddingHorizontal: 24, 
+          gap: 16,
+          flexGrow: 1,
+          justifyContent: 'center'
+        }}
       >
         {CATEGORIES.map((category) => {
           const isSelected = selectedCategoryId === category.id;
