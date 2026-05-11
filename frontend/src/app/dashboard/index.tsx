@@ -31,6 +31,19 @@ const colors = {
 
 export default function ExploreScreen() {
   const { user, logout, updateUserPreferences } = useAuth() as any;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
+
+  // Constrói objeto de filtros para o hook
+  const filters = useMemo(() => ({
+    category: selectedCategory || undefined,
+    minRating: activeFilters?.minRating || undefined,
+    minPrice: activeFilters?.priceRange?.length ? Math.min(...activeFilters.priceRange) : undefined,
+    maxPrice: activeFilters?.priceRange?.length ? Math.max(...activeFilters.priceRange) : undefined,
+    openNow: activeFilters?.openNow || undefined,
+  }), [selectedCategory, activeFilters]);
+
   const {
     attractions,
     isLoading,
@@ -39,16 +52,23 @@ export default function ExploreScreen() {
     hasMore,
     refresh,
     loadMore
-  } = useExploreData();
-  const router = useRouter();
+  } = useExploreData(filters);
 
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const router = useRouter();
 
   const handleRefresh = async () => {
     await Promise.all([
       refresh(),
       updateUserPreferences() // Atualiza XP/Level do usuário
     ]);
+  };
+
+  const handleCategorySelect = (id: string) => {
+    setSelectedCategory(prev => prev === id ? null : id);
+  };
+
+  const handleApplyFilters = (filters: FilterState) => {
+    setActiveFilters(filters);
   };
 
   const handleProfilePress = () => {
@@ -95,7 +115,10 @@ export default function ExploreScreen() {
           />
 
           {/* Categories */}
-          <CategoryCarousel />
+          <CategoryCarousel 
+            selectedCategoryId={selectedCategory}
+            onSelect={handleCategorySelect}
+          />
 
           {/* Recommendations Feed */}
           <View className="gap-y-6">
@@ -212,7 +235,8 @@ export default function ExploreScreen() {
       <FiltersModal 
         isVisible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
-        onApply={(filters) => console.log('Filters applied on Dashboard:', filters)}
+        onApply={handleApplyFilters}
+        initialFilters={activeFilters || undefined}
       />
 
       <AppFooter activeTab="explore" />

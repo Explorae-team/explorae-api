@@ -9,12 +9,12 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
-  { id: 'cultura', name: 'Cultura', icon: 'theater-comedy' },
-  { id: 'praia', name: 'Praia', icon: 'beach-access' },
-  { id: 'historico', name: 'Histórico', icon: 'account-balance' },
-  { id: 'natureza', name: 'Natureza', icon: 'forest' },
-  { id: 'compras', name: 'Compras', icon: 'shopping-bag' },
-  { id: 'lazer', name: 'Lazer', icon: 'celebration' },
+  { id: 'Cultura', name: 'Cultura', icon: 'theater-comedy' },
+  { id: 'Praia', name: 'Praia', icon: 'beach-access' },
+  { id: 'Histórico', name: 'Histórico', icon: 'account-balance' },
+  { id: 'Natureza', name: 'Natureza', icon: 'forest' },
+  { id: 'Compras', name: 'Compras', icon: 'shopping-bag' },
+  { id: 'Lazer', name: 'Lazer', icon: 'celebration' },
 ];
 
 interface CategoryCarouselProps {
