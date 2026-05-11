@@ -35,6 +35,8 @@ export default function CadastroScreen() {
 
   const [errors, setErrors] = useState<CadastroErrorMap>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async () => {
     const newErrors: CadastroErrorMap = {};
@@ -65,7 +67,7 @@ export default function CadastroScreen() {
         password: formData.password
       };
 
-      console.log('Iniciando expedição de registro...', registrationData);
+      // Removido log inseguro de dados de expedição
       
       const response = await register(registrationData);
 
@@ -144,10 +146,12 @@ export default function CadastroScreen() {
                   label="Senha"
                   iconName="lock-closed"
                   placeholder="••••••••"
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   value={formData.password}
                   onChangeText={(text) => setFormData({ ...formData, password: text })}
                   error={errors.password}
+                  rightIconName={showPassword ? "eye-off" : "eye"}
+                  onRightIconPress={() => setShowPassword(!showPassword)}
                 />
               </View>
               <View className="flex-1">
@@ -155,10 +159,12 @@ export default function CadastroScreen() {
                   label="Confirmar"
                   iconName="shield-checkmark"
                   placeholder="••••••••"
-                  secureTextEntry
+                  secureTextEntry={!showConfirmPassword}
                   value={formData.confirmPassword}
                   onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
                   error={errors.confirmPassword}
+                  rightIconName={showConfirmPassword ? "eye-off" : "eye"}
+                  onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
                 />
               </View>
             </View>

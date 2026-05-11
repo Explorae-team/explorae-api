@@ -29,7 +29,7 @@ export const UserProgressHero: React.FC<UserProgressHeroProps> = ({
           </Text>
         </View>
         <View className="bg-tertiary-container px-4 py-1.5 rounded-full flex-row items-center space-x-2 border border-tertiary/20">
-          <MaterialIcons name="military_tech" size={16} color="#ffba26" />
+          <MaterialIcons name="military-tech" size={16} color="#ffba26" />
           <Text className="text-tertiary font-bold text-sm">Nível {level}</Text>
         </View>
       </View>

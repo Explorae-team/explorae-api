@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { View, Text, TextInput, TextInputProps, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface AuthInputProps extends TextInputProps {
@@ -7,6 +6,8 @@ interface AuthInputProps extends TextInputProps {
   iconName: keyof typeof Ionicons.glyphMap;
   error?: string;
   rightElement?: React.ReactNode;
+  rightIconName?: keyof typeof Ionicons.glyphMap;
+  onRightIconPress?: () => void;
 }
 
 export default function AuthInput({
@@ -14,6 +15,9 @@ export default function AuthInput({
   iconName,
   error,
   rightElement,
+  rightIconName,
+  onRightIconPress,
+  secureTextEntry, // Extraído para controle explícito se necessário
   ...textInputProps
 }: AuthInputProps) {
   return (
@@ -25,17 +29,31 @@ export default function AuthInput({
         {rightElement}
       </View>
       
-      <View className="relative">
-        <View className="absolute left-4 top-[14px] z-10">
+      <View className="relative justify-center">
+        <View className="absolute left-4 z-20">
           <Ionicons name={iconName} size={20} color="#94A3B8" />
         </View>
+        
         <TextInput
           placeholderTextColor="#94A3B8"
-          className={`bg-slate-50 pl-12 pr-4 py-4 rounded-2xl text-[#003646] font-semibold ${
+          secureTextEntry={secureTextEntry}
+          className={`bg-slate-50 pl-12 ${rightIconName ? 'pr-12' : 'pr-4'} py-4 rounded-2xl text-[#003646] font-semibold ${
             error ? "border border-red-200" : ""
           }`}
           {...textInputProps}
         />
+
+        {rightIconName && (
+          <TouchableOpacity 
+            onPress={onRightIconPress}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            className="absolute right-4 z-20"
+            style={{ padding: 4 }}
+          >
+            <Ionicons name={rightIconName} size={22} color="#fd6c28" />
+          </TouchableOpacity>
+        )}
       </View>
       
       {error && (

@@ -55,7 +55,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
       <Pressable 
         onPress={onPress}
         style={{ backgroundColor: colors.surfaceContainerHigh }}
-        className="rounded-xl overflow-hidden border border-white/5 w-40 active:scale-95 transition-transform"
+        className="rounded-xl overflow-hidden border border-white/5 w-40"
       >
         <View className="h-28 w-full">
           <Image source={{ uri: imageUrl }} contentFit="cover" className="w-full h-full" />
@@ -76,7 +76,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
     <Pressable 
       onPress={onPress}
       style={{ backgroundColor: colors.surfaceContainerHigh }}
-      className="rounded-2xl overflow-hidden shadow-2xl border border-transparent active:border-primary/20 transition-all"
+      className="rounded-2xl overflow-hidden shadow-2xl border border-transparent"
     >
       {/* SECTION 1: HERO IMAGE */}
       <View className="h-40 w-full relative">
@@ -106,7 +106,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           onPress={onFavoritePress}
           testID="favorite-button"
           style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
-          className="absolute top-3 right-3 w-8 h-8 rounded-full items-center justify-center shadow-sm active:scale-110"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full items-center justify-center shadow-sm"
         >
           <MaterialIcons 
             name={isFavorite ? "favorite" : "favorite-border"} 

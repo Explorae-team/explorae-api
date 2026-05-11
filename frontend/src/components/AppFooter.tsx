@@ -54,7 +54,7 @@ const AppFooter: React.FC<AppFooterProps> = ({
               <View key={tab.key} className="items-center justify-center -top-6">
                 <Pressable
                   onPress={() => handlePress(tab)}
-                  className="bg-primary w-14 h-14 rounded-2xl items-center justify-center shadow-lg shadow-primary/40 active:scale-95"
+                  className="bg-primary w-14 h-14 rounded-2xl items-center justify-center shadow-lg shadow-primary/40"
                 >
                   <Ionicons name={tab.icon} size={32} color="white" />
                 </Pressable>

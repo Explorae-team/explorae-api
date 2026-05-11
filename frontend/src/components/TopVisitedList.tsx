@@ -16,11 +16,11 @@ const MOCK_TOP: TopAttraction[] = [
 
 export const TopVisitedList: React.FC = () => {
   return (
-    <View className="space-y-4 px-6">
+    <View className="gap-y-6 px-6">
       <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
         Mais Visitados
       </Text>
-      <View className="space-y-3">
+      <View className="flex-col gap-y-4">
         {MOCK_TOP.map((item, index) => (
           <Pressable 
             key={item.id}

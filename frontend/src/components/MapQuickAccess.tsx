@@ -10,7 +10,7 @@ export const MapQuickAccess: React.FC<MapQuickAccessProps> = ({ onPress }) => {
   return (
     <Pressable 
       onPress={onPress}
-      className="mx-6 h-32 rounded-2xl overflow-hidden border border-outline-variant/20 active:scale-[0.98] transition-transform mb-10"
+      className="mx-6 h-32 rounded-2xl overflow-hidden border border-outline-variant/20"
     >
       <ImageBackground 
         source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAlNB5RpYyiDx0vZZpazyoKtI_oXKbJSA1JA47H2mKHh_9KqYhYMuPS4fWEGTc857raJJBZziBSQSzuRfXGJc5hcNxTgjdaZJKwapBK45Q2LvJq-VSKMy7W3SrBiWohgtm8tsmIAq3QconK9E6Nrls9upwWpg_evLDp9DsCGWagzRNc6XMyQXmjUcyQwTPD5KbE9UVvldilQQ_tU2-t3KzjTlOLXhe_2WW4_TMQVCqicNOrL2fHBw-cbBKHXgwW3FowrHrE4EAz-CE' }}

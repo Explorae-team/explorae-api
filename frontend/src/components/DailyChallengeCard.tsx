@@ -22,7 +22,7 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
   return (
     <Pressable 
       onPress={onPress}
-      className="mx-6 rounded-2xl bg-surface-container-high border border-outline-variant/10 overflow-hidden active:scale-[0.98] transition-transform"
+      className="mx-6 rounded-2xl bg-surface-container-high border border-outline-variant/10 overflow-hidden"
     >
       <View className="p-6 space-y-4">
         <View className="flex-row justify-between items-start">
@@ -33,7 +33,7 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
             <Text className="text-xl font-bold text-on-surface">{title}</Text>
           </View>
           <View className="bg-on-primary-container p-3 rounded-2xl shadow-lg">
-            <MaterialIcons name="emoji_events" size={24} color="#591c00" />
+            <MaterialIcons name="emoji-events" size={24} color="#591c00" />
           </View>
         </View>
 

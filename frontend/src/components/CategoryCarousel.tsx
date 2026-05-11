@@ -10,15 +10,15 @@ interface Category {
 
 const CATEGORIES: Category[] = [
   { id: '1', name: 'Natureza', icon: 'forest' },
-  { id: '2', name: 'Cultura', icon: 'theater_comedy' },
+  { id: '2', name: 'Cultura', icon: 'theater-comedy' },
   { id: '3', name: 'Gastronomia', icon: 'restaurant' },
-  { id: '4', name: 'História', icon: 'account_balance' },
+  { id: '4', name: 'História', icon: 'account-balance' },
   { id: '5', name: 'Aventura', icon: 'explore' },
 ];
 
 export const CategoryCarousel: React.FC = () => {
   return (
-    <View className="space-y-4">
+    <View className="flex-col gap-y-6">
       <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant px-6">
         Categorias
       </Text>

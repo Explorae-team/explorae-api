@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -19,20 +18,20 @@ export const ExploreHeader: React.FC<ExploreHeaderProps> = ({
 
   return (
     <View 
-      style={{ paddingTop: insets.top + 12 }}
-      className="bg-surface/80 border-b border-outline-variant/10 px-6 pb-4 flex-row justify-between items-center z-50"
+      style={{ paddingTop: insets.top + 16 }}
+      className="bg-[#00161e] border-b border-white/5 px-6 pb-4 flex-row justify-between items-center"
     >
-      <View className="flex-row items-center">
+      <View style={{ width: 150, height: 40 }}>
         <Image 
           source={require('../../assets/branding/logo-main.png')}
-          contentFit="contain"
-          className="w-32 h-10"
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="contain"
         />
       </View>
 
       <Pressable 
         onPress={onNotificationsPress}
-        className="p-2 rounded-full active:bg-surface-bright/50 transition-colors"
+        className="p-2 rounded-full active:bg-surface-bright/50"
       >
         <MaterialIcons name="notifications" size={24} color="#fd6c28" />
       </Pressable>

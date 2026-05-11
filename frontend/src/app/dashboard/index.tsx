@@ -64,7 +64,7 @@ export default function ExploreScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 60, paddingTop: 24 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -74,7 +74,7 @@ export default function ExploreScreen() {
           />
         }
       >
-        <View className="space-y-8">
+        <View className="gap-y-14">
 
           {/* Hero: User Stats */}
           <UserProgressHero
@@ -97,7 +97,7 @@ export default function ExploreScreen() {
           <CategoryCarousel />
 
           {/* Recommendations Feed */}
-          <View className="space-y-4">
+          <View className="gap-y-6">
             <View className="flex-row justify-between items-center px-6">
               <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
                 Recomendado para você
@@ -136,18 +136,18 @@ export default function ExploreScreen() {
           <MapQuickAccess onPress={() => console.log('Open Map')} />
 
           {/* Vertical Feed (Paginated) */}
-          <View className="px-6 pb-20">
-            <View className="flex-row justify-between items-center mb-6">
+          <View className="px-6 pb-32">
+            <View className="flex-row justify-between items-center mb-8">
               <Text style={{ color: colors.onSurface }} className="text-lg font-bold">
                 Descubra
               </Text>
-              <Pressable className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full active:scale-95">
+              <Pressable className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full">
                 <Text className="text-sm font-bold text-primary">Filtros</Text>
                 <MaterialIcons name="tune" size={16} color="#fd6c28" />
               </Pressable>
             </View>
 
-            <View className="space-y-6">
+            <View className="flex-col gap-y-10">
               {attractions.length > 0 ? (
                 attractions.map((attraction, index) => (
                   <AttractionCard 
@@ -172,7 +172,7 @@ export default function ExploreScreen() {
               {hasMore ? (
                 <Pressable 
                   onPress={loadMore}
-                  className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20 active:bg-surface-bright"
+                  className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                 >
                   {isLoadingMore ? (
                     <ActivityIndicator color="#fd6c28" />
@@ -193,7 +193,7 @@ export default function ExploreScreen() {
                   </Text>
                   <Pressable 
                     onPress={() => console.log('Open Map')}
-                    className="bg-surface border-2 border-primary py-3 px-8 rounded-full active:bg-primary/5 active:scale-95 transition-all w-full"
+                    className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
                   >
                     <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
                   </Pressable>

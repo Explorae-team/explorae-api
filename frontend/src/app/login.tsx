@@ -29,6 +29,7 @@ export default function LoginScreen() {
 
   const [errors, setErrors] = useState<LoginErrors>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = () => {
     const newErrors: LoginErrors = {};
@@ -117,10 +118,12 @@ export default function LoginScreen() {
               label="Senha"
               iconName="lock-closed-outline"
               placeholder="••••••••"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
               error={errors.password}
+              rightIconName={showPassword ? "eye-off-outline" : "eye-outline"}
+              onRightIconPress={() => setShowPassword(!showPassword)}
               rightElement={
                 <TouchableOpacity>
                   <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
