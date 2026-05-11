@@ -46,11 +46,11 @@ export default function AchievementsList() {
         className="pb-4"
         contentContainerStyle={{ paddingRight: 20 }}
       >
-        {badges.map((b) => (
+        {badges.map((b: any) => (
           <View key={b.id} className="items-center w-24 mr-4">
             <View 
               className="w-20 h-20 rounded-full bg-surface-bright items-center justify-center border-2 mb-3"
-              style={{ borderColor: categoryColors[b.category] || '#fd6c28' }}
+              style={{ borderColor: (categoryColors as any)[b.category] || '#fd6c28' }}
             >
               {b.iconUrl ? (
                 <Image 

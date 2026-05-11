@@ -23,7 +23,7 @@ export const ExploreHeader: React.FC<ExploreHeaderProps> = ({
     >
       <View style={{ width: 150, height: 40 }}>
         <Image 
-          source={require('../../assets/branding/logo-main.png')}
+          source={require('../../../assets/branding/logo-main.png')}
           style={{ width: '100%', height: '100%' }}
           resizeMode="contain"
         />
