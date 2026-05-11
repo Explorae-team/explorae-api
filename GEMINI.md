@@ -39,7 +39,6 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 ## 📌 Próximos Passos (Sprint 03)
 
 1. **Dashboard**: Iniciar a construção da tela principal (Explore) consumindo as preferências.
-2. [ ] **Docker**: Criar `docker-compose.yml` para subir o ambiente completo.
 
 ## 🛠 Decisões Técnicas (Monorepo)
 - **Sincronia**: Mudanças que afetam Back e Front devem ser feitas no mesmo PR.
