@@ -16,6 +16,7 @@ function InitialLayout() {
     ...MaterialIcons.font,
   });
   const segments = useSegments();
+  const [isMounted, setIsMounted] = React.useState(false);
   const router = useRouter();
   const params = useGlobalSearchParams();
   const isEditMode = params.mode === 'edit';
@@ -23,7 +24,11 @@ function InitialLayout() {
   const isLoading = isAuthLoading || (!fontsLoaded && !fontError);
 
   useEffect(() => {
-    if (isLoading) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || isLoading) return;
 
     const inAppGroup = segments[0] === 'dashboard' || segments[0] === 'preferences';
     const isAuthRoute = segments[0] === 'login' || segments[0] === 'cadastro';
@@ -41,7 +46,7 @@ function InitialLayout() {
         router.replace('/dashboard');
       }
     }
-  }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode]);
+  }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode, isMounted]);
 
   if (isLoading) {
     return (
