@@ -9,14 +9,23 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
-  { id: '1', name: 'Natureza', icon: 'forest' },
-  { id: '2', name: 'Cultura', icon: 'theater-comedy' },
-  { id: '3', name: 'Gastronomia', icon: 'restaurant' },
-  { id: '4', name: 'História', icon: 'account-balance' },
-  { id: '5', name: 'Aventura', icon: 'explore' },
+  { id: 'cultura', name: 'Cultura', icon: 'theater-comedy' },
+  { id: 'praia', name: 'Praia', icon: 'beach-access' },
+  { id: 'historico', name: 'Histórico', icon: 'account-balance' },
+  { id: 'natureza', name: 'Natureza', icon: 'forest' },
+  { id: 'compras', name: 'Compras', icon: 'shopping-bag' },
+  { id: 'lazer', name: 'Lazer', icon: 'celebration' },
 ];
 
-export const CategoryCarousel: React.FC = () => {
+interface CategoryCarouselProps {
+  selectedCategoryId?: string | null;
+  onSelect?: (id: string) => void;
+}
+
+export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ 
+  selectedCategoryId, 
+  onSelect 
+}) => {
   return (
     <View className="flex-col gap-y-6">
       <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant px-6">
@@ -25,21 +34,44 @@ export const CategoryCarousel: React.FC = () => {
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 24, gap: 24 }}
+        contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
       >
-        {CATEGORIES.map((category) => (
-          <Pressable 
-            key={category.id} 
-            className="items-center space-y-3"
-          >
-            <View className="w-16 h-16 rounded-full bg-surface-bright items-center justify-center shadow-lg border border-outline-variant/10">
-              <MaterialIcons name={category.icon} size={30} color="#fd6c28" />
-            </View>
-            <Text className="text-xs font-semibold text-on-surface">
-              {category.name}
-            </Text>
-          </Pressable>
-        ))}
+        {CATEGORIES.map((category) => {
+          const isSelected = selectedCategoryId === category.id;
+          
+          return (
+            <Pressable 
+              key={category.id} 
+              onPress={() => onSelect?.(category.id)}
+              className="items-center"
+            >
+              <View 
+                className="w-16 h-16 rounded-2xl items-center justify-center border"
+                style={{
+                  backgroundColor: isSelected ? '#fd6c28' : '#002e3c',
+                  borderColor: isSelected ? '#fd6c28' : 'rgba(65, 72, 75, 0.1)',
+                  shadowColor: isSelected ? '#fd6c28' : 'transparent',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: isSelected ? 0.3 : 0,
+                  shadowRadius: 8,
+                  elevation: isSelected ? 4 : 0,
+                }}
+              >
+                <MaterialIcons 
+                  name={category.icon} 
+                  size={28} 
+                  color={isSelected ? 'white' : '#fd6c28'} 
+                />
+              </View>
+              <Text 
+                className="text-[10px] mt-2 font-bold"
+                style={{ color: isSelected ? '#fd6c28' : '#c1c7cc' }}
+              >
+                {category.name.toUpperCase()}
+              </Text>
+            </Pressable>
+          );
+        })}
       </ScrollView>
     </View>
   );

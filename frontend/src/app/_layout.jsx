@@ -69,6 +69,7 @@ function InitialLayout() {
       <Stack.Screen name="login" options={{ title: 'Login', headerShown: false }} />
       <Stack.Screen name="cadastro" options={{ title: 'Criar Conta', headerShown: false }} />
       <Stack.Screen name="dashboard/index" options={{ title: 'Dashboard', headerShown: false }} />
+      <Stack.Screen name="dashboard/search" options={{ title: 'Busca', headerShown: false }} />
       <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
       <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
     </Stack>

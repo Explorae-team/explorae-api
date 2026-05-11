@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   View,
@@ -20,6 +20,7 @@ import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
 import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
 import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
+import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
 import AppFooter from '../../components/AppFooter';
 
 const colors = {
@@ -41,6 +42,8 @@ export default function ExploreScreen() {
   } = useExploreData();
   const router = useRouter();
 
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
   const handleRefresh = async () => {
     await Promise.all([
       refresh(),
@@ -54,8 +57,6 @@ export default function ExploreScreen() {
 
   return (
     <View className="flex-1 bg-surface">
-      <Stack.Screen options={{ headerShown: false }} />
-
       <ExploreHeader
         userPhotoUrl={user?.photoUrl}
         onProfilePress={handleProfilePress}
@@ -141,7 +142,10 @@ export default function ExploreScreen() {
               <Text style={{ color: colors.onSurface }} className="text-lg font-bold">
                 Descubra
               </Text>
-              <Pressable className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full">
+              <Pressable 
+                onPress={() => setIsFilterModalVisible(true)}
+                className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full active:bg-surface-bright"
+              >
                 <Text className="text-sm font-bold text-primary">Filtros</Text>
                 <MaterialIcons name="tune" size={16} color="#fd6c28" />
               </Pressable>
@@ -204,6 +208,12 @@ export default function ExploreScreen() {
 
         </View>
       </ScrollView>
+
+      <FiltersModal 
+        isVisible={isFilterModalVisible}
+        onClose={() => setIsFilterModalVisible(false)}
+        onApply={(filters) => console.log('Filters applied on Dashboard:', filters)}
+      />
 
       <AppFooter activeTab="explore" />
     </View>
