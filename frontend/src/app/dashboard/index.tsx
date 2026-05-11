@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ScrollView,
   View,
@@ -174,16 +174,17 @@ export default function ExploreScreen() {
               </Pressable>
             </View>
 
-            <View className="flex-col gap-y-10">
+            <View className="flex-col md:flex-row md:flex-wrap gap-y-10 md:gap-x-[2%] md:gap-y-8">
               {attractions.length > 0 ? (
                 attractions.map((attraction, index) => (
-                  <AttractionCard 
-                    key={`${attraction.id}-${index}`}
-                    {...attraction}
-                    isPopular={index % 4 === 0}
-                    isNew={index === 1}
-                    onPress={() => console.log('Attraction pressed', attraction.id)}
-                  />
+                  <View key={`${attraction.id}-${index}`} className="w-full md:w-[32%]">
+                    <AttractionCard 
+                      {...attraction}
+                      isPopular={index % 4 === 0}
+                      isNew={index === 1}
+                      onPress={() => console.log('Attraction pressed', attraction.id)}
+                    />
+                  </View>
                 ))
               ) : !isLoading && (
                 <View className="items-center py-10">

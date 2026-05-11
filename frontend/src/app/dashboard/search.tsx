@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, Pressable, ActivityIndicator, FlatList, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
@@ -59,9 +59,12 @@ export default function SearchScreen() {
       <View className="flex-1">
         <FlatList
           data={attractions}
-          keyExtractor={(item) => item.id}
+          key={Platform.OS === 'web' ? 'web-grid' : 'mobile-list'}
+          numColumns={Platform.OS === 'web' ? 3 : 1}
+          columnWrapperStyle={Platform.OS === 'web' ? { paddingHorizontal: 24, gap: 16 } : null}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
           renderItem={({ item }) => (
-            <View className="px-6 mb-6">
+            <View className={Platform.OS === 'web' ? 'flex-1 mb-6' : 'px-6 mb-6'}>
               <AttractionCard 
                 title={item.title}
                 tagline={item.tagline}
