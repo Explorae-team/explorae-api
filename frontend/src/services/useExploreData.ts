@@ -14,7 +14,16 @@ interface Attraction {
   isPartner?: boolean;
 }
 
-export const useExploreData = () => {
+export interface ExploreFilters {
+  name?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  openNow?: boolean;
+}
+
+export const useExploreData = (filters?: ExploreFilters) => {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -26,7 +35,6 @@ export const useExploreData = () => {
   const fetchAttractions = useCallback(async (pageNum: number, refresh = false) => {
     if (refresh) {
       setIsRefreshing(true);
-      setPage(0);
     } else if (pageNum > 0) {
       setIsLoadingMore(true);
     } else {
@@ -37,11 +45,14 @@ export const useExploreData = () => {
 
     try {
       const response = await api.get('/api/v1/attractions', {
-        params: { page: pageNum, size: 5 }
+        params: { 
+          page: pageNum, 
+          size: 10,
+          ...filters
+        }
       });
 
       const pageData = response.data?.data;
-      console.log('API Response PageData:', JSON.stringify(pageData, null, 2));
       const content = pageData?.content || [];
       
       const mappedAttractions = content.map((item: any) => ({
@@ -52,19 +63,20 @@ export const useExploreData = () => {
         rating: item.averageRating || 4.5,
         distance: item.distance || '2.4 km',
         type: item.category || 'Sightseeing',
-        tags: item.tags || ['Cultural', 'Histórico'], // Fallback tags se não houver no banco
+        tags: item.tags || [],
         priceRange: item.priceRange || 2,
         isPartner: item.isPartner || false
       }));
 
-      if (refresh) {
+      if (refresh || pageNum === 0) {
         setAttractions(mappedAttractions);
+        setPage(0);
       } else {
         setAttractions(prev => [...prev, ...mappedAttractions]);
+        setPage(pageNum);
       }
 
       setHasMore(!pageData?.last);
-      setPage(pageNum);
     } catch (err: any) {
       console.error('Erro ao buscar atrações:', err);
       setError('Não foi possível carregar as atrações.');
@@ -73,7 +85,7 @@ export const useExploreData = () => {
       setIsLoadingMore(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [filters]);
 
   const loadMore = useCallback(() => {
     if (!isLoadingMore && hasMore) {
@@ -85,9 +97,12 @@ export const useExploreData = () => {
     fetchAttractions(0, true);
   }, [fetchAttractions]);
 
+  // Serializa filtros para dependência estável
+  const filterString = JSON.stringify(filters);
+
   useEffect(() => {
-    fetchAttractions(0);
-  }, []);
+    fetchAttractions(0, true);
+  }, [filterString]);
 
   return {
     attractions,

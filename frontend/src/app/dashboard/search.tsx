@@ -1,18 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, ScrollView, SafeAreaView, Pressable, ActivityIndicator, FlatList } from 'react-native';
 import { Stack } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
 import { SearchBar } from '../../components/dashboard/SearchBar';
 import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
+import { AttractionCard } from '../../components/dashboard/AttractionCard';
 import AppFooter from '../../components/AppFooter';
+import { useExploreData } from '../../services/useExploreData';
 
 export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
+
+  // Debounce para busca textual
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Constrói objeto de filtros para o hook
+  const filters = useMemo(() => ({
+    name: debouncedSearch || undefined,
+    category: selectedCategory || undefined,
+    minRating: activeFilters?.minRating || undefined,
+    minPrice: activeFilters?.priceRange?.length ? Math.min(...activeFilters.priceRange) : undefined,
+    maxPrice: activeFilters?.priceRange?.length ? Math.max(...activeFilters.priceRange) : undefined,
+    openNow: activeFilters?.openNow || undefined,
+  }), [debouncedSearch, selectedCategory, activeFilters]);
+
+  const {
+    attractions,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    loadMore,
+    error
+  } = useExploreData(filters);
 
   const handleCategorySelect = (id: string) => {
     setSelectedCategory(prev => prev === id ? null : id);
@@ -20,66 +48,82 @@ export default function SearchScreen() {
 
   const handleApplyFilters = (filters: FilterState) => {
     setActiveFilters(filters);
-    console.log('Filters Applied:', filters);
   };
 
   return (
     <View className="flex-1 bg-surface">
-      
       <ExploreHeader 
         onNotificationsPress={() => console.log('Notifications')}
       />
 
-      <ScrollView 
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="px-6 pt-6 gap-y-10">
-          <Text className="text-2xl font-bold text-on-surface">
-            Buscar Atrações
-          </Text>
-
-          {/* SearchBar */}
-          <SearchBar 
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onFilterPress={() => setIsFilterModalVisible(true)}
-          />
-
-          {/* Categories */}
-          <CategoryCarousel 
-            selectedCategoryId={selectedCategory}
-            onSelect={handleCategorySelect}
-          />
-
-          {/* Results Area (Placeholder) */}
-          <View className="mt-4">
-            <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-6">
-              {searchQuery || selectedCategory || activeFilters ? 'Resultados Encontrados' : 'Sugestões para você'}
-            </Text>
-            
-            <View className="items-center py-20 bg-surface-container-low rounded-3xl border border-dashed border-outline-variant/20">
-              <MaterialIcons 
-                name={searchQuery || selectedCategory || activeFilters ? "search" : "auto-awesome"} 
-                size={48} 
-                color="#8b9296" 
+      <View className="flex-1">
+        <FlatList
+          data={attractions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View className="px-6 mb-6">
+              <AttractionCard 
+                title={item.title}
+                tagline={item.tagline}
+                imageUrl={item.imageUrl}
+                rating={item.rating}
+                distance={item.distance}
+                type={item.type}
+                priceRange={item.priceRange}
+                isPartner={item.isPartner}
               />
-              <Text className="mt-4 text-on-surface-variant font-medium">
-                {searchQuery || selectedCategory || activeFilters
-                  ? `Buscando por "${searchQuery || selectedCategory || 'filtros ativos'}"...` 
-                  : "Explore por nome ou categoria"
-                }
+            </View>
+          )}
+          ListHeaderComponent={
+            <View className="px-6 pt-6 gap-y-8 mb-6">
+              <Text className="text-2xl font-bold text-on-surface">
+                Buscar Atrações
+              </Text>
+
+              <SearchBar 
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onFilterPress={() => setIsFilterModalVisible(true)}
+              />
+
+              <CategoryCarousel 
+                selectedCategoryId={selectedCategory}
+                onSelect={handleCategorySelect}
+              />
+
+              <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
+                {isLoading ? 'Buscando...' : (attractions.length > 0 ? 'Resultados Encontrados' : 'Nenhum resultado')}
               </Text>
             </View>
-          </View>
-        </View>
-      </ScrollView>
+          }
+          ListEmptyComponent={
+            !isLoading && (
+              <View className="items-center py-20 px-10">
+                <MaterialIcons name="search-off" size={48} color="#8b9296" />
+                <Text className="mt-4 text-on-surface-variant font-medium text-center">
+                  {error || "Não encontramos nada com esses filtros. Tente ajustar sua busca."}
+                </Text>
+              </View>
+            )
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
+              <View className="py-6">
+                <ActivityIndicator color="#fd6c28" />
+              </View>
+            ) : <View className="h-24" />
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
 
       <FiltersModal 
         isVisible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
         onApply={handleApplyFilters}
+        initialFilters={activeFilters || undefined}
       />
 
       <AppFooter activeTab="search" />

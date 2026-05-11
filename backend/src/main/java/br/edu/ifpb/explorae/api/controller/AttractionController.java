@@ -1,5 +1,6 @@
 package br.edu.ifpb.explorae.api.controller;
 
+import br.edu.ifpb.explorae.api.dto.AttractionFiltersDTO;
 import br.edu.ifpb.explorae.api.dto.AttractionResponseDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
 import br.edu.ifpb.explorae.service.AttractionService;
@@ -23,9 +24,10 @@ public class AttractionController {
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getAll(
+            AttractionFiltersDTO filters,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        Page<AttractionResponseDTO> page = service.findAll(pageable);
+        Page<AttractionResponseDTO> page = service.findAll(filters, pageable);
         return ResponseEntity.ok(StandardResponseDTO.success(
                 "Atrações recuperadas com sucesso",
                 page
