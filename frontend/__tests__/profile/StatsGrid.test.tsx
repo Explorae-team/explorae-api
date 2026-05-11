@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import StatsGrid from '../../src/components/StatsGrid';
+import StatsGrid from '../../src/components/profile/StatsGrid';
 import { useAuth } from '../../src/contexts/AuthContext';
 
 // Mock do Contexto de Autenticação

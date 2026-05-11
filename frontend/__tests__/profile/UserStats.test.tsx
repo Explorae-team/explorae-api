@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import UserStats from '../../src/components/UserStats';
+import UserStats from '../../src/components/profile/UserStats';
 import { useAuth } from '../../src/contexts/AuthContext';
 
 jest.setTimeout(30000);

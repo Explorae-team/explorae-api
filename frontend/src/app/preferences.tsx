@@ -12,8 +12,8 @@ export default function PreferencesScreen() {
   const { mode } = useLocalSearchParams();
   const isEditMode = mode === 'edit';
 
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (isEditMode) {

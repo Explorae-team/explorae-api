@@ -2,13 +2,13 @@ import React from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Image } from 'react-native';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function AchievementsList() {
-  const { user } = useAuth();
+  const { user } = useAuth() as any;
   
   // Mapeamento de cores para categorias de medalhas
   const categoryColors = {
@@ -59,7 +59,7 @@ export default function AchievementsList() {
                   resizeMode="contain"
                 />
               ) : (
-                <MaterialIcons name="emoji-events" size={36} color={categoryColors[b.category] || '#fd6c28'} />
+                <MaterialIcons name="emoji-events" size={36} color={(categoryColors as any)[b.category] || '#fd6c28'} />
               )}
             </View>
             <Text className="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter px-1">

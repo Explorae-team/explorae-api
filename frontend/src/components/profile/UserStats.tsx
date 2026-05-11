@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
-import api from '../services/api';
+import api from '../../services/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 

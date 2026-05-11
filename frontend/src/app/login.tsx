@@ -13,9 +13,9 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter, Link } from "expo-router";
 import { useState } from "react";
-import { LoginForm, LoginErrors } from '../types/login.types';
+import { LoginForm, LoginErrors } from './login.types';
 import { Ionicons } from "@expo/vector-icons";
-import AuthInput from "../components/AuthInput";
+import AuthInput from "../components/auth/AuthInput";
 import PrimaryButton from "../components/PrimaryButton";
 
 export default function LoginScreen() {

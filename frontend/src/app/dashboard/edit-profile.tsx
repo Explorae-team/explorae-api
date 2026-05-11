@@ -2,11 +2,11 @@ import React from 'react';
 import { ScrollView, SafeAreaView } from 'react-native';
 
 
-import EditProfileHeader from '../../components/EditProfileHeader';
-import ProfilePhotoEdit from '../../components/ProfilePhotoEdit';
-import ProfileForm from '../../components/ProfileForm';
-import InterestsSection from '../../components/InterestsSection';
-import AccountSettingsList from '../../components/AccountSettingsList';
+import EditProfileHeader from '../../components/settings/EditProfileHeader';
+import ProfilePhotoEdit from '../../components/settings/ProfilePhotoEdit';
+import ProfileForm from '../../components/settings/ProfileForm';
+import InterestsSection from '../../components/settings/InterestsSection';
+import AccountSettingsList from '../../components/settings/AccountSettingsList';
 
 export default function EditProfileScreen() {
   return (

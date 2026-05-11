@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function StatsGrid() {
   const { user } = useAuth() as any;

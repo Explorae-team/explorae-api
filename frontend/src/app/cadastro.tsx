@@ -13,7 +13,7 @@ import { Stack, Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { CadastroFormData, CadastroErrorMap } from './cadastro.types';
 import { useAuth } from '../contexts/AuthContext';
-import AuthInput from '../components/AuthInput';
+import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
 
 /**

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import api from '../services/api';
+import api from '../../services/api';
 
 export default function RecentActivity() {
   const [activities, setActivities] = useState<any[]>([]);

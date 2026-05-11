@@ -3,12 +3,12 @@ import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'r
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
-import SettingsGroup from '../components/SettingsGroup';
-import SettingsItem from '../components/SettingsItem';
+import SettingsGroup from '../components/settings/SettingsGroup';
+import SettingsItem from '../components/settings/SettingsItem';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout } = useAuth() as any;
 
   const handleLogout = () => {
     Alert.alert(

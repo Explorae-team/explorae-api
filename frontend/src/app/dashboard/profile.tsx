@@ -4,14 +4,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 
 // Importando nossos componentes reutilizáveis!
-import ExplorerHeader from '../../components/ExplorerHeader';
-import UserStats from '../../components/UserStats';
-import StatsGrid from '../../components/StatsGrid';
-import AchievementsList from '../../components/AchievementsList';
-import RecentActivity from '../../components/RecentActivity';
+import ExplorerHeader from '../../components/profile/ExplorerHeader';
+import UserStats from '../../components/profile/UserStats';
+import StatsGrid from '../../components/profile/StatsGrid';
+import AchievementsList from '../../components/profile/AchievementsList';
+import RecentActivity from '../../components/profile/RecentActivity';
 
 export default function ExplorerProfile() {
-  const { updateUserPreferences } = useAuth();
+  const { updateUserPreferences } = useAuth() as any;
   const [isRefreshing, setIsRefreshing] = useState(true);
 
   useEffect(() => {

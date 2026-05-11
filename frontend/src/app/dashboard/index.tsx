@@ -13,13 +13,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useExploreData } from '../../services/useExploreData';
 
 // Components
-import { ExploreHeader } from '../../components/ExploreHeader';
-import { UserProgressHero } from '../../components/UserProgressHero';
-import { DailyChallengeCard } from '../../components/DailyChallengeCard';
-import { CategoryCarousel } from '../../components/CategoryCarousel';
-import { AttractionCard } from '../../components/AttractionCard';
-import { TopVisitedList } from '../../components/TopVisitedList';
-import { MapQuickAccess } from '../../components/MapQuickAccess';
+import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
+import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
+import { DailyChallengeCard } from '../../components/dashboard/DailyChallengeCard';
+import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
+import { AttractionCard } from '../../components/dashboard/AttractionCard';
+import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
+import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
 import AppFooter from '../../components/AppFooter';
 
 const colors = {
@@ -29,7 +29,7 @@ const colors = {
 };
 
 export default function ExploreScreen() {
-  const { user, logout, updateUserPreferences } = useAuth();
+  const { user, logout, updateUserPreferences } = useAuth() as any;
   const {
     attractions,
     isLoading,

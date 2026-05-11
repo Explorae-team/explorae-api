@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileForm() {
   const { user } = useAuth() as any;

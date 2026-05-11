@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { AttractionCard } from '../AttractionCard';
+import { AttractionCard } from '../dashboard/AttractionCard';
 
 // Mock do Expo Icons para evitar erros no teste
 jest.mock('@expo/vector-icons', () => ({
