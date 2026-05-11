@@ -39,7 +39,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   rating,
   distance,
   type,
-  tags,
+  tags = [],
   isFavorite = false,
   isPopular = false,
   isNew = false,

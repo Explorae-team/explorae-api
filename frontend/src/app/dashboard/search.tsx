@@ -69,6 +69,7 @@ export default function SearchScreen() {
                 rating={item.rating}
                 distance={item.distance}
                 type={item.type}
+                tags={item.tags}
                 priceRange={item.priceRange}
                 isPartner={item.isPartner}
               />
