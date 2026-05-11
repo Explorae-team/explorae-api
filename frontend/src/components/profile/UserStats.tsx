@@ -192,7 +192,8 @@ export default function UserStats() {
                 placeholder="Sua bio (até 150 caracteres)"
                 maxLength={150}
                 multiline
-                className="text-on-surface-variant font-medium text-center border border-on-surface/10 rounded-xl p-3 min-h-[60px]"
+                className="text-on-surface-variant font-medium text-center border border-on-surface/10 rounded-xl p-3"
+                style={{ minHeight: 80, textAlignVertical: 'top' }}
               />
               <Text className="text-[10px] text-on-surface-variant text-right mt-1">
                 {tempBio.length}/150

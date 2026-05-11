@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -37,6 +39,9 @@ public class Attraction {
 
     @Column(name = "long_description", columnDefinition = "TEXT")
     private String longDescription;
+
+    @Column
+    private String address;
 
     @Column(nullable = false)
     private Double latitude;
@@ -70,4 +75,16 @@ public class Attraction {
     @Builder.Default
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "attraction_images", joinColumns = @JoinColumn(name = "attraction_id"))
+    @Column(name = "image_url")
+    @Builder.Default
+    private List<String> imageUrls = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "attraction_highlights", joinColumns = @JoinColumn(name = "attraction_id"))
+    @Column(name = "highlight")
+    @Builder.Default
+    private List<String> highlights = new ArrayList<>();
 }
