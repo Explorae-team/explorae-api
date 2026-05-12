@@ -16,7 +16,7 @@ public record AttractionResponseDTO(
         Boolean isPartner
 ) {
     public static AttractionResponseDTO fromEntity(Attraction attraction) {
-        String mainImage = attraction.getImages().isEmpty() ? null : attraction.getImages().get(0);
+        String mainImage = attraction.getImageUrls().isEmpty() ? null : attraction.getImageUrls().get(0);
         return new AttractionResponseDTO(
                 attraction.getId(),
                 attraction.getName(),
