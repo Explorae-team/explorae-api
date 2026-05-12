@@ -30,6 +30,8 @@ const colors = {
 
 export default function ExploreScreen() {
   const { user, logout, updateUserPreferences } = useAuth() as any;
+  const [selectedCategory, setSelectedCategory] = React.useState('');
+  
   const {
     attractions,
     isLoading,
@@ -43,9 +45,14 @@ export default function ExploreScreen() {
 
   const handleRefresh = async () => {
     await Promise.all([
-      refresh(),
-      updateUserPreferences() // Atualiza XP/Level do usuário
+      refresh(selectedCategory),
+      updateUserPreferences()
     ]);
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    refresh(category);
   };
 
   const handleProfilePress = () => {
@@ -94,7 +101,10 @@ export default function ExploreScreen() {
           />
 
           {/* Categories */}
-          <CategoryCarousel />
+          <CategoryCarousel 
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+          />
 
           {/* Recommendations Feed */}
           <View className="gap-y-6">
@@ -130,7 +140,7 @@ export default function ExploreScreen() {
           </View>
 
           {/* Top Visited */}
-          <TopVisitedList />
+          <TopVisitedList attractions={attractions} />
 
           {/* Map Quick Access */}
           <MapQuickAccess onPress={() => console.log('Open Map')} />
@@ -155,7 +165,7 @@ export default function ExploreScreen() {
                     {...attraction}
                     isPopular={index % 4 === 0}
                     isNew={index === 1}
-                    onPress={() => console.log('Attraction pressed', attraction.id)}
+                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                   />
                 ))
               ) : !isLoading && (
@@ -171,7 +181,7 @@ export default function ExploreScreen() {
             <View className="mt-10">
               {hasMore ? (
                 <Pressable 
-                  onPress={loadMore}
+                  onPress={() => loadMore(selectedCategory)}
                   className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                 >
                   {isLoadingMore ? (

@@ -23,7 +23,7 @@ export const useExploreData = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchAttractions = useCallback(async (pageNum: number, refresh = false) => {
+  const fetchAttractions = useCallback(async (pageNum: number, category?: string, refresh = false) => {
     if (refresh) {
       setIsRefreshing(true);
       setPage(0);
@@ -37,27 +37,37 @@ export const useExploreData = () => {
 
     try {
       const response = await api.get('/api/v1/attractions', {
-        params: { page: pageNum, size: 5 }
+        params: {
+          page: pageNum,
+          size: 5,
+          category: category === 'Todos' ? undefined : category
+        }
       });
 
       const pageData = response.data?.data;
-      console.log('API Response PageData:', JSON.stringify(pageData, null, 2));
       const content = pageData?.content || [];
-      
-      const mappedAttractions = content.map((item: any) => ({
-        id: item.id,
-        title: item.name,
-        tagline: item.shortDescription,
-        imageUrl: item.mainImageUrl,
-        rating: item.averageRating || 4.5,
-        distance: item.distance || '2.4 km',
-        type: item.category || 'Sightseeing',
-        tags: item.tags || ['Cultural', 'Histórico'], // Fallback tags se não houver no banco
-        priceRange: item.priceRange || 2,
-        isPartner: item.isPartner || false
-      }));
 
-      if (refresh) {
+      const mappedAttractions = content.map((item: any) => {
+        // Gerar tags dinâmicas baseadas na categoria se o back não enviar
+        const defaultTags = item.category === 'Praia' ? ['Mar', 'Verão', 'Lazer'] :
+          item.category === 'Cultura' ? ['Arte', 'Museu', 'História'] :
+            ['Exploração', 'Turismo', 'Aventura'];
+
+        return {
+          id: item.id,
+          title: item.name,
+          tagline: item.shortDescription,
+          imageUrl: item.mainImageUrl || (item.imageUrls && item.imageUrls[0]) || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500',
+          rating: item.averageRating || 0.0,
+          distance: item.distance || '2.4 km',
+          type: item.category || 'Atração',
+          tags: item.tags && item.tags.length > 0 ? item.tags : defaultTags,
+          priceRange: item.priceRange || 2,
+          isPartner: item.isPartner || false
+        };
+      });
+
+      if (refresh || pageNum === 0) {
         setAttractions(mappedAttractions);
       } else {
         setAttractions(prev => [...prev, ...mappedAttractions]);
@@ -75,14 +85,14 @@ export const useExploreData = () => {
     }
   }, []);
 
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback((category?: string) => {
     if (!isLoadingMore && hasMore) {
-      fetchAttractions(page + 1);
+      fetchAttractions(page + 1, category);
     }
   }, [fetchAttractions, page, isLoadingMore, hasMore]);
 
-  const refresh = useCallback(() => {
-    fetchAttractions(0, true);
+  const refresh = useCallback((category?: string) => {
+    fetchAttractions(0, category, true);
   }, [fetchAttractions]);
 
   useEffect(() => {

@@ -34,9 +34,15 @@ public class AttractionService {
     private final AttractionMapper attractionMapper;
 
     @Transactional(readOnly = true)
-    public Page<AttractionResponseDTO> findAll(Pageable pageable) {
-        return attractionRepository.findAll(pageable)
-                .map(AttractionResponseDTO::fromEntity);
+    public Page<AttractionResponseDTO> findAll(String category, Pageable pageable) {
+        Page<Attraction> page;
+        if (category != null && !category.isEmpty()) {
+            page = attractionRepository.findByCategory(category, pageable);
+        } else {
+            page = attractionRepository.findAll(pageable);
+        }
+        return page.map(AttractionResponseDTO::fromEntity);
+
     }
 
     @Transactional(readOnly = true)

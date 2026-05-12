@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
@@ -32,13 +33,12 @@ public class AttractionController {
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getAll(
-            @PageableDefault(size = 10) Pageable pageable
-    ) {
-        Page<AttractionResponseDTO> page = attractionService.findAll(pageable);
+            @RequestParam(required = false) String category,
+            @PageableDefault(size = 10) Pageable pageable) {
+        Page<AttractionResponseDTO> page = attractionService.findAll(category, pageable);
         return ResponseEntity.ok(StandardResponseDTO.success(
                 "Atrações recuperadas com sucesso",
-                page
-        ));
+                page));
     }
 
     @GetMapping("/{id}")
