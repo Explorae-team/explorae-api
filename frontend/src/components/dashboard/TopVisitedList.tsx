@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Image } from 'expo-image';
 
 interface TopAttraction {
   id: string;
@@ -45,8 +44,7 @@ export const TopVisitedList: React.FC<TopVisitedListProps> = ({ attractions }) =
               <Image 
                 source={{ uri: item.imageUrl }} 
                 className="w-20 h-20 rounded-[20px]"
-                contentFit="cover"
-                transition={400}
+                resizeMode="cover"
               />
               <View 
                 className="absolute -top-2 -left-2 w-8 h-8 rounded-full items-center justify-center border-2 border-[#003646]"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,14 +11,33 @@ export default function SettingsScreen() {
   const { logout } = useAuth() as any;
 
   const handleLogout = () => {
-    Alert.alert(
-      "Sair da Conta",
-      "Deseja realmente sair da sua conta?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Sair", style: "destructive", onPress: () => logout() }
-      ]
-    );
+    console.log('🚪 [Settings] Solicitando logout...');
+    
+    const onConfirm = async () => {
+      console.log('✅ [Settings] Confirmou logout');
+      await logout();
+      console.log('🚀 [Settings] Redirecionando manualmente para /login');
+      router.replace('/login');
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm("Deseja realmente sair da sua conta?")) {
+        onConfirm();
+      }
+    } else {
+      Alert.alert(
+        "Sair da Conta",
+        "Deseja realmente sair da sua conta?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { 
+            text: "Sair", 
+            style: "destructive", 
+            onPress: onConfirm
+          }
+        ]
+      );
+    }
   };
 
   const handleDeleteAccount = () => {

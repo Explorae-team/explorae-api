@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
+import storage from '../../utils/storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -17,21 +18,25 @@ export default function ProfilePhotoEdit() {
     : null;
 
   const handlePickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão negada', 'Precisamos de permissão para acessar suas fotos.');
-      return;
-    }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Precisamos de acesso à sua galeria.');
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
 
-    if (!result.canceled) {
-      uploadImage(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets[0]) {
+        uploadImage(result.assets[0].uri);
+      }
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível abrir a galeria.');
     }
   };
 
@@ -39,34 +44,32 @@ export default function ProfilePhotoEdit() {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      const filename = uri.split('/').pop();
-      const match = /\.(\w+)$/.exec(filename || '');
-      const type = match ? `image/${match[1]}` : `image`;
+      const filename = uri.split('/').pop() || 'avatar.jpg';
+      const type = 'image/jpeg';
 
       if (Platform.OS === 'web') {
         const response = await fetch(uri);
         const blob = await response.blob();
-        
-        // Extrai a extensão do tipo MIME (ex: image/png -> png)
-        const extension = blob.type.split('/')[1] || 'jpg';
-        const webFilename = `avatar-${Date.now()}.${extension}`;
-        
-        formData.append('file', blob, webFilename);
+        formData.append('file', blob, filename);
       } else {
         // @ts-ignore
         formData.append('file', { uri, name: filename, type });
       }
 
-      await api.post('/api/v1/users/me/avatar', formData, {
+      const token = await storage.getItem('auth_token');
+      const response = await fetch(`${api.defaults.baseURL}/api/v1/users/me/avatar`, {
+        method: 'POST',
+        body: formData,
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
-      Alert.alert('Sucesso', 'Foto de perfil atualizada!');
-    } catch (error) {
-      console.error('Erro no upload:', error);
-      Alert.alert('Erro', 'Falha ao fazer upload da imagem');
+      if (!response.ok) throw new Error('Falha no servidor');
+
+      Alert.alert('Sucesso', 'Foto atualizada com sucesso!');
+    } catch (error: any) {
+      Alert.alert('Erro no Upload', 'Não foi possível salvar sua foto.');
     } finally {
       setIsSaving(false);
     }
@@ -81,25 +84,22 @@ export default function ProfilePhotoEdit() {
         className="w-32 h-32 rounded-full shadow-xl items-center justify-center overflow-hidden"
         style={{ backgroundColor: tierColor }}
       >
-        <View className="w-[124px] h-[124px] rounded-full bg-surface items-center justify-center">
-          {avatarUrl ? (
-            <Image 
-              source={{ uri: avatarUrl }} 
-              className="w-full h-full rounded-full" 
-            />
-          ) : (
-            <View className="w-full h-full rounded-full bg-surface-container items-center justify-center">
-              <MaterialIcons name="person" size={64} color={tierColor} />
-            </View>
-          )}
-          
-          <View className="absolute inset-0 bg-black/20 items-center justify-center">
-            <MaterialIcons name="camera-alt" size={24} color="white" />
-          </View>
+        {avatarUrl ? (
+          <Image 
+            source={{ uri: avatarUrl }} 
+            className="w-full h-full" 
+          />
+        ) : (
+          <MaterialIcons name="person" size={64} color="white" />
+        )}
+        
+        {/* Camera Overlay */}
+        <View className="absolute bottom-0 w-full h-8 bg-black/50 items-center justify-center">
+           <MaterialIcons name="camera-alt" size={18} color="white" />
         </View>
 
         {isSaving && (
-          <View className="absolute inset-0 bg-black/40 items-center justify-center rounded-full">
+          <View className="absolute inset-0 bg-black/40 items-center justify-center">
             <ActivityIndicator color="white" />
           </View>
         )}

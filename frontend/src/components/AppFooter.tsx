@@ -40,10 +40,8 @@ const AppFooter: React.FC<AppFooterProps> = ({
   return (
     <View className="bg-surface/95 border-t border-outline-variant/10 flex-row items-end justify-around pb-8 pt-2 px-2"
       style={{
-        ...Platform.select({
-          ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.05, shadowRadius: 8 },
-          android: { elevation: 8 }
-        })
+        boxShadow: '0px -4px 8px rgba(0, 0, 0, 0.05)',
+        elevation: 8
       }}
     >
         {tabs.map((tab) => {

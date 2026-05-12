@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="014-create-saved-attractions-table" author="explorae-team">
+        <createTable tableName="saved_attractions">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attraction_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="saved_at" type="TIMESTAMP" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="saved_attractions" 
+                             columnNames="user_id, attraction_id" 
+                             constraintName="uk_user_attraction"/>
+
+        <addForeignKeyConstraint baseTableName="saved_attractions" 
+                                 baseColumnNames="user_id" 
+                                 referencedTableName="users" 
+                                 referencedColumnNames="id" 
+                                 constraintName="fk_saved_user"/>
+
+        <addForeignKeyConstraint baseTableName="saved_attractions" 
+                                 baseColumnNames="attraction_id" 
+                                 referencedTableName="attractions" 
+                                 referencedColumnNames="id" 
+                                 constraintName="fk_saved_attraction"/>
+    </changeSet>
+</databaseChangeLog>

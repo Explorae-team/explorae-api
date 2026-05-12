@@ -18,4 +18,5 @@
     <include file="db/changelog/changes/011-create-attraction-highlights-table.xml"/>
     <include file="db/changelog/changes/012-create-attraction-reviews-table.xml"/>
     <include file="db/changelog/changes/013-more-images-seed.xml"/>
+    <include file="db/changelog/changes/014-create-saved-attractions-table.xml"/>
 </databaseChangeLog>

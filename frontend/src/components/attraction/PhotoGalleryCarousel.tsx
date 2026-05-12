@@ -67,10 +67,10 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
           {safeImages.map((_, index) => (
             <View
               key={index}
-              style={{ 
+              style={{
                 height: 6,
                 borderRadius: 3,
-                width: index === currentIndex ? 32 : 8,
+                width: index === currentIndex ? 15 : 8,
                 backgroundColor: index === currentIndex ? '#F2641F' : 'rgba(255,255,255,0.3)'
               }}
             />
@@ -88,14 +88,14 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999 }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Pressable 
-                style={{ position: 'absolute', top: 50, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
+              <Pressable
+                style={{ position: 'absolute', top: 30, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
                 onPress={() => setIsModalVisible(false)}
               >
-                <MaterialCommunityIcons name="close" size={30} color="white" />
+                <MaterialCommunityIcons name="close" size={30} color="#F2641F" />
               </Pressable>
 
-              <Pressable 
+              <Pressable
                 onPress={() => setIsModalVisible(false)}
                 style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
               >

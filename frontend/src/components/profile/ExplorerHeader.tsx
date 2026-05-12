@@ -2,21 +2,22 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ExplorerHeader() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   
   return (
     <View 
-      className="flex-row justify-between items-center px-6 h-16 w-full absolute top-0 z-50"
+      className="flex-row justify-between items-center px-6 w-full absolute top-0 z-50"
       style={{
+        paddingTop: insets.top,
+        height: 64 + insets.top,
         backgroundColor: '#00161e',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(189, 233, 254, 0.1)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
         elevation: 10,
       }}
     >

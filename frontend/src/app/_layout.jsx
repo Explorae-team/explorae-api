@@ -25,7 +25,8 @@ function InitialLayout() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAppGroup = segments[0] === 'dashboard' || segments[0] === 'preferences';
+    const protectedRoutes = ['dashboard', 'preferences', 'settings', 'attraction'];
+    const inAppGroup = protectedRoutes.includes(segments[0]);
     const isAuthRoute = segments[0] === 'login' || segments[0] === 'cadastro';
 
     if (!isAuthenticated && inAppGroup) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -13,6 +14,7 @@ import RecentActivity from '../../components/profile/RecentActivity';
 export default function ExplorerProfile() {
   const { updateUserPreferences } = useAuth() as any;
   const [isRefreshing, setIsRefreshing] = useState(true);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -27,10 +29,10 @@ export default function ExplorerProfile() {
 
   if (isRefreshing) {
     return (
-      <SafeAreaView className="flex-1 bg-surface justify-center items-center">
+      <View className="flex-1 bg-surface justify-center items-center">
         <ActivityIndicator size="large" color="#fd6c28" />
         <Text className="mt-4 text-primary font-sans">Carregando explorador...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
   return (
@@ -40,7 +42,7 @@ export default function ExplorerProfile() {
       <ScrollView 
         className="flex-1" 
         contentContainerStyle={{ 
-          paddingTop: 80, 
+          paddingTop: insets.top + 80, 
           paddingBottom: 160, 
           paddingHorizontal: 24,
           flexGrow: 1
