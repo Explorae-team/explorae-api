@@ -122,7 +122,7 @@ export default function ExploreScreen() {
                     key={attraction.id}
                     {...attraction}
                     variant="compact"
-                    onPress={() => console.log('Attraction pressed', attraction.id)}
+                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                   />
                 ))}
               </ScrollView>

@@ -71,6 +71,13 @@ function InitialLayout() {
       <Stack.Screen name="dashboard/index" options={{ title: 'Dashboard', headerShown: false }} />
       <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
       <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
+      <Stack.Screen 
+        name="attraction/[id]" 
+        options={{ 
+          title: 'Detalhes da Atração',
+          headerShown: false // Reforça que não quer o header aqui
+        }} 
+      />
     </Stack>
   );
 }
