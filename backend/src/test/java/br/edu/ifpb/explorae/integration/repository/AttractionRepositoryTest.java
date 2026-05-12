@@ -34,7 +34,7 @@ class AttractionRepositoryTest {
                 .longitude(-34.8776)
                 .address("Centro, João Pessoa - PB")
                 .priceRange(1)
-                .images(List.of("http://image1.jpg", "http://image2.jpg"))
+                .imageUrls(List.of("http://image1.jpg", "http://image2.jpg"))
                 .build();
 
         // When
@@ -45,8 +45,8 @@ class AttractionRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getName()).isEqualTo("Parque Solon de Lucena");
         assertThat(found.get().getAddress()).isEqualTo("Centro, João Pessoa - PB");
-        assertThat(found.get().getImages()).hasSize(2);
-        assertThat(found.get().getImages()).contains("http://image1.jpg", "http://image2.jpg");
+        assertThat(found.get().getImageUrls()).hasSize(2);
+        assertThat(found.get().getImageUrls()).contains("http://image1.jpg", "http://image2.jpg");
     }
 
     @Test
@@ -59,7 +59,7 @@ class AttractionRepositoryTest {
                 .shortDescription("Teatro histórico.")
                 .latitude(-7.1150)
                 .longitude(-34.8850)
-                .images(List.of("http://theater1.jpg"))
+                .imageUrls(List.of("http://theater1.jpg"))
                 .build();
         
         Attraction saved = attractionRepository.save(attraction);
