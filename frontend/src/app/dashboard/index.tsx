@@ -20,7 +20,6 @@ import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
 import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
 import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
-import AppFooter from '../../components/AppFooter';
 
 const colors = {
   onSurface: '#bde9fe',
@@ -215,7 +214,6 @@ export default function ExploreScreen() {
         </View>
       </ScrollView>
 
-      <AppFooter activeTab="explore" />
     </View>
   );
 }

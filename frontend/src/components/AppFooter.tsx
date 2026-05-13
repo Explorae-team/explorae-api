@@ -18,17 +18,17 @@ interface AppFooterProps {
   couponCount?: number;
 }
 
-const AppFooter: React.FC<AppFooterProps> = ({ 
-  activeTab, 
+const AppFooter: React.FC<AppFooterProps> = ({
+  activeTab,
   questNotification = false,
-  couponCount = 0 
+  couponCount = 0
 }) => {
   const router = useRouter();
 
   const tabs: FooterTab[] = [
     { key: 'routes', label: 'Rotas', icon: 'map-outline', route: '/dashboard/routes' },
-    { key: 'explore', label: 'Explore', icon: 'compass-outline', route: '/dashboard' },
-    { key: 'action', label: 'Explorar', icon: 'add', route: '/dashboard/search', isFAB: true },
+    { key: 'explore', label: 'Buscas', icon: 'search-outline', route: '/dashboard/search' },
+    { key: 'action', label: 'Explorar', icon: 'compass-outline', route: '/dashboard', isFAB: true },
     { key: 'coupons', label: 'Cupons', icon: 'ticket-outline', route: '/dashboard/coupons', badgeCount: couponCount },
     { key: 'profile', label: 'Perfil', icon: 'person-outline', route: '/dashboard/profile', badgeCount: questNotification ? 1 : 0 },
   ];
@@ -44,55 +44,59 @@ const AppFooter: React.FC<AppFooterProps> = ({
         elevation: 8
       }}
     >
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
-          
-          if (tab.isFAB) {
-            return (
-              <View key={tab.key} className="items-center justify-center -top-6">
-                <Pressable
-                  onPress={() => handlePress(tab)}
-                  className="bg-primary w-14 h-14 rounded-2xl items-center justify-center shadow-lg shadow-primary/40"
-                >
-                  <Ionicons name={tab.icon} size={32} color="white" />
-                </Pressable>
-                <Text className="text-[10px] font-medium text-on-surface-variant mt-1">
-                  {tab.label}
-                </Text>
-              </View>
-            );
-          }
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.key;
 
+        if (tab.isFAB) {
           return (
-            <Pressable
-              key={tab.key}
-              onPress={() => handlePress(tab)}
-              className="flex-1 items-center justify-center py-2 active:opacity-70"
-            >
-              <View>
+            <View key={tab.key} className="items-center justify-center -top-3">
+              <Pressable
+                onPress={() => handlePress(tab)}
+                className={`${isActive ? 'bg-primary shadow-primary/40' : 'bg-[#0d3e4e] border border-white/10'} w-14 h-14 rounded-2xl items-center justify-center shadow-lg`}
+              >
                 <Ionicons 
                   name={isActive ? tab.icon.replace('-outline', '') as any : tab.icon} 
-                  size={24} 
-                  color={isActive ? '#FF5C00' : '#8E918F'} 
+                  size={32} 
+                  color={isActive ? 'white' : '#bde9fe'} 
                 />
-                
-                {tab.badgeCount && tab.badgeCount > 0 ? (
-                  <View className="absolute -top-1 -right-1 bg-error min-w-[16px] h-4 rounded-full items-center justify-center px-1">
-                    <Text className="text-[8px] font-bold text-white">
-                      {tab.badgeCount > 9 ? '9+' : tab.badgeCount}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              
-              <Text 
-                className={`text-[10px] mt-1 ${isActive ? 'font-bold text-primary' : 'font-medium text-on-surface-variant'}`}
-              >
+              </Pressable>
+              <Text className={`text-[10px] mt-1 ${isActive ? 'font-bold text-primary' : 'font-medium text-on-surface-variant'}`}>
                 {tab.label}
               </Text>
-            </Pressable>
+            </View>
           );
-        })}
+        }
+
+        return (
+          <Pressable
+            key={tab.key}
+            onPress={() => handlePress(tab)}
+            className="flex-1 items-center justify-center py-2 active:opacity-70"
+          >
+            <View>
+              <Ionicons
+                name={isActive ? tab.icon.replace('-outline', '') as any : tab.icon}
+                size={24}
+                color={isActive ? '#FF5C00' : '#8E918F'}
+              />
+
+              {tab.badgeCount && tab.badgeCount > 0 ? (
+                <View className="absolute -top-1 -right-1 bg-error min-w-[16px] h-4 rounded-full items-center justify-center px-1">
+                  <Text className="text-[8px] font-bold text-white">
+                    {tab.badgeCount > 9 ? '9+' : tab.badgeCount}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+
+            <Text
+              className={`text-[10px] mt-1 ${isActive ? 'font-bold text-primary' : 'font-medium text-on-surface-variant'}`}
+            >
+              {tab.label}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 };
