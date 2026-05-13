@@ -132,7 +132,7 @@ export default function SearchScreen() {
         initialFilters={activeFilters || undefined}
       />
 
-      <AppFooter activeTab="search" />
+
     </View>
   );
 }

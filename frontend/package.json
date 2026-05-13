@@ -15,6 +15,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "axios": "^1.14.0",
+    "@supabase/supabase-js": "^2.49.1",
     "expo": "^55.0.8",
     "expo-blur": "~55.0.14",
     "expo-font": "^55.0.0",

@@ -65,12 +65,12 @@ const AppFooter: React.FC<AppFooterProps> = ({
             <View key={tab.key} className="items-center justify-center -top-3">
               <Pressable
                 onPress={() => handleTabPress(tab.route)}
-                className={`${isActive ? 'bg-primary shadow-primary/40' : 'bg-[#0d3e4e] border border-white/10'} w-14 h-14 rounded-2xl items-center justify-center shadow-lg`}
+                className="bg-primary shadow-primary/40 w-14 h-14 rounded-2xl items-center justify-center shadow-lg"
               >
                 <Ionicons 
-                  name={isActive ? tab.icon.replace('-outline', '') as any : tab.icon} 
+                  name={tab.icon.replace('-outline', '') as any} 
                   size={32} 
-                  color={isActive ? 'white' : '#bde9fe'} 
+                  color="white" 
                 />
               </Pressable>
               <Text className={`text-[10px] mt-1 ${isActive ? 'font-bold text-primary' : 'font-medium text-on-surface-variant'}`}>

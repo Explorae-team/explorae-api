@@ -15,6 +15,10 @@ public record AttractionResponseDTO(
         Integer priceRange,
         Boolean isPartner
 ) {
+    public static AttractionResponseDTO fromEntity(Attraction attraction) {
+        return fromEntity(attraction, null);
+    }
+
     public static AttractionResponseDTO fromEntity(Attraction attraction, String distance) {
         String mainImage = attraction.getImageUrls().isEmpty() ? null : attraction.getImageUrls().get(0);
         return new AttractionResponseDTO(

@@ -17,7 +17,17 @@ export const AuthProvider = ({ children }) => {
         const storedUser = await storage.getItem('user_data');
 
         if (storedToken && storedUser) {
-          setUser(JSON.parse(storedUser));
+          // Tenta validar o token buscando dados atualizados do usuário
+          try {
+            const response = await api.get('/api/v1/users/me');
+            setUser(response.data.data);
+          } catch (error) {
+            // Se falhar (ex: 401), limpa os dados
+            console.warn('Sessão expirada ou inválida:', error);
+            await storage.removeItem('auth_token');
+            await storage.removeItem('user_data');
+            setUser(null);
+          }
         }
       } catch (error) {
         console.error('Erro ao recarregar dados de autenticação:', error);

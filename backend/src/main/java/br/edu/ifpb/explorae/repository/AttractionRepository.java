@@ -10,7 +10,14 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+import java.util.UUID;
+
 @Repository
 public interface AttractionRepository extends JpaRepository<Attraction, UUID>, JpaSpecificationExecutor<Attraction> {
+    
     Page<Attraction> findByCategory(String category, Pageable pageable);
+
+    @Override
+    Page<Attraction> findAll(Pageable pageable);
 }

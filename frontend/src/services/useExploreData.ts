@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { getPublicImageUrl } from './supabase';
 
 interface Attraction {
   id: string;
@@ -75,9 +76,13 @@ export const useExploreData = (filters?: ExploreFilters) => {
             ['Exploração', 'Turismo', 'Aventura'];
 
         const rawImageUrl = item.mainImageUrl || (item.imageUrls && item.imageUrls[0]) || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b';
-        const imageUrl = rawImageUrl.includes('unsplash.com') 
-          ? `${rawImageUrl}?q=80&w=500&auto=format&fit=crop` 
-          : rawImageUrl;
+        
+        // Resolve URL do Supabase se for um caminho relativo
+        const resolvedUrl = getPublicImageUrl(rawImageUrl);
+
+        const imageUrl = resolvedUrl && resolvedUrl.includes('unsplash.com') 
+          ? `${resolvedUrl}?q=80&w=500&auto=format&fit=crop` 
+          : resolvedUrl || rawImageUrl;
 
         return {
           id: item.id,
@@ -93,14 +98,14 @@ export const useExploreData = (filters?: ExploreFilters) => {
         };
       });
 
-      let updatedList: Attraction[];
-      if (refresh || pageNum === 0) {
-        updatedList = mappedAttractions;
-      } else {
-        updatedList = [...attractions, ...mappedAttractions];
-      }
-
-      setAttractions(updatedList);
+      setAttractions(prev => {
+        if (refresh || pageNum === 0) {
+          return mappedAttractions;
+        } else {
+          return [...prev, ...mappedAttractions];
+        }
+      });
+      
       const last = !!pageData?.last;
       setHasMore(!last);
       setPage(pageNum);
@@ -108,7 +113,7 @@ export const useExploreData = (filters?: ExploreFilters) => {
       // Atualiza o cache se não houver filtros aplicados
       if (!filters) {
         attractionCache[cacheKey] = {
-          data: updatedList,
+          data: refresh || pageNum === 0 ? mappedAttractions : [...attractions, ...mappedAttractions],
           page: pageNum,
           hasMore: !last
         };
@@ -139,7 +144,8 @@ export const useExploreData = (filters?: ExploreFilters) => {
 
   useEffect(() => {
     fetchAttractions(0, filters?.category, true);
-  }, [filterString, fetchAttractions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterString]);
 
   return {
     attractions,

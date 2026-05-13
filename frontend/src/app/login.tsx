@@ -125,9 +125,11 @@ export default function LoginScreen() {
               rightIconName={showPassword ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={() => setShowPassword(!showPassword)}
               rightElement={
-                <TouchableOpacity>
-                  <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
-                </TouchableOpacity>
+                <Link href="/recuperar-senha" asChild>
+                  <TouchableOpacity>
+                    <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
+                  </TouchableOpacity>
+                </Link>
               }
             />
 

@@ -5,7 +5,8 @@ import {
   Text,
   RefreshControl,
   ActivityIndicator,
-  Pressable
+  Pressable,
+  Platform
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -183,21 +184,29 @@ export default function ExploreScreen() {
               </Pressable>
             </View>
 
-            <View className="flex-col gap-y-10">
+            <View className={Platform.OS === 'web' ? 'flex-row flex-wrap -mx-2' : 'flex-col gap-y-10'}>
               {isLoading && !isRefreshing ? (
-                [1, 2].map((i) => <AttractionSkeleton key={i} />)
+                [1, 2, 3].map((i) => (
+                  <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                    <AttractionSkeleton />
+                  </View>
+                ))
               ) : attractions.length > 0 ? (
                 attractions.map((attraction, index) => (
-                  <AttractionCard
-                    key={`${attraction.id}-${index}`}
-                    {...attraction}
-                    isPopular={index % 4 === 0}
-                    isNew={index === 1}
-                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
-                  />
+                  <View 
+                    key={`${attraction.id}-${index}`} 
+                    className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                  >
+                    <AttractionCard
+                      {...attraction}
+                      isPopular={index % 4 === 0}
+                      isNew={index === 1}
+                      onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                    />
+                  </View>
                 ))
               ) : (
-                <View className="items-center py-10">
+                <View className="flex-1 items-center py-10 w-full">
                   <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
                   <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
                     Nenhuma atração encontrada no momento.

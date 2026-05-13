@@ -61,10 +61,10 @@ function InitialLayout() {
       if (subRoute === 'profile') return 'profile';
       if (subRoute === 'routes') return 'routes';
       if (subRoute === 'coupons') return 'coupons';
-      if (subRoute === 'search') return 'explore';
-      return 'action';
+      if (subRoute === 'search') return 'search';
+      return 'explore';
     }
-    return 'action';
+    return 'explore';
   };
 
   if (isLoading) {
