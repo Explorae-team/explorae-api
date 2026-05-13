@@ -41,8 +41,8 @@ public class AttractionService {
         } else {
             page = attractionRepository.findAll(pageable);
         }
+        return page.map(AttractionResponseDTO::fromEntity);
 
-        return page.map(attraction -> AttractionResponseDTO.fromEntity(attraction, "2.4 km"));
     }
 
     @Transactional(readOnly = true)
@@ -56,7 +56,7 @@ public class AttractionService {
         }
 
         List<AttractionReview> reviews = reviewRepository.findByAttractionIdOrderByCreatedAtDesc(attractionId);
-        
+
         List<AttractionReviewDTO> reviewDTOs = reviews.stream()
                 .map(attractionMapper::toReviewDTO)
                 .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class AttractionService {
     public AttractionReviewDTO addReview(UUID attractionId, AttractionReviewRequestDTO dto, UUID userId) {
         Attraction attraction = attractionRepository.findById(attractionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Atração não encontrada"));
-        
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 

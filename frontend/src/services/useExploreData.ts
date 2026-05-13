@@ -14,6 +14,9 @@ interface Attraction {
   isPartner?: boolean;
 }
 
+// Cache simples em memória para evitar loading excessivo ao alternar categorias
+const attractionCache: Record<string, { data: Attraction[], page: number, hasMore: boolean }> = {};
+
 export const useExploreData = () => {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,12 +27,22 @@ export const useExploreData = () => {
   const [hasMore, setHasMore] = useState(true);
 
   const fetchAttractions = useCallback(async (pageNum: number, category?: string, refresh = false) => {
+    const cacheKey = category || 'all';
+
+    // Se for a primeira página e tivermos cache, usamos o cache primeiro (SWR)
+    if (pageNum === 0 && attractionCache[cacheKey] && !refresh) {
+      setAttractions(attractionCache[cacheKey].data);
+      setPage(attractionCache[cacheKey].page);
+      setHasMore(attractionCache[cacheKey].hasMore);
+      setIsLoading(false);
+      // Opcional: fazer um fetch silencioso em background para atualizar o cache
+    }
+
     if (refresh) {
       setIsRefreshing(true);
-      setPage(0);
     } else if (pageNum > 0) {
       setIsLoadingMore(true);
-    } else {
+    } else if (!attractionCache[cacheKey]) {
       setIsLoading(true);
     }
 
@@ -48,7 +61,6 @@ export const useExploreData = () => {
       const content = pageData?.content || [];
 
       const mappedAttractions = content.map((item: any) => {
-        // Gerar tags dinâmicas baseadas na categoria se o back não enviar
         const defaultTags = item.category === 'Praia' ? ['Mar', 'Verão', 'Lazer'] :
           item.category === 'Cultura' ? ['Arte', 'Museu', 'História'] :
             ['Exploração', 'Turismo', 'Aventura'];
@@ -64,7 +76,7 @@ export const useExploreData = () => {
           tagline: item.shortDescription,
           imageUrl: imageUrl,
           rating: item.averageRating || 0.0,
-          distance: item.distance || 'Localizando...',
+          distance: item.distance || '2.4 km',
           type: item.category || 'Atração',
           tags: item.tags && item.tags.length > 0 ? item.tags : defaultTags,
           priceRange: item.priceRange || 2,
@@ -72,14 +84,25 @@ export const useExploreData = () => {
         };
       });
 
+      let updatedList: Attraction[];
       if (refresh || pageNum === 0) {
-        setAttractions(mappedAttractions);
+        updatedList = mappedAttractions;
       } else {
-        setAttractions(prev => [...prev, ...mappedAttractions]);
+        updatedList = [...attractions, ...mappedAttractions];
       }
 
-      setHasMore(!pageData?.last);
+      setAttractions(updatedList);
+      const last = !!pageData?.last;
+      setHasMore(!last);
       setPage(pageNum);
+
+      // Atualiza o cache para esta categoria
+      attractionCache[cacheKey] = {
+        data: updatedList,
+        page: pageNum,
+        hasMore: !last
+      };
+
     } catch (err: any) {
       console.error('Erro ao buscar atrações:', err);
       setError('Não foi possível carregar as atrações.');
@@ -88,7 +111,7 @@ export const useExploreData = () => {
       setIsLoadingMore(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [attractions]);
 
   const loadMore = useCallback((category?: string) => {
     if (!isLoadingMore && hasMore) {
