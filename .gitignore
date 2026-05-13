@@ -89,4 +89,17 @@ HELP.md
 /explorae-user-service/target/
 # GSD / Planning
 .planning/
+
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Chaves e Variáveis (SEGURANÇA)
+*.pem
+*.pub
+*.tfvars
+.env
 backend/.m2/
