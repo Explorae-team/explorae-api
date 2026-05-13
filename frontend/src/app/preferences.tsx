@@ -49,6 +49,8 @@ export default function PreferencesScreen() {
       await updateUserPreferences();
       if (isEditMode) {
         router.back();
+      } else {
+        router.replace('/dashboard');
       }
     } else {
       Alert.alert('Erro', result.message);

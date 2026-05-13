@@ -9,12 +9,13 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
+  { id: 'all', name: 'Todos', icon: 'apps' },
   { id: 'Cultura', name: 'Cultura', icon: 'theater-comedy' },
   { id: 'Praia', name: 'Praia', icon: 'beach-access' },
+  { id: 'Gastronomia', name: 'Gastronomia', icon: 'restaurant' },
   { id: 'Histórico', name: 'Histórico', icon: 'account-balance' },
   { id: 'Natureza', name: 'Natureza', icon: 'forest' },
-  { id: 'Compras', name: 'Compras', icon: 'shopping-bag' },
-  { id: 'Lazer', name: 'Lazer', icon: 'celebration' },
+  { id: 'Aventura', name: 'Aventura', icon: 'explore' },
 ];
 
 interface CategoryCarouselProps {
@@ -42,19 +43,20 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
         }}
       >
         {CATEGORIES.map((category) => {
-          const isSelected = selectedCategoryId === category.id;
+          const isAll = category.id === 'all';
+          const isSelected = (isAll && !selectedCategoryId) || selectedCategoryId === category.id;
           
           return (
             <Pressable 
               key={category.id} 
-              onPress={() => onSelect?.(category.id)}
+              onPress={() => onSelect?.(isAll ? '' : category.id)}
               className="items-center"
             >
               <View 
                 className="w-16 h-16 rounded-2xl items-center justify-center border"
                 style={{
-                  backgroundColor: isSelected ? '#fd6c28' : '#002e3c',
-                  borderColor: isSelected ? '#fd6c28' : 'rgba(65, 72, 75, 0.1)',
+                  backgroundColor: isSelected ? '#fd6c28' : '#0d3e4e',
+                  borderColor: isSelected ? '#fd6c28' : 'rgba(189, 233, 254, 0.1)',
                   shadowColor: isSelected ? '#fd6c28' : 'transparent',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: isSelected ? 0.3 : 0,

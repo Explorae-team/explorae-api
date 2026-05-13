@@ -18,10 +18,10 @@ import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
 import { DailyChallengeCard } from '../../components/dashboard/DailyChallengeCard';
 import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
+import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
 import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
 import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
 import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
-import AppFooter from '../../components/AppFooter';
 
 const colors = {
   onSurface: '#bde9fe',
@@ -30,7 +30,7 @@ const colors = {
 };
 
 export default function ExploreScreen() {
-  const { user, logout, updateUserPreferences } = useAuth() as any;
+  const { user, updateUserPreferences } = useAuth() as any;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
@@ -58,8 +58,8 @@ export default function ExploreScreen() {
 
   const handleRefresh = async () => {
     await Promise.all([
-      refresh(),
-      updateUserPreferences() // Atualiza XP/Level do usuário
+      refresh(selectedCategory || undefined),
+      updateUserPreferences()
     ]);
   };
 
@@ -77,6 +77,7 @@ export default function ExploreScreen() {
 
   return (
     <View className="flex-1 bg-surface">
+      <Stack.Screen options={{ headerShown: false }} />
       <ExploreHeader
         userPhotoUrl={user?.photoUrl}
         onProfilePress={handleProfilePress}
@@ -85,7 +86,7 @@ export default function ExploreScreen() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 60, paddingTop: 24 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: 24 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -134,9 +135,15 @@ export default function ExploreScreen() {
             </View>
 
             {isLoading && !isRefreshing ? (
-              <View className="h-40 items-center justify-center">
-                <ActivityIndicator color="#fd6c28" />
-              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+              >
+                {[1, 2, 3].map((i) => (
+                  <AttractionSkeleton key={i} variant="compact" />
+                ))}
+              </ScrollView>
             ) : (
               <ScrollView
                 horizontal
@@ -148,7 +155,7 @@ export default function ExploreScreen() {
                     key={attraction.id}
                     {...attraction}
                     variant="compact"
-                    onPress={() => console.log('Attraction pressed', attraction.id)}
+                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                   />
                 ))}
               </ScrollView>
@@ -156,7 +163,7 @@ export default function ExploreScreen() {
           </View>
 
           {/* Top Visited */}
-          <TopVisitedList />
+          <TopVisitedList attractions={attractions} />
 
           {/* Map Quick Access */}
           <MapQuickAccess onPress={() => console.log('Open Map')} />
@@ -176,19 +183,20 @@ export default function ExploreScreen() {
               </Pressable>
             </View>
 
-            <View className="flex-col md:flex-row md:flex-wrap gap-y-10 md:gap-x-[2%] md:gap-y-8">
-              {attractions.length > 0 ? (
+            <View className="flex-col gap-y-10">
+              {isLoading && !isRefreshing ? (
+                [1, 2].map((i) => <AttractionSkeleton key={i} />)
+              ) : attractions.length > 0 ? (
                 attractions.map((attraction, index) => (
-                  <View key={`${attraction.id}-${index}`} className="w-full md:w-[32%]">
-                    <AttractionCard 
-                      {...attraction}
-                      isPopular={index % 4 === 0}
-                      isNew={index === 1}
-                      onPress={() => console.log('Attraction pressed', attraction.id)}
-                    />
-                  </View>
+                  <AttractionCard
+                    key={`${attraction.id}-${index}`}
+                    {...attraction}
+                    isPopular={index % 4 === 0}
+                    isNew={index === 1}
+                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                  />
                 ))
-              ) : !isLoading && (
+              ) : (
                 <View className="items-center py-10">
                   <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
                   <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
@@ -200,8 +208,8 @@ export default function ExploreScreen() {
 
             <View className="mt-10">
               {hasMore ? (
-                <Pressable 
-                  onPress={loadMore}
+                <Pressable
+                  onPress={() => loadMore(selectedCategory || undefined)}
                   className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                 >
                   {isLoadingMore ? (
@@ -210,7 +218,7 @@ export default function ExploreScreen() {
                     <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
                   )}
                 </Pressable>
-              ) : (
+              ) : attractions.length > 0 ? (
                 <View className="items-center justify-center py-10">
                   <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
                     <MaterialIcons name="route" size={32} color="#8b9296" />
@@ -221,14 +229,14 @@ export default function ExploreScreen() {
                   <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
                     Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
                   </Text>
-                  <Pressable 
+                  <Pressable
                     onPress={() => console.log('Open Map')}
                     className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
                   >
                     <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
                   </Pressable>
                 </View>
-              )}
+              ) : null}
             </View>
           </View>
 
@@ -241,10 +249,6 @@ export default function ExploreScreen() {
         onApply={handleApplyFilters}
         initialFilters={activeFilters || undefined}
       />
-
-      <AppFooter activeTab="explore" />
     </View>
   );
 }
-
-

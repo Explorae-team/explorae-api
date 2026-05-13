@@ -59,8 +59,12 @@ public class GamificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado para atribuição de medalha"));
 
-        Badge badge = badgeRepository.findByName(badgeName)
-                .orElseThrow(() -> new RuntimeException("Medalha não encontrada: " + badgeName));
+        java.util.Optional<Badge> badgeOpt = badgeRepository.findByName(badgeName);
+        if (badgeOpt.isEmpty()) {
+            System.err.println("WARN: Medalha não encontrada: " + badgeName + ". Ignorando erro para não travar a aplicação.");
+            return;
+        }
+        Badge badge = badgeOpt.get();
 
         if (!userBadgeRepository.existsByUserAndBadge(user, badge)) {
             UserBadge userBadge = UserBadge.builder()

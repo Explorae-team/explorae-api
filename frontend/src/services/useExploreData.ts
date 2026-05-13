@@ -23,6 +23,9 @@ export interface ExploreFilters {
   openNow?: boolean;
 }
 
+// Cache simples em memória para evitar loading excessivo ao alternar categorias
+const attractionCache: Record<string, { data: Attraction[], page: number, hasMore: boolean }> = {};
+
 export const useExploreData = (filters?: ExploreFilters) => {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,12 +35,22 @@ export const useExploreData = (filters?: ExploreFilters) => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchAttractions = useCallback(async (pageNum: number, refresh = false) => {
+  const fetchAttractions = useCallback(async (pageNum: number, category?: string, refresh = false) => {
+    const cacheKey = category || 'all';
+
+    // Se for a primeira página e tivermos cache, usamos o cache primeiro (SWR)
+    if (pageNum === 0 && attractionCache[cacheKey] && !refresh && !filters) {
+      setAttractions(attractionCache[cacheKey].data);
+      setPage(attractionCache[cacheKey].page);
+      setHasMore(attractionCache[cacheKey].hasMore);
+      setIsLoading(false);
+    }
+
     if (refresh) {
       setIsRefreshing(true);
     } else if (pageNum > 0) {
       setIsLoadingMore(true);
-    } else {
+    } else if (!attractionCache[cacheKey]) {
       setIsLoading(true);
     }
 
@@ -45,38 +58,62 @@ export const useExploreData = (filters?: ExploreFilters) => {
 
     try {
       const response = await api.get('/api/v1/attractions', {
-        params: { 
-          page: pageNum, 
+        params: {
+          page: pageNum,
           size: 10,
+          category: category === 'Todos' ? undefined : category,
           ...filters
         }
       });
 
       const pageData = response.data?.data;
       const content = pageData?.content || [];
-      
-      const mappedAttractions = content.map((item: any) => ({
-        id: item.id,
-        title: item.name,
-        tagline: item.shortDescription,
-        imageUrl: item.mainImageUrl,
-        rating: item.averageRating || 4.5,
-        distance: item.distance || '2.4 km',
-        type: item.category || 'Sightseeing',
-        tags: item.tags || [],
-        priceRange: item.priceRange || 2,
-        isPartner: item.isPartner || false
-      }));
 
+      const mappedAttractions = content.map((item: any) => {
+        const defaultTags = item.category === 'Praia' ? ['Mar', 'Verão', 'Lazer'] :
+          item.category === 'Cultura' ? ['Arte', 'Museu', 'História'] :
+            ['Exploração', 'Turismo', 'Aventura'];
+
+        const rawImageUrl = item.mainImageUrl || (item.imageUrls && item.imageUrls[0]) || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b';
+        const imageUrl = rawImageUrl.includes('unsplash.com') 
+          ? `${rawImageUrl}?q=80&w=500&auto=format&fit=crop` 
+          : rawImageUrl;
+
+        return {
+          id: item.id,
+          title: item.name,
+          tagline: item.shortDescription,
+          imageUrl: imageUrl,
+          rating: item.averageRating || 0.0,
+          distance: item.distance || '2.4 km',
+          type: item.category || 'Atração',
+          tags: item.tags && item.tags.length > 0 ? item.tags : defaultTags,
+          priceRange: item.priceRange || 2,
+          isPartner: item.isPartner || false
+        };
+      });
+
+      let updatedList: Attraction[];
       if (refresh || pageNum === 0) {
-        setAttractions(mappedAttractions);
-        setPage(0);
+        updatedList = mappedAttractions;
       } else {
-        setAttractions(prev => [...prev, ...mappedAttractions]);
-        setPage(pageNum);
+        updatedList = [...attractions, ...mappedAttractions];
       }
 
-      setHasMore(!pageData?.last);
+      setAttractions(updatedList);
+      const last = !!pageData?.last;
+      setHasMore(!last);
+      setPage(pageNum);
+
+      // Atualiza o cache se não houver filtros aplicados
+      if (!filters) {
+        attractionCache[cacheKey] = {
+          data: updatedList,
+          page: pageNum,
+          hasMore: !last
+        };
+      }
+
     } catch (err: any) {
       console.error('Erro ao buscar atrações:', err);
       setError('Não foi possível carregar as atrações.');
@@ -85,24 +122,24 @@ export const useExploreData = (filters?: ExploreFilters) => {
       setIsLoadingMore(false);
       setIsRefreshing(false);
     }
-  }, [filters]);
+  }, [filters, attractions]);
 
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback((category?: string) => {
     if (!isLoadingMore && hasMore) {
-      fetchAttractions(page + 1);
+      fetchAttractions(page + 1, category);
     }
   }, [fetchAttractions, page, isLoadingMore, hasMore]);
 
-  const refresh = useCallback(() => {
-    fetchAttractions(0, true);
+  const refresh = useCallback((category?: string) => {
+    fetchAttractions(0, category, true);
   }, [fetchAttractions]);
 
   // Serializa filtros para dependência estável
   const filterString = JSON.stringify(filters);
 
   useEffect(() => {
-    fetchAttractions(0, true);
-  }, [filterString]);
+    fetchAttractions(0, filters?.category, true);
+  }, [filterString, fetchAttractions]);
 
   return {
     attractions,

@@ -219,13 +219,6 @@ export default function CadastroScreen() {
           </Text>
         </View>
 
-        {/* Decorative Nebula */}
-        <View className="absolute bottom-[-10%] left-[-5%] w-64 h-64 opacity-20 transform -rotate-12 pointer-events-none">
-          <Image 
-            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJkyQ61n_U8ON35KnLYdgCM9G-58nSX_0yLsXAkkJ0mapiXLMPpv1TjaFECjd4T5_0TpN2xCDio4qvlhznlKXj9FMciJGeNppu-zKqfTcYP0fBzRD0K8gDl5qNCpctypCcBHmgZAG_qhI0uzf3IIacIXHJAzxEQ_DVnk3Hz92xmCPQaat6a0ywkopGeIV2S8641W-v52nJY9c1MpsolDM5jT-pq3qCu2FfWV8q5WksHH9AmGwgTW6t3hA4Is1s0lSN0UQ3LgrL5Vw' }}
-            className="w-full h-full rounded-3xl"
-          />
-        </View>
 
       </ScrollView>
     </KeyboardAvoidingView>

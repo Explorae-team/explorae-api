@@ -1,6 +1,4 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 interface AttractionCardProps {
@@ -58,7 +56,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         className="rounded-xl overflow-hidden border border-white/5 w-40"
       >
         <View className="h-28 w-full">
-          <Image source={{ uri: imageUrl }} contentFit="cover" className="w-full h-full" />
+          <Image source={{ uri: imageUrl }} resizeMode="cover" className="w-full h-full" />
           <View className="absolute top-2 right-2 bg-black/40 rounded-full p-1">
             <MaterialIcons name="star" size={10} color={colors.tertiary} />
           </View>
@@ -82,8 +80,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
       <View className="h-40 w-full relative">
         <Image 
           source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500' }} 
-          contentFit="cover" 
-          transition={500} 
+          resizeMode="cover" 
           className="w-full h-full" 
         />
         

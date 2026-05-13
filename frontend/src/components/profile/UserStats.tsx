@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
+import storage from '../../utils/storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -59,7 +60,7 @@ export default function UserStats() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
@@ -74,35 +75,32 @@ export default function UserStats() {
     setIsSaving(true);
     try {
       const formData = new FormData();
-      const filename = uri.split('/').pop();
-      const match = /\.(\w+)$/.exec(filename || '');
-      const type = match ? `image/${match[1]}` : `image`;
+      const filename = uri.split('/').pop() || 'avatar.jpg';
+      const type = 'image/jpeg';
 
       if (Platform.OS === 'web') {
         const response = await fetch(uri);
         const blob = await response.blob();
-        
-        // Extrai a extensão do tipo MIME (ex: image/png -> png)
-        const extension = blob.type.split('/')[1] || 'jpg';
-        const webFilename = `avatar-${Date.now()}.${extension}`;
-        
-        formData.append('file', blob, webFilename);
+        formData.append('file', blob, filename);
       } else {
         // @ts-ignore
         formData.append('file', { uri, name: filename, type });
       }
 
-      await api.post('/api/v1/users/me/avatar', formData, {
+      const token = await storage.getItem('auth_token');
+      const response = await fetch(`${api.defaults.baseURL}/api/v1/users/me/avatar`, {
+        method: 'POST',
+        body: formData,
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
-      // Recarregar dados do usuário
-      Alert.alert('Sucesso', 'Foto de perfil atualizada!');
-    } catch (error) {
-      console.error('Erro no upload:', error);
-      Alert.alert('Erro', 'Falha ao fazer upload da imagem');
+      if (!response.ok) throw new Error('Falha no upload');
+
+      Alert.alert('Sucesso', 'Foto atualizada!');
+    } catch (error: any) {
+      Alert.alert('Erro', 'Não foi possível salvar a foto.');
     } finally {
       setIsSaving(false);
     }
@@ -192,7 +190,8 @@ export default function UserStats() {
                 placeholder="Sua bio (até 150 caracteres)"
                 maxLength={150}
                 multiline
-                className="text-on-surface-variant font-medium text-center border border-on-surface/10 rounded-xl p-3 min-h-[60px]"
+                className="text-on-surface-variant font-medium text-center border border-on-surface/10 rounded-xl p-3"
+                style={{ minHeight: 80, textAlignVertical: 'top' }}
               />
               <Text className="text-[10px] text-on-surface-variant text-right mt-1">
                 {tempBio.length}/150
@@ -248,10 +247,7 @@ export default function UserStats() {
       <View 
         className="w-full mt-8 bg-surface-container-highest rounded-full h-4 overflow-hidden relative"
         style={{
-          shadowColor: tierColor,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.5,
-          shadowRadius: 10,
+          boxShadow: `0px 0px 10px ${tierColor}`,
           elevation: 5,
         }}
       >

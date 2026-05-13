@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function loadStoredData() {
       try {
-        // Usando o wrapper local
         const storedToken = await storage.getItem('auth_token');
         const storedUser = await storage.getItem('user_data');
 
@@ -102,7 +101,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Remove de forma segura ao deslogar
       await storage.removeItem('auth_token');
       await storage.removeItem('user_data');
       setUser(null);
