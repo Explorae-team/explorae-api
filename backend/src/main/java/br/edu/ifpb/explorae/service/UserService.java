@@ -61,7 +61,8 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public UserResponseDTO getUserProfile(java.util.UUID id) {
-        User user = findById(id);
+        User user = userRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
         return userMapper.toResponseDTO(user);
     }
 

@@ -18,6 +18,7 @@ import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
 import { DailyChallengeCard } from '../../components/dashboard/DailyChallengeCard';
 import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
+import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
 import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
 import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
 
@@ -30,7 +31,7 @@ const colors = {
 export default function ExploreScreen() {
   const { user, logout, updateUserPreferences } = useAuth() as any;
   const [selectedCategory, setSelectedCategory] = React.useState('');
-  
+
   const {
     attractions,
     isLoading,
@@ -100,7 +101,7 @@ export default function ExploreScreen() {
           />
 
           {/* Categories */}
-          <CategoryCarousel 
+          <CategoryCarousel
             selectedCategory={selectedCategory}
             onCategorySelect={handleCategorySelect}
           />
@@ -117,9 +118,15 @@ export default function ExploreScreen() {
             </View>
 
             {isLoading && !isRefreshing ? (
-              <View className="h-40 items-center justify-center">
-                <ActivityIndicator color="#fd6c28" />
-              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+              >
+                {[1, 2, 3].map((i) => (
+                  <AttractionSkeleton key={i} variant="compact" />
+                ))}
+              </ScrollView>
             ) : (
               <ScrollView
                 horizontal
@@ -157,9 +164,11 @@ export default function ExploreScreen() {
             </View>
 
             <View className="flex-col gap-y-10">
-              {attractions.length > 0 ? (
+              {isLoading && !isRefreshing ? (
+                [1, 2].map((i) => <AttractionSkeleton key={i} />)
+              ) : attractions.length > 0 ? (
                 attractions.map((attraction, index) => (
-                  <AttractionCard 
+                  <AttractionCard
                     key={`${attraction.id}-${index}`}
                     {...attraction}
                     isPopular={index % 4 === 0}
@@ -179,7 +188,7 @@ export default function ExploreScreen() {
 
             <View className="mt-10">
               {hasMore ? (
-                <Pressable 
+                <Pressable
                   onPress={() => loadMore(selectedCategory)}
                   className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                 >
@@ -200,7 +209,7 @@ export default function ExploreScreen() {
                   <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
                     Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
                   </Text>
-                  <Pressable 
+                  <Pressable
                     onPress={() => console.log('Open Map')}
                     className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
                   >

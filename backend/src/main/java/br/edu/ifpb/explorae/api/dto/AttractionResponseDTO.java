@@ -15,7 +15,7 @@ public record AttractionResponseDTO(
         Integer priceRange,
         Boolean isPartner
 ) {
-    public static AttractionResponseDTO fromEntity(Attraction attraction) {
+    public static AttractionResponseDTO fromEntity(Attraction attraction, String distance) {
         String mainImage = attraction.getImageUrls().isEmpty() ? null : attraction.getImageUrls().get(0);
         return new AttractionResponseDTO(
                 attraction.getId(),
@@ -24,7 +24,7 @@ public record AttractionResponseDTO(
                 attraction.getShortDescription(),
                 attraction.getAverageRating(),
                 mainImage,
-                "2.4 km", // Placeholder conforme design showcase
+                distance != null ? distance : "Localizando...",
                 attraction.getPriceRange(),
                 attraction.getIsPartner()
         );

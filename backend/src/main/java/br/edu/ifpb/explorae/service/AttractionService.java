@@ -41,8 +41,8 @@ public class AttractionService {
         } else {
             page = attractionRepository.findAll(pageable);
         }
-        return page.map(AttractionResponseDTO::fromEntity);
 
+        return page.map(attraction -> AttractionResponseDTO.fromEntity(attraction, "2.4 km"));
     }
 
     @Transactional(readOnly = true)
