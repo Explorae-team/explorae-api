@@ -14,6 +14,10 @@ public class AttractionSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (filters == null) {
+                return criteriaBuilder.conjunction();
+            }
+
             if (filters.getName() != null && !filters.getName().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("name")),

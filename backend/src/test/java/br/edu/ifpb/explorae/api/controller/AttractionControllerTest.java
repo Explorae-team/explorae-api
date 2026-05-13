@@ -45,7 +45,7 @@ class AttractionControllerTest {
     @Test
     @DisplayName("Deve retornar 200 ao listar atrações (acesso público)")
     void shouldReturn200WhenListingAttractions() throws Exception {
-        when(service.findAll(any())).thenReturn(Page.empty());
+        when(service.findAll(any(), any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/attractions")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -62,7 +62,7 @@ class AttractionControllerTest {
         );
         Page<AttractionResponseDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
 
-        when(service.findAll(any())).thenReturn(page);
+        when(service.findAll(any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/attractions?page=0&size=5")
                         .contentType(MediaType.APPLICATION_JSON))
