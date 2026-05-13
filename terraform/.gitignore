@@ -1,0 +1,10 @@
+# Terraform local gitignore
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Secret files
+*.pem
+*.tfvars
+.env
