@@ -1,25 +1,15 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import InterestCard from './InterestCard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import preferenceService from '../../services/preferenceService';
 
-interface Interest {
+interface Category {
   id: string;
-  label: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  slug: string;
+  name: string;
+  iconName: string;
 }
-
-const INTERESTS: Interest[] = [
-  { id: 'sabores', label: 'Sabores Locais', icon: 'silverware-fork-knife' },
-  { id: 'ecoturismo', label: 'Ecoturismo', icon: 'leaf' },
-  { id: 'historia', label: 'História', icon: 'history' },
-  { id: 'noite', label: 'Vida Noturna', icon: 'glass-cocktail' },
-  { id: 'aventura', label: 'Aventura', icon: 'compass-outline' },
-  { id: 'cultura', label: 'Arte & Cultura', icon: 'palette' },
-  { id: 'fotografia', label: 'Fotografia', icon: 'camera' },
-  { id: 'relaxamento', label: 'Relaxamento', icon: 'spa' },
-  { id: 'arquitetura', label: 'Arquitetura', icon: 'office-building' },
-];
 
 interface InterestsGridProps {
   selectedIds: string[];
@@ -27,15 +17,37 @@ interface InterestsGridProps {
 }
 
 export default function InterestsGrid({ selectedIds, onToggle }: InterestsGridProps) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await preferenceService.getCategories();
+      if (result.success) {
+        setCategories(result.data);
+      }
+      setLoading(false);
+    };
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="py-10 items-center justify-center">
+        <ActivityIndicator size="large" color="#fd6c28" />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-row flex-wrap justify-center gap-4">
-      {INTERESTS.map((interest) => (
-        <View key={interest.id} style={{ width: 'auto' }}>
+      {categories.map((category) => (
+        <View key={category.id} style={{ width: 'auto' }}>
           <InterestCard
-            label={interest.label}
-            iconName={interest.icon}
-            isSelected={selectedIds.includes(interest.id)}
-            onPress={() => onToggle(interest.id)}
+            label={category.name}
+            iconName={category.iconName as any}
+            isSelected={selectedIds.includes(category.slug)}
+            onPress={() => onToggle(category.slug)}
           />
         </View>
       ))}

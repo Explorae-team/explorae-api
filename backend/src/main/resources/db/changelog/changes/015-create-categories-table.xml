@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="20260514-1" author="nichollas">
+        <createTable tableName="categories">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon_name" type="VARCHAR(50)"/>
+        </createTable>
+
+        <createTable tableName="user_interests">
+            <column name="travel_preference_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_interests_pref" referencedTableName="travel_preferences" referencedColumnNames="id"/>
+            </column>
+            <column name="category_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_interests_cat" referencedTableName="categories" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="user_interests" columnNames="travel_preference_id, category_id"/>
+    </changeSet>
+
+    <changeSet id="20260514-2" author="nichollas">
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"/>
+            <column name="slug" value="sabores"/>
+            <column name="name" value="Sabores Locais"/>
+            <column name="icon_name" value="silverware-fork-knife"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"/>
+            <column name="slug" value="ecoturismo"/>
+            <column name="name" value="Ecoturismo"/>
+            <column name="icon_name" value="leaf"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13"/>
+            <column name="slug" value="historia"/>
+            <column name="name" value="História"/>
+            <column name="icon_name" value="history"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14"/>
+            <column name="slug" value="noite"/>
+            <column name="name" value="Vida Noturna"/>
+            <column name="icon_name" value="glass-cocktail"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15"/>
+            <column name="slug" value="aventura"/>
+            <column name="name" value="Aventura"/>
+            <column name="icon_name" value="compass-outline"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16"/>
+            <column name="slug" value="cultura"/>
+            <column name="name" value="Arte &amp; Cultura"/>
+            <column name="icon_name" value="palette"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17"/>
+            <column name="slug" value="fotografia"/>
+            <column name="name" value="Fotografia"/>
+            <column name="icon_name" value="camera"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18"/>
+            <column name="slug" value="relaxamento"/>
+            <column name="name" value="Relaxamento"/>
+            <column name="icon_name" value="spa"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19"/>
+            <column name="slug" value="arquitetura"/>
+            <column name="name" value="Arquitetura"/>
+            <column name="icon_name" value="office-building"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20260514-3" author="nichollas">
+        <dropColumn tableName="travel_preferences" columnName="interests"/>
+    </changeSet>
+
+</databaseChangeLog>
