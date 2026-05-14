@@ -34,6 +34,9 @@ class TravelPreferenceServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private br.edu.ifpb.explorae.repository.CategoryRepository categoryRepository;
+
     @InjectMocks
     private TravelPreferenceService travelPreferenceService;
 

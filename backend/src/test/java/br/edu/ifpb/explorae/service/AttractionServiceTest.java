@@ -43,7 +43,7 @@ class AttractionServiceTest {
         when(repository.findAll(pageable)).thenReturn(page);
 
         // Act
-        Page<AttractionResponseDTO> result = service.findAll(pageable);
+        Page<AttractionResponseDTO> result = service.findAll(null, pageable);
 
         // Assert
         assertThat(result).isNotNull();
