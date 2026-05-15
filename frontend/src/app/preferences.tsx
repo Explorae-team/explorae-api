@@ -83,11 +83,15 @@ export default function PreferencesScreen() {
       <ScrollView
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={true}
+        className="w-full"
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingTop: 24,
-          paddingBottom: 140, // Espaço para o rodapé
-          flexGrow: 1
+          paddingBottom: 140, 
+          flexGrow: 1,
+          maxWidth: 1200, // Limite premium para desktop
+          alignSelf: 'center',
+          width: '100%'
         }}
       >
         {/* Progress Indicator */}

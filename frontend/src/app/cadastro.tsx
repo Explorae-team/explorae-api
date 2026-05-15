@@ -195,15 +195,15 @@ export default function CadastroScreen() {
           </View>
 
           {/* Footer Card */}
-          <View className="items-center mt-6">
+          <View className="items-center mt-6 flex-row justify-center">
             <Text className="text-[#8b9296] font-medium text-xs">
               Já tem uma conta?{' '}
-              <Link href="/login" asChild>
-                <TouchableOpacity>
-                  <Text className="text-[#fd6c28] font-black">Entrar</Text>
-                </TouchableOpacity>
-              </Link>
             </Text>
+            <Link href="/login" asChild>
+              <TouchableOpacity>
+                <Text className="text-[#fd6c28] font-black text-xs">Entrar</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
         </View>
 

@@ -6,6 +6,11 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
     <changeSet id="20260514-1" author="nichollas">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="categories"/>
+            </not>
+        </preConditions>
         <createTable tableName="categories">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
@@ -18,7 +23,14 @@
             </column>
             <column name="icon_name" type="VARCHAR(50)"/>
         </createTable>
+    </changeSet>
 
+    <changeSet id="20260514-1-1" author="nichollas">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_interests"/>
+            </not>
+        </preConditions>
         <createTable tableName="user_interests">
             <column name="travel_preference_id" type="UUID">
                 <constraints nullable="false" foreignKeyName="fk_user_interests_pref" referencedTableName="travel_preferences" referencedColumnNames="id"/>
@@ -31,6 +43,9 @@
     </changeSet>
 
     <changeSet id="20260514-2" author="nichollas">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM categories</sqlCheck>
+        </preConditions>
         <insert tableName="categories">
             <column name="id" value="a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"/>
             <column name="slug" value="sabores"/>
@@ -88,6 +103,9 @@
     </changeSet>
 
     <changeSet id="20260514-3" author="nichollas">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="travel_preferences" columnName="interests"/>
+        </preConditions>
         <dropColumn tableName="travel_preferences" columnName="interests"/>
     </changeSet>
 
