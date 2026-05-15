@@ -28,4 +28,7 @@ public class Category {
 
     @Column(name = "icon_name")
     private String iconName;
+
+    @Column(name = "parent_category")
+    private String parentCategory;
 }

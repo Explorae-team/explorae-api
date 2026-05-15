@@ -22,7 +22,8 @@ public class CategoryService {
                         cat.getId(),
                         cat.getSlug(),
                         cat.getName(),
-                        cat.getIconName()
+                        cat.getIconName(),
+                        cat.getParentCategory()
                 ))
                 .collect(Collectors.toList());
     }

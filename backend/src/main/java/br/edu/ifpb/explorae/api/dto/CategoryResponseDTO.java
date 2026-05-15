@@ -6,5 +6,6 @@ public record CategoryResponseDTO(
     UUID id,
     String slug,
     String name,
-    String iconName
+    String iconName,
+    String parentCategory
 ) {}

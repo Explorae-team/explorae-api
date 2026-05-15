@@ -9,14 +9,16 @@ interface Category {
   slug: string;
   name: string;
   iconName: string;
+  parentCategory: string;
 }
 
 interface InterestsGridProps {
   selectedIds: string[];
   onToggle: (id: string) => void;
+  pillarFilter: string;
 }
 
-export default function InterestsGrid({ selectedIds, onToggle }: InterestsGridProps) {
+export default function InterestsGrid({ selectedIds, onToggle, pillarFilter }: InterestsGridProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,19 +65,21 @@ export default function InterestsGrid({ selectedIds, onToggle }: InterestsGridPr
 
   return (
     <View className="flex-row flex-wrap justify-start gap-4 md:gap-6">
-      {categories.map((category) => (
-        <View 
-          key={category.id} 
-          className="w-[47%] md:w-[31%] lg:w-[23%]"
-        >
-          <InterestCard
-            label={category.name}
-            iconName={category.iconName as any}
-            isSelected={selectedIds.includes(category.slug)}
-            onPress={() => onToggle(category.slug)}
-          />
-        </View>
-      ))}
+      {categories
+        .filter(cat => cat.parentCategory === pillarFilter)
+        .map((category) => (
+          <View 
+            key={category.id} 
+            className="w-[47%] md:w-[31%] lg:w-[23%]"
+          >
+            <InterestCard
+              label={category.name}
+              iconName={category.iconName as any}
+              isSelected={selectedIds.includes(category.slug)}
+              onPress={() => onToggle(category.slug)}
+            />
+          </View>
+        ))}
     </View>
   );
 }
