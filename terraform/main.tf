@@ -58,5 +58,6 @@ resource "oci_core_instance" "instancia_free" {
   # Configuração de Acesso (Sua Chave SSH)
   metadata = {
     ssh_authorized_keys = file(var.ssh_public_key_path)
+    user_data           = base64encode(file("${path.module}/user_data.sh"))
   }
 }
