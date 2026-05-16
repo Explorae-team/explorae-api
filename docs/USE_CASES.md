@@ -2,83 +2,10 @@
 
 Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para análise de sistemas com foco em gamificação e roteirização turística.
 
-## 1. Diagrama de Casos de Uso (Geral)
 
-```mermaid
-useCaseDiagram
-    actor "Explorador" as U
-    actor "Parceiro" as P
-    actor "Administrador" as A
 
-    package "Módulo de Perfil & Onboarding" {
-        usecase "UC01: Manter Cadastro" as UC01
-        usecase "UC02: Autenticar Usuário" as UC02
-        usecase "UC03: Configurar Preferências" as UC03
-    }
+## Módulo de Perfil & Onboarding
 
-    package "Módulo de Exploração & Rotas" {
-        usecase "UC04: Explorar Feed" as UC04
-        usecase "UC09: Visualizar Mapa Interativo" as UC09
-        usecase "UC10: Planejar Rota Otimizada" as UC10
-        usecase "UC11: Gerenciar Geolocalização" as UC11
-    }
-
-    package "Módulo de Gamificação" {
-        usecase "UC05: Avaliar Atração" as UC05
-        usecase "UC06: Visualizar Conquistas" as UC06
-    }
-
-    U --> UC01
-    U --> UC02
-    U --> UC03
-    U --> UC04
-    U --> UC09
-    U --> UC10
-    U --> UC11
-    U --> UC05
-    U --> UC06
-
-    P --> UC07["UC07: Manter Atração"]
-    A --> UC08["UC08: Gerenciar Sistema"]
-```
-
----
-
-## 2. Detalhamento dos Casos de Uso por Módulo
-
-### 2.1 Módulo de Perfil & Onboarding
-
-```mermaid
-useCaseDiagram
-    actor "Explorador" as U
-    actor "Supabase Auth" as S <<System>>
-
-    package "Sistema Exploraê" {
-        usecase "UC01: Manter Cadastro" as UC01 <<crud>>
-        usecase "UC02: Autenticar Usuário" as UC02
-        usecase "UC03: Configurar Preferências" as UC03
-        
-        usecase "Cadastro via E-mail" as V1 <<variant>>
-        usecase "Login via Redes Sociais" as V2 <<variant>>
-        
-        usecase "Exibir Erro: E-mail Duplicado" as E1 <<exception>>
-        usecase "Validar Credenciais" as I1 <<include>>
-    }
-
-    U --> UC01
-    U --> UC02
-    U --> UC03
-
-    V1 --|> UC01
-    V2 --|> UC02
-    
-    UC01 ..> E1 : <<extend>>
-    UC02 ..> I1 : <<include>>
-    I1 -- S
-    
-    note "A configuração de interesses é obrigatória no primeiro acesso" as N1
-    UC03 .. N1
-```
 
 ### UC01: Manter Cadastro de Usuário <<CRUD>>
 
@@ -131,40 +58,8 @@ useCaseDiagram
 
 ---
 
-### 2.2 Módulo de Exploração & Rotas
+## Módulo de Exploração & Rotas
 
-```mermaid
-useCaseDiagram
-    actor "Explorador" as U
-    actor "Google Maps API" as G <<System>>
-
-    package "Sistema Exploraê" {
-        usecase "UC04: Explorar Feed" as UC04
-        usecase "UC09: Visualizar Mapa" as UC09
-        usecase "UC10: Planejar Rota" as UC10
-        usecase "UC11: Gerenciar GPS" as UC11
-        
-        usecase "Rota a Pé" as V3 <<variant>>
-        usecase "Rota via Uber/99" as V4 <<variant>>
-        
-        usecase "Exibir Erro: GPS Desativado" as E2 <<exception>>
-        usecase "Filtrar por Categoria" as I2 <<include>>
-    }
-
-    U --> UC04
-    U --> UC09
-    U --> UC10
-    U --> UC11
-
-    V3 --|> UC10
-    V4 --|> UC10
-    
-    UC11 ..> E2 : <<extend>>
-    UC04 ..> I2 : <<include>>
-    
-    UC09 -- G
-    UC10 -- G
-```
 
 ### UC04: Explorar Feed de Atrações
 
@@ -180,128 +75,6 @@ useCaseDiagram
 | **Fluxo Básico** | 1. Usuário acessa aba Explore.<br>2. Sistema identifica interesses do usuário.<br>3. Sistema busca atrações no banco que dêem "match" com as categorias.<br>4. Sistema apresenta Cards com foto, preço, nota e selo de parceiro. |
 | **Fluxo Variante** | **Refresh Manual**: Usuário "puxa para baixo" para atualizar a lista. |
 | **Fluxo Exceção** | **Sem Resultados**: Sistema sugere que o usuário altere suas preferências no perfil. |
-
----
-
-### 2.3 Módulo de Gamificação
-
-```mermaid
-useCaseDiagram
-    actor "Explorador" as U
-
-    package "Sistema Exploraê" {
-        usecase "UC05: Avaliar Atração" as UC05
-        usecase "UC06: Visualizar Perfil" as UC06
-        
-        usecase "Atribuir Nota e Texto" as I3 <<include>>
-        usecase "Ganhar XP / Badge" as EX1 <<extend>>
-        usecase "Exibir Erro: Fora do Perímetro" as E3 <<exception>>
-    }
-
-    U --> UC05
-    U --> UC06
-
-    UC05 ..> I3 : <<include>>
-    UC05 ..> EX1 : <<extend>>
-    UC05 ..> E3 : <<extend>>
-    
-    note right of EX1 : Somente se a avaliação for válida
-```
-
-### UC05: Avaliar Atração (Gamificação)
-
-| Campo | Detalhe |
-|---|---|
-| **ID** | UC05 |
-| **Atores** | Explorador |
-| **Interessados** | Explorador (ganha XP), Parceiro (feedback), Outros Usuários (recomendações) |
-| **Pré-condição** | Usuário ter visitado a atração (baseado em geofencing ou check-in) |
-| **Pós-condição** | XP adicionado ao perfil e comentário visível no feed |
-| **Backlog ID** | SDGEU-82, SDGEU-83 |
-| **Tecnologia** | Spring Boot (Gamification Service), PostgreSQL (Histórico de XP) |
-| **Fluxo Básico** | 1. Usuário seleciona "Avaliar" na tela da atração.<br>2. Usuário atribui nota e escreve comentário.<br>3. Sistema valida a submissão.<br>4. Sistema calcula XP baseado no nível do usuário.<br>5. Sistema exibe mensagem de "Level Up" se atingir a meta. |
-| **Fluxo Variante** | **Edição de Avaliação**: Usuário altera sua nota; sistema recalcula média mas não dá XP novo. |
-| **Fluxo Exceção** | **Tentativa de Spam**: Sistema bloqueia avaliações repetidas em curto intervalo. |
-
----
-
-### UC06: Visualizar Perfil e Gamificação
-
-| Campo | Detalhe |
-|---|---|
-| **ID** | UC06 |
-| **Atores** | Explorador |
-| **Interessados** | Explorador (acompanhar progresso) |
-| **Pré-condição** | Usuário autenticado |
-| **Pós-condição** | Exibição de estatísticas e medalhas atualizadas |
-| **Backlog ID** | SDGEU-203 |
-| **Tecnologia** | React Native, NativeWind, API de Gamificação |
-| **Fluxo Básico** | 1. Usuário acessa aba Perfil.<br>2. Sistema exibe Foto, Nível, Barra de XP e Total de Pontos.<br>3. Sistema lista Medalhas (Badges) conquistadas.<br>4. Sistema mostra histórico recente de atividades. |
-| **Fluxo Variante** | **Compartilhar Perfil**: Usuário gera imagem/link com suas conquistas para redes sociais. |
-| **Fluxo Exceção** | **Dados Inconsistentes**: Sistema exibe placeholder e tenta recarregar dados do servidor. |
-
----
-
-### 2.4 Módulo de Administração & Parceiro
-
-```mermaid
-useCaseDiagram
-    actor "Administrador" as A
-    actor "Parceiro" as P
-    actor "PostgreSQL" as DB <<System>>
-
-    package "Sistema Exploraê" {
-        usecase "UC07: Manter Atração" as UC07 <<crud>>
-        usecase "UC08: Gerenciar Sistema" as UC08
-        
-        usecase "Aprovar Novo Parceiro" as EX2 <<extend>>
-        usecase "Gerar Relatório de Engajamento" as R1 <<report>>
-        usecase "Moderar Comentários" as I4 <<include>>
-    }
-
-    P --> UC07
-    A --> UC07
-    A --> UC08
-
-    UC08 ..> EX2 : <<extend>>
-    UC08 ..> R1 : <<include>>
-    UC08 ..> I4 : <<include>>
-    
-    UC07 -- DB
-    UC08 -- DB
-```
-
-### UC07: Manter Atração <<CRUD>>
-
-| Campo | Detalhe |
-|---|---|
-| **ID** | UC07 |
-| **Atores** | Parceiro, Administrador |
-| **Interessados** | Parceiro (gestão de negócio), Explorador (acesso a informações) |
-| **Pré-condição** | Usuário com role 'PARTNER' ou 'ADMIN' |
-| **Pós-condição** | Atração criada, editada ou removida do catálogo |
-| **Backlog ID** | SDGEU-209 |
-| **Tecnologia** | Spring Data JPA, Supabase Storage (Imagens) |
-| **Fluxo Básico** | 1. Ator seleciona "Gerenciar Atrações".<br>2. Sistema abre formulário (Nome, Descrição, Coordenadas, Preço, Categoria).<br>3. Ator faz upload de fotos.<br>4. Sistema salva no banco e invalida cache de busca. |
-| **Fluxo Variante** | **Desativar Temporariamente**: Ator oculta a atração sem deletar. |
-| **Fluxo Exceção** | **Falha no Upload**: Sistema mantém dados do formulário e solicita nova tentativa de imagem. |
-
----
-
-### UC08: Gerenciar Sistema (Dashboard Admin)
-
-| Campo | Detalhe |
-|---|---|
-| **ID** | UC08 |
-| **Atores** | Administrador |
-| **Interessados** | Sistema (saúde e moderação) |
-| **Pré-condição** | Login com credenciais administrativas |
-| **Pós-condição** | Configurações do sistema aplicadas |
-| **Backlog ID** | ADMIN-01 |
-| **Tecnologia** | Spring Boot Actuator, Dashboard Custom |
-| **Fluxo Básico** | 1. Admin acessa portal de gestão.<br>2. Sistema exibe métricas (Total usuários, Atividades hoje).<br>3. Admin aprova novos parceiros cadastrados.<br>4. Admin modera comentários/avaliações denunciadas. |
-| **Fluxo Variante** | **Gerar Relatórios <<rep>>**: Sistema exporta CSV com dados de engajamento. |
-| **Fluxo Exceção** | **Acesso Não Autorizado**: Sistema bloqueia e registra tentativa de invasão (logs). |
 
 ---
 
@@ -353,3 +126,79 @@ useCaseDiagram
 | **Fluxo Básico** | 1. App solicita permissão de GPS no primeiro acesso.<br>2. Usuário aceita.<br>3. Sistema captura posição a cada 5 segundos.<br>4. Sistema atualiza marcador de posição no mapa. |
 | **Fluxo Variante** | **Economia de Bateria**: Sistema reduz frequência de captura se o app estiver em background. |
 | **Fluxo Exceção** | **Permissão Negada**: Sistema exibe alerta instruindo como ativar nas configurações do SO. |
+
+---
+
+## Módulo de Gamificação
+
+
+### UC05: Avaliar Atração (Gamificação)
+
+| Campo | Detalhe |
+|---|---|
+| **ID** | UC05 |
+| **Atores** | Explorador |
+| **Interessados** | Explorador (ganha XP), Parceiro (feedback), Outros Usuários (recomendações) |
+| **Pré-condição** | Usuário ter visitado a atração (baseado em geofencing ou check-in) |
+| **Pós-condição** | XP adicionado ao perfil e comentário visível no feed |
+| **Backlog ID** | SDGEU-82, SDGEU-83 |
+| **Tecnologia** | Spring Boot (Gamification Service), PostgreSQL (Histórico de XP) |
+| **Fluxo Básico** | 1. Usuário seleciona "Avaliar" na tela da atração.<br>2. Usuário atribui nota e escreve comentário.<br>3. Sistema valida a submissão.<br>4. Sistema calcula XP baseado no nível do usuário.<br>5. Sistema exibe mensagem de "Level Up" se atingir a meta. |
+| **Fluxo Variante** | **Edição de Avaliação**: Usuário altera sua nota; sistema recalcula média mas não dá XP novo. |
+| **Fluxo Exceção** | **Tentativa de Spam**: Sistema bloqueia avaliações repetidas em curto intervalo. |
+
+---
+
+### UC06: Visualizar Perfil e Gamificação
+
+| Campo | Detalhe |
+|---|---|
+| **ID** | UC06 |
+| **Atores** | Explorador |
+| **Interessados** | Explorador (acompanhar progresso) |
+| **Pré-condição** | Usuário autenticado |
+| **Pós-condição** | Exibição de estatísticas e medalhas atualizadas |
+| **Backlog ID** | SDGEU-203 |
+| **Tecnologia** | React Native, NativeWind, API de Gamificação |
+| **Fluxo Básico** | 1. Usuário acessa aba Perfil.<br>2. Sistema exibe Foto, Nível, Barra de XP e Total de Pontos.<br>3. Sistema lista Medalhas (Badges) conquistadas.<br>4. Sistema mostra histórico recente de atividades. |
+| **Fluxo Variante** | **Compartilhar Perfil**: Usuário gera imagem/link com suas conquistas para redes sociais. |
+| **Fluxo Exceção** | **Dados Inconsistentes**: Sistema exibe placeholder e tenta recarregar dados do servidor. |
+
+---
+
+## Módulo de Administração & Parceiro
+
+
+### UC07: Manter Atração <<CRUD>>
+
+| Campo | Detalhe |
+|---|---|
+| **ID** | UC07 |
+| **Atores** | Parceiro, Administrador |
+| **Interessados** | Parceiro (gestão de negócio), Explorador (acesso a informações) |
+| **Pré-condição** | Usuário com role 'PARTNER' ou 'ADMIN' |
+| **Pós-condição** | Atração criada, editada ou removida do catálogo |
+| **Backlog ID** | SDGEU-209 |
+| **Tecnologia** | Spring Data JPA, Supabase Storage (Imagens) |
+| **Fluxo Básico** | 1. Ator seleciona "Gerenciar Atrações".<br>2. Sistema abre formulário (Nome, Descrição, Coordenadas, Preço, Categoria).<br>3. Ator faz upload de fotos.<br>4. Sistema salva no banco e invalida cache de busca. |
+| **Fluxo Variante** | **Desativar Temporariamente**: Ator oculta a atração sem deletar. |
+| **Fluxo Exceção** | **Falha no Upload**: Sistema mantém dados do formulário e solicita nova tentativa de imagem. |
+
+---
+
+### UC08: Gerenciar Sistema (Dashboard Admin)
+
+| Campo | Detalhe |
+|---|---|
+| **ID** | UC08 |
+| **Atores** | Administrador |
+| **Interessados** | Sistema (saúde e moderação) |
+| **Pré-condição** | Login com credenciais administrativas |
+| **Pós-condição** | Configurações do sistema aplicadas |
+| **Backlog ID** | ADMIN-01 |
+| **Tecnologia** | Spring Boot Actuator, Dashboard Custom |
+| **Fluxo Básico** | 1. Admin acessa portal de gestão.<br>2. Sistema exibe métricas (Total usuários, Atividades hoje).<br>3. Admin aprova novos parceiros cadastrados.<br>4. Admin modera comentários/avaliações denunciadas. |
+| **Fluxo Variante** | **Gerar Relatórios <<rep>>**: Sistema exporta CSV com dados de engajamento. |
+| **Fluxo Exceção** | **Acesso Não Autorizado**: Sistema bloqueia e registra tentativa de invasão (logs). |
+
+---
