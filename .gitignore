@@ -101,4 +101,5 @@ HELP.md
 *.pem
 *.pub
 *.tfvars
-.envbackend/.m2/
+.env
+backend/.m2/

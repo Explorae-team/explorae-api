@@ -15,7 +15,7 @@ import { useRouter, Link } from "expo-router";
 import { useState } from "react";
 import { LoginForm, LoginErrors } from '../types/login.types';
 import { Ionicons } from "@expo/vector-icons";
-import AuthInput from "../components/AuthInput";
+import AuthInput from "../components/auth/AuthInput";
 import PrimaryButton from "../components/PrimaryButton";
 
 export default function LoginScreen() {
@@ -29,6 +29,7 @@ export default function LoginScreen() {
 
   const [errors, setErrors] = useState<LoginErrors>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validate = () => {
     const newErrors: LoginErrors = {};
@@ -117,14 +118,18 @@ export default function LoginScreen() {
               label="Senha"
               iconName="lock-closed-outline"
               placeholder="••••••••"
-              secureTextEntry
+              secureTextEntry={!showPassword}
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
               error={errors.password}
+              rightIconName={showPassword ? "eye-off-outline" : "eye-outline"}
+              onRightIconPress={() => setShowPassword(!showPassword)}
               rightElement={
-                <TouchableOpacity>
-                  <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
-                </TouchableOpacity>
+                <Link href="/recuperar-senha" asChild>
+                  <TouchableOpacity>
+                    <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
+                  </TouchableOpacity>
+                </Link>
               }
             />
 

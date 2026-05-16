@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import { Stack, Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { CadastroFormData, CadastroErrorMap } from './cadastro.types';
+import { CadastroFormData, CadastroErrorMap } from '../types/cadastro.types';
 import { useAuth } from '../contexts/AuthContext';
-import AuthInput from '../components/AuthInput';
+import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
 
 /**
@@ -35,6 +35,8 @@ export default function CadastroScreen() {
 
   const [errors, setErrors] = useState<CadastroErrorMap>({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async () => {
     const newErrors: CadastroErrorMap = {};
@@ -65,7 +67,7 @@ export default function CadastroScreen() {
         password: formData.password
       };
 
-      console.log('Iniciando expedição de registro...', registrationData);
+      // Removido log inseguro de dados de expedição
       
       const response = await register(registrationData);
 
@@ -144,10 +146,12 @@ export default function CadastroScreen() {
                   label="Senha"
                   iconName="lock-closed"
                   placeholder="••••••••"
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   value={formData.password}
                   onChangeText={(text) => setFormData({ ...formData, password: text })}
                   error={errors.password}
+                  rightIconName={showPassword ? "eye-off" : "eye"}
+                  onRightIconPress={() => setShowPassword(!showPassword)}
                 />
               </View>
               <View className="flex-1">
@@ -155,10 +159,12 @@ export default function CadastroScreen() {
                   label="Confirmar"
                   iconName="shield-checkmark"
                   placeholder="••••••••"
-                  secureTextEntry
+                  secureTextEntry={!showConfirmPassword}
                   value={formData.confirmPassword}
                   onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
                   error={errors.confirmPassword}
+                  rightIconName={showConfirmPassword ? "eye-off" : "eye"}
+                  onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
                 />
               </View>
             </View>
@@ -189,15 +195,15 @@ export default function CadastroScreen() {
           </View>
 
           {/* Footer Card */}
-          <View className="items-center mt-6">
+          <View className="items-center mt-6 flex-row justify-center">
             <Text className="text-[#8b9296] font-medium text-xs">
               Já tem uma conta?{' '}
-              <Link href="/login" asChild>
-                <TouchableOpacity>
-                  <Text className="text-[#fd6c28] font-black">Entrar</Text>
-                </TouchableOpacity>
-              </Link>
             </Text>
+            <Link href="/login" asChild>
+              <TouchableOpacity>
+                <Text className="text-[#fd6c28] font-black text-xs">Entrar</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
         </View>
 
@@ -213,13 +219,6 @@ export default function CadastroScreen() {
           </Text>
         </View>
 
-        {/* Decorative Nebula */}
-        <View className="absolute bottom-[-10%] left-[-5%] w-64 h-64 opacity-20 transform -rotate-12 pointer-events-none">
-          <Image 
-            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJkyQ61n_U8ON35KnLYdgCM9G-58nSX_0yLsXAkkJ0mapiXLMPpv1TjaFECjd4T5_0TpN2xCDio4qvlhznlKXj9FMciJGeNppu-zKqfTcYP0fBzRD0K8gDl5qNCpctypCcBHmgZAG_qhI0uzf3IIacIXHJAzxEQ_DVnk3Hz92xmCPQaat6a0ywkopGeIV2S8641W-v52nJY9c1MpsolDM5jT-pq3qCu2FfWV8q5WksHH9AmGwgTW6t3hA4Is1s0lSN0UQ3LgrL5Vw' }}
-            className="w-full h-full rounded-3xl"
-          />
-        </View>
 
       </ScrollView>
     </KeyboardAvoidingView>

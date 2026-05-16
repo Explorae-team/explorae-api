@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="011-create-attraction-highlights-table" author="explorae-team">
+        <createTable tableName="attraction_highlights">
+            <column name="attraction_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_attraction_highlights_attraction" referencedTableName="attractions" referencedColumnNames="id"/>
+            </column>
+            <column name="highlight" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

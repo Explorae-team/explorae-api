@@ -14,7 +14,7 @@ export default function InterestCard({ label, iconName, isSelected, onPress }: I
     <TouchableOpacity 
       onPress={onPress}
       activeOpacity={0.7}
-      style={{ width: 160, height: 160 }}
+      style={{ width: '100%', aspectRatio: 1 }}
       className={`rounded-3xl p-5 justify-between border-2 ${
         isSelected 
           ? 'bg-[#fd6c28] border-[#fd6c28]' 

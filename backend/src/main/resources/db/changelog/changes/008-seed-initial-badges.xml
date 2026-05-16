@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="008-seed-initial-badges" author="explorae-team">
+    <changeSet id="008-seed-initial-badges-v2" author="explorae-team">
         <insert tableName="badges">
             <column name="id" value="a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6"/>
             <column name="name" value="PIONEIRO"/>

@@ -46,26 +46,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Extrai o token (tirando o prefixo "Bearer ").
         String jwt = authHeader.substring(7);
 
-        String userEmail = tokenService.extractUsername(jwt);
+        try {
+            String userEmail = tokenService.extractUsername(jwt);
 
-        // Se o usuário ainda não estiver autenticado
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Busca os detalhes do usuário no banco.
-            UserDetails userDetails = this.userService.loadUserByUsername(userEmail);
+            // Se o usuário ainda não estiver autenticado
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Busca os detalhes do usuário no banco.
+                UserDetails userDetails = this.userService.loadUserByUsername(userEmail);
 
-            // Valida se o token é original e não expirou.
-            if (tokenService.isTokenValid(jwt)) {
-                // Se estiver ok, cria um crachá de autenticação.
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-                // Vincula os detalhes da requisição ao crachá.
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // Colocam o crachá no contexto do Spring para que ele saiba
-                // que esse usuário está autorizado para essa requisição.
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Valida se o token é original e não expirou.
+                if (tokenService.isTokenValid(jwt)) {
+                    // Se estiver ok, cria um crachá de autenticação.
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+                    // Vincula os detalhes da requisição ao crachá.
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // Colocam o crachá no contexto do Spring para que ele saiba
+                    // que esse usuário está autorizado para essa requisição.
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // Se o token for inválido ou expirar, apenas ignoramos e deixamos o Spring Security
+            // decidir se a rota exige autenticação ou não.
+            logger.error("Erro ao processar Token JWT: " + e.getMessage());
         }
 
         // Libera a requisição para seguir seu caminho até o Controller.

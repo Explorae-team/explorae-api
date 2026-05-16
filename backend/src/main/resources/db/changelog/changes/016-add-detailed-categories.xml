@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <!-- 1. Adiciona coluna parent_category -->
+    <changeSet id="20260515-1" author="antigravity">
+        <addColumn tableName="categories">
+            <column name="parent_category" type="VARCHAR(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- 2. Limpa referências e categorias (Correção de Bug de FK) -->
+    <changeSet id="20260515-2" author="antigravity">
+        <delete tableName="user_interests"/> <!-- Limpa interesses antigos para permitir delete de categorias -->
+        <delete tableName="categories"/>
+    </changeSet>
+
+    <!-- 3. Insere o catálogo ULTRA expandido (Wizard Pro Max+) -->
+    <changeSet id="20260515-3" author="antigravity">
+        <!-- GASTRONOMIA -->
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="comida-italiana"/><column name="name" value="Comida Italiana"/><column name="icon_name" value="pizza"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="comida-oriental"/><column name="name" value="Comida Oriental"/><column name="icon_name" value="bowl-mix"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="sabor-local"/><column name="name" value="Sabor Local"/><column name="icon_name" value="pot-steam"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="cafes"/><column name="name" value="Cafés Artesanais"/><column name="icon_name" value="coffee"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="vegano"/><column name="name" value="Vegano &amp; Veggie"/><column name="icon_name" value="leaf"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="comida-rua"/><column name="name" value="Comida de Rua"/><column name="icon_name" value="truck-fast"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="viniculas"/><column name="name" value="Vinharias &amp; Degustação"/><column name="icon_name" value="glass-wine-variant"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="confeitaria"/><column name="name" value="Doces &amp; Confeitarias"/><column name="icon_name" value="cupcake"/><column name="parent_category" value="gastronomia"/>
+        </insert>
+
+        <!-- ARTE & CULTURA -->
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="cinema"/><column name="name" value="Cinema"/><column name="icon_name" value="movie-open"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="exposicao-artes"/><column name="name" value="Exposições"/><column name="icon_name" value="palette-swatch"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="musica-ao-vivo"/><column name="name" value="Música ao Vivo"/><column name="icon_name" value="music"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="artesanato"/><column name="name" value="Artesanato Local"/><column name="icon_name" value="basket"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="teatro"/><column name="name" value="Teatro &amp; Musicais"/><column name="icon_name" value="theater"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="arte-urbana"/><column name="name" value="Grafite &amp; Street Art"/><column name="icon_name" value="format-paint"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="centros-culturais"/><column name="name" value="Centros Culturais"/><column name="icon_name" value="office-building-marker"/><column name="parent_category" value="cultura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="folclore"/><column name="name" value="Tradições &amp; Folclore"/><column name="icon_name" value="human-greeting-proximity"/><column name="parent_category" value="cultura"/>
+        </insert>
+
+        <!-- AVENTURA -->
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="trilhas"/><column name="name" value="Trilhas"/><column name="icon_name" value="terrain"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="surf"/><column name="name" value="Surf"/><column name="icon_name" value="waves"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="camping"/><column name="name" value="Camping &amp; Bushcraft"/><column name="icon_name" value="tent"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="mergulho"/><column name="name" value="Mergulho"/><column name="icon_name" value="scuba-mask"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="astro-turismo"/><column name="name" value="Observação de Astros"/><column name="icon_name" value="telescope"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="trekking"/><column name="name" value="Trekking de Longo Curso"/><column name="icon_name" value="walk"/><column name="parent_category" value="aventura"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="esportes-radicais"/><column name="name" value="Esportes Radicais"/><column name="icon_name" value="run-fast"/><column name="parent_category" value="aventura"/>
+        </insert>
+
+        <!-- RELAXAMENTO -->
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="ioga"/><column name="name" value="Ioga"/><column name="icon_name" value="yoga"/><column name="parent_category" value="relaxamento"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="spas"/><column name="name" value="Spas &amp; Termais"/><column name="icon_name" value="hot-tub"/><column name="parent_category" value="relaxamento"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="parques"/><column name="name" value="Parques &amp; Jardins"/><column name="icon_name" value="flower"/><column name="parent_category" value="relaxamento"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="meditacao"/><column name="name" value="Meditação &amp; Zen"/><column name="icon_name" value="meditation"/><column name="parent_category" value="relaxamento"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="terapias-holisticas"/><column name="name" value="Terapias Holísticas"/><column name="icon_name" value="hand-heart"/><column name="parent_category" value="relaxamento"/>
+        </insert>
+
+        <!-- VIDA NOTURNA -->
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="bar"/><column name="name" value="Barzinho"/><column name="icon_name" value="glass-mug-variant"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="balada"/><column name="name" value="Balada"/><column name="icon_name" value="music-circle"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="vinhos"/><column name="name" value="Vinhos &amp; Bistrôs"/><column name="icon_name" value="glass-wine"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="pubs"/><column name="name" value="Pubs &amp; Speakeasies"/><column name="icon_name" value="beer"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="rooftop"/><column name="name" value="Rooftops"/><column name="icon_name" value="city"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="stand-up"/><column name="name" value="Stand-up Comedy"/><column name="icon_name" value="microphone-variant"/><column name="parent_category" value="noite"/>
+        </insert>
+        <insert tableName="categories">
+            <column name="id" valueComputed="gen_random_uuid()"/><column name="slug" value="jazz-clubs"/><column name="name" value="Jazz &amp; Blues Clubs"/><column name="icon_name" value="saxophone"/><column name="parent_category" value="noite"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

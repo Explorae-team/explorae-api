@@ -34,7 +34,13 @@ public class TravelPreference {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    // Interesses (Separados por vírgula)
-    @Column(length = 500)
-    private String interests;
+    // Interesses do usuário (Relacional)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_interests",
+            joinColumns = @JoinColumn(name = "travel_preference_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    @Builder.Default
+    private java.util.Set<Category> interests = new java.util.HashSet<>();
 }

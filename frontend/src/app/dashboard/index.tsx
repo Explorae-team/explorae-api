@@ -1,0 +1,263 @@
+import React, { useState, useMemo } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  RefreshControl,
+  ActivityIndicator,
+  Pressable,
+  Platform
+} from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '../../contexts/AuthContext';
+import { useExploreData } from '../../services/useExploreData';
+
+// Components
+import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
+import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
+import { DailyChallengeCard } from '../../components/dashboard/DailyChallengeCard';
+import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
+import { AttractionCard } from '../../components/dashboard/AttractionCard';
+import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
+import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
+import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
+import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
+
+const colors = {
+  onSurface: '#bde9fe',
+  onSurfaceVariant: '#c1c7cc',
+  primary: '#fd6c28',
+};
+
+export default function ExploreScreen() {
+  const { user, updateUserPreferences } = useAuth() as any;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
+
+  // Constrói objeto de filtros para o hook
+  const filters = useMemo(() => ({
+    category: selectedCategory || undefined,
+    minRating: activeFilters?.minRating || undefined,
+    minPrice: activeFilters?.priceRange?.length ? Math.min(...activeFilters.priceRange) : undefined,
+    maxPrice: activeFilters?.priceRange?.length ? Math.max(...activeFilters.priceRange) : undefined,
+    openNow: activeFilters?.openNow || undefined,
+  }), [selectedCategory, activeFilters]);
+
+  const {
+    attractions,
+    isLoading,
+    isLoadingMore,
+    isRefreshing,
+    hasMore,
+    refresh,
+    loadMore
+  } = useExploreData(filters);
+
+  const router = useRouter();
+
+  const handleRefresh = async () => {
+    await Promise.all([
+      refresh(selectedCategory || undefined),
+      updateUserPreferences()
+    ]);
+  };
+
+  const handleCategorySelect = (id: string) => {
+    setSelectedCategory(prev => prev === id ? null : id);
+  };
+
+  const handleApplyFilters = (filters: FilterState) => {
+    setActiveFilters(filters);
+  };
+
+  const handleProfilePress = () => {
+    router.push('/dashboard/profile');
+  };
+
+  return (
+    <View className="flex-1 bg-surface">
+      <Stack.Screen options={{ headerShown: false }} />
+      <ExploreHeader
+        userPhotoUrl={user?.photoUrl}
+        onProfilePress={handleProfilePress}
+        onNotificationsPress={() => console.log('Notifications')}
+      />
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: 24 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor="#fd6c28"
+          />
+        }
+      >
+        <View className="gap-y-14">
+
+          {/* Hero: User Stats */}
+          <UserProgressHero
+            userName={user?.name || 'Explorador'}
+            level={user?.level || 1}
+            currentXp={user?.xp || 0}
+            nextLevelXp={(user?.level || 1) * 100} // Fórmula baseada na decisão técnica
+          />
+
+          {/* Daily Challenge */}
+          <DailyChallengeCard
+            title="Caminho das Artes"
+            description="Visite 3 murais icônicos para desbloquear esta conquista."
+            progress={0.66}
+            progressLabel="2/3 murais"
+            rewardXp={450}
+          />
+
+          {/* Categories */}
+          <View className="items-center">
+            <CategoryCarousel 
+              selectedCategoryId={selectedCategory}
+              onSelect={handleCategorySelect}
+            />
+          </View>
+
+          {/* Recommendations Feed */}
+          <View className="gap-y-6">
+            <View className="flex-row justify-between items-center px-6">
+              <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
+                Recomendado para você
+              </Text>
+              <Pressable>
+                <Text className="text-xs font-bold text-on-primary-container">VER TUDO</Text>
+              </Pressable>
+            </View>
+
+            {isLoading && !isRefreshing ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+              >
+                {[1, 2, 3].map((i) => (
+                  <AttractionSkeleton key={i} variant="compact" />
+                ))}
+              </ScrollView>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+              >
+                {attractions.slice(0, 10).map((attraction) => (
+                  <AttractionCard
+                    key={attraction.id}
+                    {...attraction}
+                    variant="compact"
+                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </View>
+
+          {/* Top Visited */}
+          <TopVisitedList attractions={attractions} />
+
+          {/* Map Quick Access */}
+          <MapQuickAccess onPress={() => console.log('Open Map')} />
+
+          {/* Vertical Feed (Paginated) */}
+          <View className="px-6 pb-32">
+            <View className="flex-row justify-between items-center mb-8">
+              <Text style={{ color: colors.onSurface }} className="text-lg font-bold">
+                Descubra
+              </Text>
+              <Pressable 
+                onPress={() => setIsFilterModalVisible(true)}
+                className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full active:bg-surface-bright"
+              >
+                <Text className="text-sm font-bold text-primary">Filtros</Text>
+                <MaterialIcons name="tune" size={16} color="#fd6c28" />
+              </Pressable>
+            </View>
+
+            <View className={Platform.OS === 'web' ? 'flex-row flex-wrap -mx-2' : 'flex-col gap-y-10'}>
+              {isLoading && !isRefreshing ? (
+                [1, 2, 3].map((i) => (
+                  <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                    <AttractionSkeleton />
+                  </View>
+                ))
+              ) : attractions.length > 0 ? (
+                attractions.map((attraction, index) => (
+                  <View 
+                    key={`${attraction.id}-${index}`} 
+                    className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                  >
+                    <AttractionCard
+                      {...attraction}
+                      isPopular={index % 4 === 0}
+                      isNew={index === 1}
+                      onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                    />
+                  </View>
+                ))
+              ) : (
+                <View className="flex-1 items-center py-10 w-full">
+                  <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
+                  <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
+                    Nenhuma atração encontrada no momento.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <View className="mt-10">
+              {hasMore ? (
+                <Pressable
+                  onPress={() => loadMore(selectedCategory || undefined)}
+                  className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
+                >
+                  {isLoadingMore ? (
+                    <ActivityIndicator color="#fd6c28" />
+                  ) : (
+                    <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
+                  )}
+                </Pressable>
+              ) : attractions.length > 0 ? (
+                <View className="items-center justify-center py-10">
+                  <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
+                    <MaterialIcons name="route" size={32} color="#8b9296" />
+                  </View>
+                  <Text className="text-lg font-bold text-on-surface text-center mb-2">
+                    Você chegou ao fim por agora
+                  </Text>
+                  <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
+                    Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
+                  </Text>
+                  <Pressable
+                    onPress={() => console.log('Open Map')}
+                    className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
+                  >
+                    <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </View>
+          </View>
+
+        </View>
+      </ScrollView>
+
+      <FiltersModal 
+        isVisible={isFilterModalVisible}
+        onClose={() => setIsFilterModalVisible(false)}
+        onApply={handleApplyFilters}
+        initialFilters={activeFilters || undefined}
+      />
+    </View>
+  );
+}

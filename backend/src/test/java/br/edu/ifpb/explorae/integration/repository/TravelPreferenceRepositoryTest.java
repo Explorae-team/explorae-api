@@ -26,6 +26,9 @@ class TravelPreferenceRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private br.edu.ifpb.explorae.repository.CategoryRepository categoryRepository;
+
     @Test
     @DisplayName("Deve salvar e buscar preferências por usuário")
     void shouldSaveAndFindByUser() {
@@ -37,9 +40,15 @@ class TravelPreferenceRepositoryTest {
                 .build();
         user = userRepository.save(user);
 
+        br.edu.ifpb.explorae.domain.user.Category cat = br.edu.ifpb.explorae.domain.user.Category.builder()
+                .slug("natureza")
+                .name("Natureza")
+                .build();
+        cat = categoryRepository.save(cat);
+        
         TravelPreference preference = TravelPreference.builder()
                 .user(user)
-                .interests("Natureza, Museus")
+                .interests(new java.util.HashSet<>(java.util.List.of(cat)))
                 .build();
         
         // When
@@ -48,7 +57,7 @@ class TravelPreferenceRepositoryTest {
 
         // Then
         assertThat(found).isPresent();
-        assertThat(found.get().getInterests()).isEqualTo("Natureza, Museus");
+        assertThat(found.get().getInterests()).hasSize(1);
         assertThat(found.get().getUser().getId()).isEqualTo(user.getId());
     }
 
@@ -65,7 +74,7 @@ class TravelPreferenceRepositoryTest {
 
         TravelPreference preference = TravelPreference.builder()
                 .user(user)
-                .interests("Culinária")
+                .interests(new java.util.HashSet<>())
                 .build();
         
         // Em OneToOne bidirecional, configuramos ambos os lados

@@ -1,7 +1,9 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import UserStats from '../../src/components/UserStats';
+import UserStats from '../../src/components/profile/UserStats';
 import { useAuth } from '../../src/contexts/AuthContext';
+
+jest.setTimeout(30000);
 
 // Mock do Contexto de Autenticação
 const mockUpdateProfile = jest.fn();
@@ -13,7 +15,7 @@ jest.mock('../../src/contexts/AuthContext', () => ({
 const mockLaunchImageLibraryAsync = jest.fn();
 const mockRequestMediaLibraryPermissionsAsync = jest.fn();
 jest.mock('expo-image-picker', () => ({
-  launchImageLibraryAsync: (...args) => mockLaunchImageLibraryAsync(...args),
+  launchImageLibraryAsync: (...args: any[]) => mockLaunchImageLibraryAsync(...args),
   requestMediaLibraryPermissionsAsync: () => mockRequestMediaLibraryPermissionsAsync(),
   MediaTypeOptions: {
     Images: 'Images',

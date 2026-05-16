@@ -38,6 +38,24 @@ const preferenceService = {
         message: error.response?.data?.message || 'Erro ao recuperar preferências' 
       };
     }
+  },
+
+  /**
+   * Recupera o catálogo de categorias disponíveis no sistema.
+   */
+  getCategories: async () => {
+    try {
+      const response = await api.get('/api/v1/categories');
+      return { 
+        success: true, 
+        data: response.data.data 
+      };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Erro ao recuperar catálogo' 
+      };
+    }
   }
 };
 

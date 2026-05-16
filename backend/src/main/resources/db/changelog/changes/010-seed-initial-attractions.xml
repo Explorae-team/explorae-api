@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="010-seed-initial-attractions-v3" author="explorae-team">
+        <insert tableName="attractions">
+            <column name="id" value="f179bc95-a027-51ff-ad00-b0465d4da467"/>
+            <column name="name" value="Farol do Cabo Branco"/>
+            <column name="category" value="Cultura"/>
+            <column name="short_description" value="O ponto mais oriental das Américas."/>
+            <column name="long_description" value="Farol icônico com estrutura triangular, simboliza o extremo leste."/>
+            <column name="latitude" valueNumeric="-7.1475"/>
+            <column name="longitude" valueNumeric="-34.7969"/>
+            <column name="address" value="Ponta do Seixas, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="bf124eb8-f59e-5b8e-b731-726df87325fe"/>
+            <column name="name" value="Praia de Tambaú"/>
+            <column name="category" value="Praia"/>
+            <column name="short_description" value="Praia urbana mais movimentada de Jampa."/>
+            <column name="long_description" value="Famosa pela feirinha, calçadão e saída para Picãozinho."/>
+            <column name="latitude" valueNumeric="-7.1147"/>
+            <column name="longitude" valueNumeric="-34.8225"/>
+            <column name="address" value="Tambaú, João Pessoa"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="3a150918-39d6-5122-b1c9-e1433588b747"/>
+            <column name="name" value="Centro Cultural São Francisco"/>
+            <column name="category" value="Histórico"/>
+            <column name="short_description" value="Conjunto barroco do século XVIII."/>
+            <column name="long_description" value="Uma das igrejas mais ricas em ouro e arte sacra do Brasil."/>
+            <column name="latitude" valueNumeric="-7.1128"/>
+            <column name="longitude" valueNumeric="-34.8858"/>
+            <column name="address" value="Centro, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="989b484d-ed7d-5ca0-8de1-b7fbbd78ba1f"/>
+            <column name="name" value="Parque Solon de Lucena"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="O cartão-postal do centro da cidade."/>
+            <column name="long_description" value="Conhecido como Lagoa, oferece lazer e belos jardins."/>
+            <column name="latitude" valueNumeric="-7.1214"/>
+            <column name="longitude" valueNumeric="-34.8789"/>
+            <column name="address" value="Centro, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="c9ccb7c1-3196-5360-87fa-78bcab146150"/>
+            <column name="name" value="Mercado de Artesanato Paraibano"/>
+            <column name="category" value="Compras"/>
+            <column name="short_description" value="Tudo sobre o artesanato local."/>
+            <column name="long_description" value="Melhor lugar para comprar redes, rendas e doces regionais."/>
+            <column name="latitude" valueNumeric="-7.1172"/>
+            <column name="longitude" valueNumeric="-34.8286"/>
+            <column name="address" value="Tambauzinho, João Pessoa"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="f9e53706-d68f-530d-ba98-c442980a2f9a"/>
+            <column name="name" value="Praia do Jacaré"/>
+            <column name="category" value="Lazer"/>
+            <column name="short_description" value="O pôr do sol mais famoso da Paraíba."/>
+            <column name="long_description" value="Espetáculo do Bolero de Ravel executado por Jurandy do Sax."/>
+            <column name="latitude" valueNumeric="-7.0394"/>
+            <column name="longitude" valueNumeric="-34.8431"/>
+            <column name="address" value="Cabedelo, Paraíba"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="ba3ba978-dbc6-5495-a048-073f152d7d8e"/>
+            <column name="name" value="Piscinas Naturais do Seixas"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Piscinas cristalinas em mar aberto."/>
+            <column name="long_description" value="Ideal para mergulho e observação de peixes coloridos."/>
+            <column name="latitude" valueNumeric="-7.1555"/>
+            <column name="longitude" valueNumeric="-34.7889"/>
+            <column name="address" value="Ponta do Seixas, João Pessoa"/>
+            <column name="price_range" valueNumeric="3"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="b0fa6402-eb8f-5376-b29c-4b0ddf8d9608"/>
+            <column name="name" value="Estação Cabo Branco"/>
+            <column name="category" value="Cultura"/>
+            <column name="short_description" value="Obra de Oscar Niemeyer."/>
+            <column name="long_description" value="Centro de ciência, cultura e artes com vista privilegiada."/>
+            <column name="latitude" valueNumeric="-7.1472"/>
+            <column name="longitude" valueNumeric="-34.8014"/>
+            <column name="address" value="Altiplano, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="b3d062d7-bf0b-5cea-87a7-bf0f196c26a7"/>
+            <column name="name" value="Praia de Coqueirinho"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Paraíso escondido no Litoral Sul."/>
+            <column name="long_description" value="Águas calmas protegidas por falésias e muitos coqueiros."/>
+            <column name="latitude" valueNumeric="-7.3206"/>
+            <column name="longitude" valueNumeric="-34.8136"/>
+            <column name="address" value="Conde, Paraíba"/>
+            <column name="price_range" valueNumeric="3"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="21a27ec3-a376-5d9a-a5a7-85f4503710fb"/>
+            <column name="name" value="Praia de Tambaba"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Primeira praia de naturismo do Brasil."/>
+            <column name="long_description" value="Dividida em área para banhistas comuns e área naturista restrita."/>
+            <column name="latitude" valueNumeric="-7.3614"/>
+            <column name="longitude" valueNumeric="-34.7961"/>
+            <column name="address" value="Conde, Paraíba"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="85c129ef-d047-5b0c-933f-bef8154c2ff5"/>
+            <column name="name" value="Ilha de Areia Vermelha"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Banco de areia no meio do oceano."/>
+            <column name="long_description" value="Aparece apenas na maré baixa com águas quentes e rasas."/>
+            <column name="latitude" valueNumeric="-7.0119"/>
+            <column name="longitude" valueNumeric="-34.8256"/>
+            <column name="address" value="Cabedelo, Paraíba"/>
+            <column name="price_range" valueNumeric="3"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="ad43072f-d032-5e19-b58d-19ec75fb9091"/>
+            <column name="name" value="Hotel Globo"/>
+            <column name="category" value="Histórico"/>
+            <column name="short_description" value="Primeiro hotel de luxo da cidade."/>
+            <column name="long_description" value="Atualmente museu com um dos melhores pores do sol do Rio Sanhauá."/>
+            <column name="latitude" valueNumeric="-7.1139"/>
+            <column name="longitude" valueNumeric="-34.8894"/>
+            <column name="address" value="Centro Histórico, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="5dbfb4f3-6754-5fd0-a09c-f99d2723dab3"/>
+            <column name="name" value="Bica (Parque Arruda Câmara)"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Santuário ecológico no coração da cidade."/>
+            <column name="long_description" value="Zoológico e jardim botânico ideal para famílias e crianças."/>
+            <column name="latitude" valueNumeric="-7.1219"/>
+            <column name="longitude" valueNumeric="-34.8731"/>
+            <column name="address" value="Roger, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="6379829c-bd32-59c3-8660-3ae988cf1dd7"/>
+            <column name="name" value="Praia do Bessa"/>
+            <column name="category" value="Praia"/>
+            <column name="short_description" value="O Caribe pessoense."/>
+            <column name="long_description" value="Águas calmas e transparentes com o famoso Caribessa."/>
+            <column name="latitude" valueNumeric="-7.0864"/>
+            <column name="longitude" valueNumeric="-34.8281"/>
+            <column name="address" value="Bessa, João Pessoa"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="32d412af-e1e1-533e-bb84-ecda84edefa3"/>
+            <column name="name" value="Feirinha de Tambaú"/>
+            <column name="category" value="Compras"/>
+            <column name="short_description" value="Tradicional ponto de encontro noturno."/>
+            <column name="long_description" value="Lembrancinhas, roupas e a famosa tapioca da feirinha."/>
+            <column name="latitude" valueNumeric="-7.1158"/>
+            <column name="longitude" valueNumeric="-34.8239"/>
+            <column name="address" value="Tambaú, João Pessoa"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="a7dd459f-e20f-578e-b55a-7fbd5680412a"/>
+            <column name="name" value="Praia de Cabo Branco"/>
+            <column name="category" value="Praia"/>
+            <column name="short_description" value="Extensa orla para esportes."/>
+            <column name="long_description" value="Ideal para corrida e ciclismo matinal com a orla fechada."/>
+            <column name="latitude" valueNumeric="-7.1294"/>
+            <column name="longitude" valueNumeric="-34.8197"/>
+            <column name="address" value="Cabo Branco, João Pessoa"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="77a49037-59f3-5248-8838-e9e34f7a462f"/>
+            <column name="name" value="Casa da Pólvora"/>
+            <column name="category" value="Histórico"/>
+            <column name="short_description" value="Ponto de defesa do período colonial."/>
+            <column name="long_description" value="Antigo depósito de munição agora transformado em centro cultural."/>
+            <column name="latitude" valueNumeric="-7.115"/>
+            <column name="longitude" valueNumeric="-34.8881"/>
+            <column name="address" value="Centro, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="92c69289-4c3f-5107-bab2-ba89f6f5a48b"/>
+            <column name="name" value="Praia de Tabatinga"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Encontro do rio com o mar."/>
+            <column name="long_description" value="Cenário rústico e tranquilo com falésias imponentes."/>
+            <column name="latitude" valueNumeric="-7.3006"/>
+            <column name="longitude" valueNumeric="-34.8156"/>
+            <column name="address" value="Conde, Paraíba"/>
+            <column name="price_range" valueNumeric="2"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="887865c3-063c-5ff2-a787-d48867ba377c"/>
+            <column name="name" value="Praia Bela"/>
+            <column name="category" value="Natureza"/>
+            <column name="short_description" value="Lazer entre águas doces e salgadas."/>
+            <column name="long_description" value="Famosa pelas mesas dentro do rio e culinária de frutos do mar."/>
+            <column name="latitude" valueNumeric="-7.4614"/>
+            <column name="longitude" valueNumeric="-34.8231"/>
+            <column name="address" value="Pitimbu, Paraíba"/>
+            <column name="price_range" valueNumeric="3"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+        <insert tableName="attractions">
+            <column name="id" value="f7399052-1eca-5561-9c05-ab29b5c84db4"/>
+            <column name="name" value="Mosteiro de São Bento"/>
+            <column name="category" value="Histórico"/>
+            <column name="short_description" value="Imponente conjunto beneditino."/>
+            <column name="long_description" value="Arquitetura clássica e um dos monumentos mais antigos da cidade."/>
+            <column name="latitude" valueNumeric="-7.113"/>
+            <column name="longitude" valueNumeric="-34.887"/>
+            <column name="address" value="Centro, João Pessoa"/>
+            <column name="price_range" valueNumeric="1"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+            <column name="is_partner" valueBoolean="false"/>
+            <column name="created_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="011-seed-attraction-images-v2" author="explorae-team">
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f179bc95-a027-51ff-ad00-b0465d4da467"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f179bc95-a027-51ff-ad00-b0465d4da467"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1590523508937-25e4f4d2f801"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="bf124eb8-f59e-5b8e-b731-726df87325fe"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1540206351-d6465b3ac5c1"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="bf124eb8-f59e-5b8e-b731-726df87325fe"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="3a150918-39d6-5122-b1c9-e1433588b747"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1548544149-4835e62ee5b3"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="3a150918-39d6-5122-b1c9-e1433588b747"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1518709268805-4e9042af9f23"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="989b484d-ed7d-5ca0-8de1-b7fbbd78ba1f"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1441974231531-c6227db76b6e"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="989b484d-ed7d-5ca0-8de1-b7fbbd78ba1f"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="c9ccb7c1-3196-5360-87fa-78bcab146150"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1533900298318-6b8da08a523e"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="c9ccb7c1-3196-5360-87fa-78bcab146150"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1513161455079-7dc1de15ef3e"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f9e53706-d68f-530d-ba98-c442980a2f9a"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1502082553048-f009c37129b9"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f9e53706-d68f-530d-ba98-c442980a2f9a"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1472214103451-9374bd1c798e"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="ba3ba978-dbc6-5495-a048-073f152d7d8e"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1544551763-47a0159f963f"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="ba3ba978-dbc6-5495-a048-073f152d7d8e"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1582967788606-a171c1080cb0"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="b0fa6402-eb8f-5376-b29c-4b0ddf8d9608"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="b0fa6402-eb8f-5376-b29c-4b0ddf8d9608"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1511818966892-d7d671e672a2"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="b3d062d7-bf0b-5cea-87a7-bf0f196c26a7"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1519046904884-53103b34b206"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="b3d062d7-bf0b-5cea-87a7-bf0f196c26a7"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1506929197414-43644778138d"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="21a27ec3-a376-5d9a-a5a7-85f4503710fb"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1473116763249-2faaef81ccda"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="21a27ec3-a376-5d9a-a5a7-85f4503710fb"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="85c129ef-d047-5b0c-933f-bef8154c2ff5"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1544551763-77ef2d0ca02c"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="85c129ef-d047-5b0c-933f-bef8154c2ff5"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="ad43072f-d032-5e19-b58d-19ec75fb9091"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1566073771259-6a8506099945"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="ad43072f-d032-5e19-b58d-19ec75fb9091"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="5dbfb4f3-6754-5fd0-a09c-f99d2723dab3"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1534567153574-2b12153a87f0"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="5dbfb4f3-6754-5fd0-a09c-f99d2723dab3"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1444464666168-49d633b867ad"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="6379829c-bd32-59c3-8660-3ae988cf1dd7"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1505118380757-91f5f45d8de2"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="6379829c-bd32-59c3-8660-3ae988cf1dd7"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1495954484750-af469f2f9be5"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="32d412af-e1e1-533e-bb84-ecda84edefa3"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1533038590840-1cde6e668a91"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="32d412af-e1e1-533e-bb84-ecda84edefa3"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1472851294608-062f824d29cc"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="a7dd459f-e20f-578e-b55a-7fbd5680412a"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1520116468816-95b69f847357"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="a7dd459f-e20f-578e-b55a-7fbd5680412a"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1510414842594-a61c69b5ae57"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="77a49037-59f3-5248-8838-e9e34f7a462f"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="77a49037-59f3-5248-8838-e9e34f7a462f"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1513584684374-8bdb74ec9bd1"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="92c69289-4c3f-5107-bab2-ba89f6f5a48b"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1468413253725-0d5181091126"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="92c69289-4c3f-5107-bab2-ba89f6f5a48b"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1473496169904-658ba7c44d8a"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="887865c3-063c-5ff2-a787-d48867ba377c"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1509233725247-49e657c54213"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="887865c3-063c-5ff2-a787-d48867ba377c"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1414490929659-9a12b7e31907"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f7399052-1eca-5561-9c05-ab29b5c84db4"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1548544149-4835e62ee5b3"/>
+        </insert>
+        <insert tableName="attraction_images">
+            <column name="attraction_id" value="f7399052-1eca-5561-9c05-ab29b5c84db4"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1518709268805-4e9042af9f23"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
