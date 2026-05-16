@@ -22,6 +22,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - EXPO_PUBLIC_API_URL=${API_URL:-http://137.131.135.59:8080}
     container_name: explorae-frontend
     restart: always
     ports:

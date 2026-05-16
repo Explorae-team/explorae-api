@@ -7,6 +7,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Define a URL da API durante o build (necessário para o Expo Web)
+ARG EXPO_PUBLIC_API_URL
+ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+
 # Copia o código e faz o build para web
 COPY . .
 RUN npx expo export --platform web
