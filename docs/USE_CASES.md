@@ -16,7 +16,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Usuário (acesso ao app), Sistema (segurança) |
 | **Pré-condição** | E-mail válido e único |
 | **Pós-condição** | Conta criada no Supabase Auth e perfil no banco PostgreSQL |
-| **Backlog ID** | SDGEU-19-FE |
+| **Backlog ID** | SDGEU-147 <br> SDGEU-151 |
 | **Tecnologia** | Supabase Auth, Spring Security, JWT |
 | **Fluxo Básico** | 1. Usuário informa e-mail e senha.<br>2. Sistema valida critérios de senha forte.<br>3. Sistema cria usuário no Auth provider.<br>4. Sistema inicializa perfil com Nível 1 e 0 XP. |
 | **Fluxo Variante** | **Social Login**: Cadastro via Google/Apple. |
@@ -33,7 +33,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Usuário (acesso), Sistema (controle de acesso) |
 | **Pré-condição** | Usuário cadastrado (UC01) |
 | **Pós-condição** | Token JWT gerado e sessão ativa no dispositivo |
-| **Backlog ID** | SDGEU-19 |
+| **Backlog ID** | SDGEU-145 <br> SDGEU-146  |
 | **Tecnologia** | Supabase Auth, JWT, Axios Interceptors |
 | **Fluxo Básico** | 1. Usuário informa credenciais.<br>2. Sistema valida contra o Supabase Auth.<br>3. Sistema retorna dados do perfil e Token.<br>4. Sistema redireciona para a Dashboard ou Wizard (se novo usuário). |
 | **Fluxo Variante** | **Lembrar Senha**: Sistema gera link de recuperação via e-mail. |
@@ -50,7 +50,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (feed personalizado), Sistema (recomendações) |
 | **Pré-condição** | Usuário autenticado (UC02) |
 | **Pós-condição** | Preferências salvas e feed de atrações atualizado |
-| **Backlog ID** | SDGEU-22, SDGEU-23 |
+| **Backlog ID** | SDGEU-152 |
 | **Tecnologia** | React Native (Expo), Spring Boot, Supabase (PostgreSQL) |
 | **Fluxo Básico** | 1. Usuário acessa tela de preferências.<br>2. Sistema apresenta Wizard de 5 passos (Gastronomia, Cultura, Aventura, Relaxamento, Noite).<br>3. Usuário seleciona categorias em cada passo.<br>4. Usuário finaliza o Wizard.<br>5. Sistema salva slugs e redireciona para o Feed. |
 | **Fluxo Variante** | **Editar Preferências**: Usuário acessa pelo perfil e altera categorias já salvas. |
@@ -70,7 +70,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (descoberta), Parceiro (visibilidade) |
 | **Pré-condição** | Preferências configuradas (UC03) |
 | **Pós-condição** | Lista de atrações filtrada e ordenada |
-| **Backlog ID** | SDGEU-154 |
+| **Backlog ID** | SDGEU-154 <br> SDGEU-155 <br> SDGEU-156 <br> SDGEU-157 |
 | **Tecnologia** | Spring Boot (Pagination), React Native (FlatList) |
 | **Fluxo Básico** | 1. Usuário acessa aba Explore.<br>2. Sistema identifica interesses do usuário.<br>3. Sistema busca atrações no banco que dêem "match" com as categorias.<br>4. Sistema apresenta Cards com foto, preço, nota e selo de parceiro. |
 | **Fluxo Variante** | **Refresh Manual**: Usuário "puxa para baixo" para atualizar a lista. |
@@ -87,7 +87,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (localização visual) |
 | **Pré-condição** | Permissão de localização concedida (UC11) |
 | **Pós-condição** | Mapa exibido com pins coloridos por categoria |
-| **Backlog ID** | MAP-01 |
+| **Backlog ID** | SDGEU-157 <br> SDGEU-158 |
 | **Tecnologia** | React Native Maps (Google/Apple SDKs) |
 | **Fluxo Básico** | 1. Usuário alterna para visão de Mapa.<br>2. Sistema obtém coordenadas das atrações do banco.<br>3. Sistema renderiza pins coloridos por categoria.<br>4. Usuário clica no pin.<br>5. Sistema abre 'Bottom Sheet' com resumo e foto da atração. |
 | **Fluxo Variante** | **Filtro de Categoria**: Usuário filtra o mapa para mostrar apenas "Gastronomia". |
@@ -104,7 +104,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (eficiência no deslocamento) |
 | **Pré-condição** | Geolocalização ativa (UC11), Atrações selecionadas |
 | **Pós-condição** | Rota exibida no mapa com estimativas de tempo e distância |
-| **Backlog ID** | NOVO-ROUTING-02 |
+| **Backlog ID** | SDGEU-159 |
 | **Tecnologia** | Google Maps API / Mapbox, React Native Maps, Node.js/Spring Boot |
 | **Fluxo Básico** | 1. Usuário seleciona até 10 pontos de interesse.<br>2. Usuário escolhe modo de transporte (Pé, Público, Uber/99).<br>3. Sistema calcula a melhor ordem dos pontos.<br>4. Sistema exibe a linha da rota no mapa.<br>5. Sistema mostra tempo e distância total. |
 | **Fluxo Variante** | **Alterar Ordem Manual**: Usuário arrasta pontos para mudar a sequência. |
@@ -121,7 +121,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Sistema (precisão de navegação) |
 | **Pré-condição** | Hardware de GPS ativo |
 | **Pós-condição** | Coordenadas [Lat, Lng] disponíveis em tempo real |
-| **Backlog ID** | GEO-01 |
+| **Backlog ID** | SDGEU-160 |
 | **Tecnologia** | Expo Location, Google Directions API |
 | **Fluxo Básico** | 1. App solicita permissão de GPS no primeiro acesso.<br>2. Usuário aceita.<br>3. Sistema captura posição a cada 5 segundos.<br>4. Sistema atualiza marcador de posição no mapa. |
 | **Fluxo Variante** | **Economia de Bateria**: Sistema reduz frequência de captura se o app estiver em background. |
@@ -141,7 +141,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (ganha XP), Parceiro (feedback), Outros Usuários (recomendações) |
 | **Pré-condição** | Usuário ter visitado a atração (baseado em geofencing ou check-in) |
 | **Pós-condição** | XP adicionado ao perfil e comentário visível no feed |
-| **Backlog ID** | SDGEU-82, SDGEU-83 |
+| **Backlog ID** | SDGEU-161 <br> SDGEU-162 |
 | **Tecnologia** | Spring Boot (Gamification Service), PostgreSQL (Histórico de XP) |
 | **Fluxo Básico** | 1. Usuário seleciona "Avaliar" na tela da atração.<br>2. Usuário atribui nota e escreve comentário.<br>3. Sistema valida a submissão.<br>4. Sistema calcula XP baseado no nível do usuário.<br>5. Sistema exibe mensagem de "Level Up" se atingir a meta. |
 | **Fluxo Variante** | **Edição de Avaliação**: Usuário altera sua nota; sistema recalcula média mas não dá XP novo. |
@@ -158,7 +158,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Explorador (acompanhar progresso) |
 | **Pré-condição** | Usuário autenticado |
 | **Pós-condição** | Exibição de estatísticas e medalhas atualizadas |
-| **Backlog ID** | SDGEU-203 |
+| **Backlog ID** | SDGEU-151 <br> SDGEU-161 <br> SDGEU-163 |
 | **Tecnologia** | React Native, NativeWind, API de Gamificação |
 | **Fluxo Básico** | 1. Usuário acessa aba Perfil.<br>2. Sistema exibe Foto, Nível, Barra de XP e Total de Pontos.<br>3. Sistema lista Medalhas (Badges) conquistadas.<br>4. Sistema mostra histórico recente de atividades. |
 | **Fluxo Variante** | **Compartilhar Perfil**: Usuário gera imagem/link com suas conquistas para redes sociais. |
@@ -178,7 +178,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Parceiro (gestão de negócio), Explorador (acesso a informações) |
 | **Pré-condição** | Usuário com role 'PARTNER' ou 'ADMIN' |
 | **Pós-condição** | Atração criada, editada ou removida do catálogo |
-| **Backlog ID** | SDGEU-209 |
+| **Backlog ID** | Indisponível |
 | **Tecnologia** | Spring Data JPA, Supabase Storage (Imagens) |
 | **Fluxo Básico** | 1. Ator seleciona "Gerenciar Atrações".<br>2. Sistema abre formulário (Nome, Descrição, Coordenadas, Preço, Categoria).<br>3. Ator faz upload de fotos.<br>4. Sistema salva no banco e invalida cache de busca. |
 | **Fluxo Variante** | **Desativar Temporariamente**: Ator oculta a atração sem deletar. |
@@ -195,7 +195,7 @@ Este documento detalha os Casos de Uso do sistema Exploraê, estruturado para an
 | **Interessados** | Sistema (saúde e moderação) |
 | **Pré-condição** | Login com credenciais administrativas |
 | **Pós-condição** | Configurações do sistema aplicadas |
-| **Backlog ID** | ADMIN-01 |
+| **Backlog ID** | Indisponível |
 | **Tecnologia** | Spring Boot Actuator, Dashboard Custom |
 | **Fluxo Básico** | 1. Admin acessa portal de gestão.<br>2. Sistema exibe métricas (Total usuários, Atividades hoje).<br>3. Admin aprova novos parceiros cadastrados.<br>4. Admin modera comentários/avaliações denunciadas. |
 | **Fluxo Variante** | **Gerar Relatórios <<rep>>**: Sistema exporta CSV com dados de engajamento. |
