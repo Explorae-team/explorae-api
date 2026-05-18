@@ -15,7 +15,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
 
-
   frontend:
     build:
       context: ./frontend
@@ -25,7 +24,7 @@ services:
     container_name: explorae-frontend
     restart: always
     ports:
-      - "80:80"
+      - "80"
     networks:
       - explorae-network
 
