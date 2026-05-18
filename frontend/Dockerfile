@@ -11,6 +11,13 @@ RUN npm install
 ARG EXPO_PUBLIC_API_URL
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
 
+# Define as variáveis do Supabase durante o build (necessário para o Expo Web)
+ARG EXPO_PUBLIC_SUPABASE_URL
+ENV EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL
+
+ARG EXPO_PUBLIC_SUPABASE_ANON_KEY
+ENV EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY
+
 # Copia o código e faz o build para web
 COPY . .
 RUN npx expo export --platform web

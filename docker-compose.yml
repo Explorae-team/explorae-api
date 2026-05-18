@@ -17,15 +17,17 @@ services:
       - DB_SSL_MODE
       - JWT_SECRET
       - JWT_EXPIRATION
-      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - SUPABASE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+      - SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL:-${NEXT_PUBLIC_SUPABASE_URL}}
+      - SUPABASE_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY:-${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}}
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - EXPO_PUBLIC_API_URL=${API_URL:-http://137.131.135.59:8080}
+        - EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL}
+        - EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL}
+        - EXPO_PUBLIC_SUPABASE_ANON_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY}
     container_name: explorae-frontend
     restart: always
     expose:
