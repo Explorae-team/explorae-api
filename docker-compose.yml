@@ -5,8 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: explorae-backend
     restart: always
-    ports:
-      - "8080:8080"
+    network_mode: "host"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - DB_HOST=${DB_HOST}
@@ -15,8 +14,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
-    networks:
-      - explorae-network
+
 
   frontend:
     build:
