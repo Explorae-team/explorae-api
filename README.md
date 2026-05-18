@@ -22,4 +22,4 @@ Bem-vindo ao repositório unificado do Exploraê!
 Em breve, teremos um `docker-compose.yml` para rodar o banco de dados e as aplicações com facilidade.
 
 ## 🤝 Contribuição
-Todas as features devem ser enviadas via Pull Request. Para o MVP, as mudanças devem ser feitas de forma atômica, unindo as alterações de Back e Front no mesmo PR quando possível.
+Todas as features devem ser enviadas via Pull Request. Para o MVP, as mudanças devem ser feitas de forma atômica, unindo as alterações de Back e Front no mesmo PR quando possível!
