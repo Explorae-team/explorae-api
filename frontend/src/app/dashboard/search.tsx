@@ -159,7 +159,7 @@ export default function SearchScreen() {
         ) : hasMore && attractions.length > 0 ? (
           <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
             <Pressable
-              onPress={loadMore}
+              onPress={() => loadMore()}
               style={{ paddingVertical: 16, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#002e3c', borderWidth: 1, borderColor: 'rgba(189, 233, 254, 0.1)' }}
             >
               <Text style={{ fontSize: 13, fontWeight: '700', color: '#fd6c28', letterSpacing: 2, textTransform: 'uppercase' }}>
