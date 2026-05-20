@@ -35,10 +35,11 @@ O projeto foi unificado em um **Monorepo**. O Backend (Spring Boot) está funcio
 - [X] **Componentes UI**: Componente `AttractionCard` (Variant: Default) implementado e testado (SDGEU-213).
 - [X] **Dashboard Explore**: Tela principal integrada com o backend, carregando atrações reais com paginação, preço e selo de parceiro (SDGEU-154).
 - [X] **Infraestrutura de Testes (Frontend)**: Estabilização de mocks do Axios e Jest para ambiente Expo (Phase 14-FE).
+- [X] **Carrossel de Recomendações & Feed Paginado**: Dashboard integrado com geolocalização multiplataforma (camera + GPS no Native, GPS no Web, fallback João Pessoa), carrossel horizontal de afinidades e feed vertical dinâmico (SDGEU-377 / Phase 10).
 
 ## 📌 Próximos Passos (Sprint 03)
 
-1. **Dashboard**: Iniciar a construção da tela principal (Explore) consumindo as preferências.
+1. **Mapa Interativo**: Exibir atrações em tempo real com base no raio de geolocalização.
 
 ## 🛠 Decisões Técnicas (Monorepo)
 - **Sincronia**: Mudanças que afetam Back e Front devem ser feitas no mesmo PR.
