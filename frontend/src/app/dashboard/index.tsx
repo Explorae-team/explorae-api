@@ -376,11 +376,10 @@ export default function ExploreScreen() {
                   </View>
                 ) : null
               )}
-            </View>       </View>
+            </View>
           </View>
 
-        </View>
-      </ScrollView>
+        </ScrollView>
 
       <FiltersModal 
         isVisible={isFilterModalVisible}
