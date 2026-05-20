@@ -65,7 +65,7 @@ class GamificationServiceTest {
     void shouldLevelUpWhenXpThresholdReached() {
         // GIVEN
         UUID userId = UUID.randomUUID();
-        // Nível 1 -> 100 XP para subir (Fórmula: Nivel * 100)
+        // Nível 1 -> 2: precisa de 100 XP (Total: 100 XP)
         User user = User.builder().id(userId).xp(90).level(1).build();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -76,6 +76,25 @@ class GamificationServiceTest {
         // THEN
         assertThat(user.getXp()).isEqualTo(110);
         assertThat(user.getLevel()).isEqualTo(2);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    @DisplayName("Deve subir para o nível 3 somente ao atingir o limite cumulativo de 300 XP")
+    void shouldLevelUpToLevel3WhenCumulativeThresholdReached() {
+        // GIVEN
+        UUID userId = UUID.randomUUID();
+        // Nível 2 -> 3: precisa de 300 XP totais acumulados
+        User user = User.builder().id(userId).xp(280).level(2).build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // WHEN
+        gamificationService.addXp(userId, 30, "Level Up");
+
+        // THEN
+        assertThat(user.getXp()).isEqualTo(310);
+        assertThat(user.getLevel()).isEqualTo(3);
         verify(userRepository, times(1)).save(user);
     }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ProgressBar, calculateLevelProgress } from '../common/ProgressBar';
 
 interface UserProgressHeroProps {
   userName: string;
@@ -15,7 +16,7 @@ export const UserProgressHero: React.FC<UserProgressHeroProps> = ({
   currentXp,
   nextLevelXp,
 }) => {
-  const progress = Math.min((currentXp / nextLevelXp) * 100, 100);
+  const { progressXp, xpNeededForThisLevel, progressPercentage } = calculateLevelProgress(currentXp, level);
 
   return (
     <View className="space-y-4 px-6 pt-4">
@@ -40,15 +41,14 @@ export const UserProgressHero: React.FC<UserProgressHeroProps> = ({
             XP ATUAL
           </Text>
           <Text className="text-tertiary text-xs font-bold">
-            {currentXp.toLocaleString()} / {nextLevelXp.toLocaleString()} XP
+            {progressXp.toLocaleString()} / {xpNeededForThisLevel.toLocaleString()} XP
           </Text>
         </View>
-        <View className="h-3 w-full bg-surface-container-highest rounded-full overflow-hidden">
-          <View 
-            className="h-full bg-tertiary rounded-full" 
-            style={{ width: `${progress}%` }} 
-          />
-        </View>
+        <ProgressBar
+          progressPercentage={progressPercentage}
+          fillColor="#ffba26" // cor correspondente ao bg-tertiary
+          variant="compact"
+        />
       </View>
     </View>
   );

@@ -80,15 +80,24 @@ public class User implements UserDetails {
 
     private boolean checkLevelUp() {
         int oldLevel = this.level;
-        // XP necessário para o próximo nível = nivel * 100
-        while (this.xp >= getXpForNextLevel()) {
+        // Fórmula de RPG Cumulativa (Opção B):
+        // Nível 1 -> 2: 100 XP (Total: 100 XP)
+        // Nível 2 -> 3: 200 XP (Total: 300 XP)
+        // Nível 3 -> 4: 300 XP (Total: 600 XP)
+        // Limite para nível L = 50 * L * (L - 1)
+        while (this.xp >= getXpThresholdForLevel(this.level + 1)) {
             this.level++;
         }
         return this.level > oldLevel;
     }
 
+    public int getXpThresholdForLevel(int l) {
+        if (l <= 1) return 0;
+        return 50 * l * (l - 1);
+    }
+
     public int getXpForNextLevel() {
-        return this.level * 100;
+        return getXpThresholdForLevel(this.level + 1);
     }
 
 

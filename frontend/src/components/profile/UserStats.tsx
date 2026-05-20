@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
 import storage from '../../utils/storage';
+import { ProgressBar, calculateLevelProgress } from '../common/ProgressBar';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -119,11 +120,7 @@ export default function UserStats() {
     ? (user.photoUrl.startsWith('http') ? user.photoUrl : `${API_URL}${user.photoUrl}`)
     : null;
 
-  const levelStartXp = (level - 1) * 100;
-  const nextLevelXp = level * 100;
-  const currentLevelProgress = xp - levelStartXp;
-  
-  const progressPercentage = Math.min(Math.max((currentLevelProgress / 100) * 100, 0), 100);
+  const { currentLevelProgress, xpNeededForThisLevel, progressPercentage } = calculateLevelProgress(xp, level);
 
   return (
     <View className="items-center mt-6">
@@ -244,22 +241,16 @@ export default function UserStats() {
       </View>
 
 
-      <View 
-        className="w-full mt-8 bg-surface-container-highest rounded-full h-4 overflow-hidden relative"
-        style={{
-          boxShadow: `0px 0px 10px ${tierColor}`,
-          elevation: 5,
-        }}
-      >
-        <View
-          className="absolute top-0 left-0 h-full rounded-full"
-          style={{ width: `${progressPercentage}%`, backgroundColor: tierColor }}
-        />
-      </View>
+      <ProgressBar
+        progressPercentage={progressPercentage}
+        variant="premium"
+        fillColor={tierColor}
+        style={{ marginTop: 32 }}
+      />
 
       <View className="w-full flex-row justify-between mt-2 px-1">
         <Text className="text-xs font-bold text-tertiary uppercase tracking-widest" style={{ color: tierColor }}>{currentLevelProgress} XP</Text>
-        <Text className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">100 XP</Text>
+        <Text className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">{xpNeededForThisLevel} XP</Text>
       </View>
     </View>
   );
