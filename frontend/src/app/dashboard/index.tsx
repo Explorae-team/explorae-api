@@ -183,7 +183,7 @@ export default function ExploreScreen() {
           </View>
 
           {/* Recommendations Feed */}
-          <View className="gap-y-6">
+          <View style={{ gap: 24 }}>
             <View className="flex-row justify-between items-center px-6">
               <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
                 Recomendado para você
@@ -197,6 +197,7 @@ export default function ExploreScreen() {
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
                 contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
               >
                 {[1, 2, 3].map((i) => (
@@ -207,6 +208,7 @@ export default function ExploreScreen() {
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
+                style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
                 contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
               >
                 {recsTop.slice(0, 10).map((attraction) => (
@@ -242,19 +244,19 @@ export default function ExploreScreen() {
               </Pressable>
             </View>
 
-            <View className={Platform.OS === 'web' ? 'flex-row flex-wrap -mx-2' : 'flex-col gap-y-10'}>
+            <View style={Platform.OS === 'web' ? { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -8 } : { flexDirection: 'column' }}>
               {hasActiveFilters ? (
                 isLoading && !isRefreshing ? (
                   [1, 2, 3].map((i) => (
-                    <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                    <View key={i} style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}>
                       <AttractionSkeleton />
                     </View>
                   ))
                 ) : attractions.length > 0 ? (
                   attractions.map((attraction, index) => (
-                    <View 
-                      key={`${attraction.id}-${index}`} 
-                      className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                    <View
+                      key={`${attraction.id}-${index}`}
+                      style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}
                     >
                       <AttractionCard
                         {...attraction}
@@ -275,15 +277,15 @@ export default function ExploreScreen() {
               ) : (
                 isLoadingRecsVert && !isRefreshing ? (
                   [1, 2, 3].map((i) => (
-                    <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                    <View key={i} style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}>
                       <AttractionSkeleton />
                     </View>
                   ))
                 ) : recsVertical.length > 0 ? (
                   recsVertical.map((attraction, index) => (
-                    <View 
-                      key={`${attraction.id}-${index}`} 
-                      className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                    <View
+                      key={`${attraction.id}-${index}`}
+                      style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}
                     >
                       <AttractionCard
                         {...attraction}

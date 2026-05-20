@@ -23,25 +23,108 @@ export default function AttractionSkeleton({ variant = 'default' }: { variant?: 
 
   if (variant === 'compact') {
     return (
-      <View className="w-48 bg-surface-container rounded-3xl p-3 overflow-hidden">
-        <Animated.View style={{ opacity }} className="w-full h-32 bg-on-surface/10 rounded-2xl" />
-        <View className="mt-3 gap-y-2">
-          <Animated.View style={{ opacity }} className="w-3/4 h-4 bg-on-surface/10 rounded-lg" />
-          <Animated.View style={{ opacity }} className="w-1/2 h-3 bg-on-surface/10 rounded-lg" />
+      <View
+        style={{
+          width: 192,
+          backgroundColor: '#00232f',
+          borderRadius: 24,
+          padding: 12,
+          overflow: 'hidden',
+        }}
+      >
+        <Animated.View
+          style={{
+            opacity,
+            width: '100%',
+            height: 128,
+            backgroundColor: 'rgba(189, 233, 254, 0.08)',
+            borderRadius: 16,
+          }}
+        />
+        {/* Usamos marginTop em vez de gap para compatibilidade web */}
+        <View style={{ marginTop: 12 }}>
+          <Animated.View
+            style={{
+              opacity,
+              width: '75%',
+              height: 16,
+              backgroundColor: 'rgba(189, 233, 254, 0.08)',
+              borderRadius: 8,
+            }}
+          />
+          <Animated.View
+            style={{
+              opacity,
+              width: '50%',
+              height: 12,
+              backgroundColor: 'rgba(189, 233, 254, 0.08)',
+              borderRadius: 8,
+              marginTop: 8,
+            }}
+          />
         </View>
       </View>
     );
   }
 
   return (
-    <View className="w-full bg-surface-container-low rounded-[40px] p-6 mb-4">
-      <Animated.View style={{ opacity }} className="w-full h-64 bg-on-surface/10 rounded-[32px]" />
-      <View className="mt-6 gap-y-3">
-        <Animated.View style={{ opacity }} className="w-2/3 h-6 bg-on-surface/10 rounded-lg" />
-        <Animated.View style={{ opacity }} className="w-full h-4 bg-on-surface/10 rounded-lg" />
-        <View className="flex-row justify-between mt-2">
-          <Animated.View style={{ opacity }} className="w-24 h-4 bg-on-surface/10 rounded-lg" />
-          <Animated.View style={{ opacity }} className="w-16 h-4 bg-on-surface/10 rounded-lg" />
+    <View
+      style={{
+        width: '100%',
+        backgroundColor: '#001b24',
+        borderRadius: 40,
+        padding: 24,
+        marginBottom: 16,
+      }}
+    >
+      <Animated.View
+        style={{
+          opacity,
+          width: '100%',
+          height: 256,
+          backgroundColor: 'rgba(189, 233, 254, 0.08)',
+          borderRadius: 32,
+        }}
+      />
+      <View style={{ marginTop: 24 }}>
+        <Animated.View
+          style={{
+            opacity,
+            width: '66%',
+            height: 24,
+            backgroundColor: 'rgba(189, 233, 254, 0.08)',
+            borderRadius: 8,
+          }}
+        />
+        <Animated.View
+          style={{
+            opacity,
+            width: '100%',
+            height: 16,
+            backgroundColor: 'rgba(189, 233, 254, 0.08)',
+            borderRadius: 8,
+            marginTop: 12,
+          }}
+        />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
+          <Animated.View
+            style={{
+              opacity,
+              width: 96,
+              height: 16,
+              backgroundColor: 'rgba(189, 233, 254, 0.08)',
+              borderRadius: 8,
+            }}
+          />
+          <Animated.View
+            style={{
+              opacity,
+              width: 64,
+              height: 16,
+              backgroundColor: 'rgba(189, 233, 254, 0.08)',
+              borderRadius: 8,
+            }}
+          />
         </View>
       </View>
     </View>
