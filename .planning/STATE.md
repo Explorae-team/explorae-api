@@ -5,13 +5,14 @@ Iniciando a Sprint 03 do Exploraê. O backend está funcional com Auth e Prefer�
 
 ## Current Phase
 - **Active**: Phase 10 - [SDGEU-377] Exibir Carrossel de Recomendações no Feed (Expo/Native)
-- **Status**: Pronto para iniciar planejamento (discuss-phase).
+- **Status**: ✓ Context gathered, ready to plan.
 
 ## Recent Progress
 - [X] Phase 9: Algoritmo de recomendação híbrido concluído no backend, com suporte à persistência de interações (VIEW) e cobertura total de testes de integração.
 ## Session Continuity
 - **Last session**: 2026-05-20
-- **Stopped at**: Sessão retomada com sucesso. Pronto para planejar e discutir a Fase 10 (Carrossel de Recomendações).
+- **Stopped at**: Phase 10 context gathered.
+- **Resume file**: .planning/phases/10-exibir-carrossel-recomendacoes-feed/10-CONTEXT.md
 - Concluída a revisão de progresso real da Sprint 03.
 - Identificado que as Fases 12 (Galeria de Fotos/Carousel) e 14 (Infraestrutura Terraform OCI) já estão concluídas.
 - Concluída Sprint 02 (Perfil e Preferências).
