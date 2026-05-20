@@ -9,8 +9,19 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const stepInfo = ONBOARDING_STEPS[currentStep];
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      const result = await preferenceService.getCategories();
+      if (result.success) {
+        setCategories(result.data);
+      }
+    };
+    fetchCats();
+  }, []);
 
   useEffect(() => {
     if (isEditMode) {
@@ -33,6 +44,18 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   };
 
   const handleNext = () => {
+    const currentPillar = stepInfo?.pillar;
+    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
+    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
+
+    if (pillarCategories.length > 0 && !hasSelection) {
+      Alert.alert(
+        'Exploração sob Medida',
+        'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
+      );
+      return;
+    }
+
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
@@ -51,6 +74,18 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   };
 
   const handleFinish = async () => {
+    const currentPillar = stepInfo?.pillar;
+    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
+    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
+
+    if (pillarCategories.length > 0 && !hasSelection) {
+      Alert.alert(
+        'Exploração sob Medida',
+        'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
+      );
+      return;
+    }
+
     if (selectedIds.length === 0) {
       Alert.alert('Ops!', 'Selecione pelo menos um interesse para continuar.');
       return;
@@ -77,6 +112,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     selectedIds,
     isSubmitting,
     stepInfo,
+    categories,
     handleToggleInterest,
     handleNext,
     handleBack

@@ -1,3 +1,9 @@
+// Mock do módulo de Supabase ANTES de qualquer importação
+jest.mock('../supabase', () => ({
+  __esModule: true,
+  getPublicImageUrl: jest.fn((path) => path),
+}));
+
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { useExploreData } from '../useExploreData';
 

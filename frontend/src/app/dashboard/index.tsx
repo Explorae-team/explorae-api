@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -12,6 +12,9 @@ import { Stack, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useExploreData } from '../../services/useExploreData';
+import * as Location from 'expo-location';
+import * as ImagePicker from 'expo-image-picker';
+import { useRecommendations } from '../../services/useRecommendations';
 
 // Components
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
@@ -36,6 +39,42 @@ export default function ExploreScreen() {
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
 
+  const [coords, setCoords] = useState<{ latitude: number | null; longitude: number | null }>({
+    latitude: null,
+    longitude: null,
+  });
+
+  useEffect(() => {
+    async function requestPermissionsAndGetLocation() {
+      try {
+        if (Platform.OS === 'web') {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status === 'granted') {
+            const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+          } else {
+            setCoords({ latitude: -7.1196, longitude: -34.8450 });
+          }
+        } else {
+          await ImagePicker.requestCameraPermissionsAsync();
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status === 'granted') {
+            const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+            setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+          } else {
+            setCoords({ latitude: -7.1196, longitude: -34.8450 });
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao obter localização/permissões:', err);
+        setCoords({ latitude: -7.1196, longitude: -34.8450 });
+      }
+    }
+    requestPermissionsAndGetLocation();
+  }, []);
+
+  const hasActiveFilters = selectedCategory !== null || activeFilters !== null;
+
   // Constrói objeto de filtros para o hook
   const filters = useMemo(() => ({
     category: selectedCategory || undefined,
@@ -55,11 +94,30 @@ export default function ExploreScreen() {
     loadMore
   } = useExploreData(filters);
 
+  // Carrossel superior (size 15 - sliced to top 10)
+  const {
+    recommendations: recsTop,
+    isLoading: isLoadingRecsTop,
+    refresh: refreshRecsTop
+  } = useRecommendations(coords.latitude, coords.longitude, 15);
+
+  // Feed vertical "Descubra" paginado (size 10)
+  const {
+    recommendations: recsVertical,
+    isLoading: isLoadingRecsVert,
+    isLoadingMore: isLoadingMoreRecsVert,
+    hasMore: hasMoreRecsVert,
+    refresh: refreshRecsVert,
+    loadMore: loadMoreRecsVert
+  } = useRecommendations(coords.latitude, coords.longitude, 10);
+
   const router = useRouter();
 
   const handleRefresh = async () => {
     await Promise.all([
       refresh(selectedCategory || undefined),
+      refreshRecsTop(),
+      refreshRecsVert(),
       updateUserPreferences()
     ]);
   };
@@ -135,7 +193,7 @@ export default function ExploreScreen() {
               </Pressable>
             </View>
 
-            {isLoading && !isRefreshing ? (
+            {isLoadingRecsTop && !isRefreshing ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -151,7 +209,7 @@ export default function ExploreScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
               >
-                {attractions.slice(0, 10).map((attraction) => (
+                {recsTop.slice(0, 10).map((attraction) => (
                   <AttractionCard
                     key={attraction.id}
                     {...attraction}
@@ -185,68 +243,132 @@ export default function ExploreScreen() {
             </View>
 
             <View className={Platform.OS === 'web' ? 'flex-row flex-wrap -mx-2' : 'flex-col gap-y-10'}>
-              {isLoading && !isRefreshing ? (
-                [1, 2, 3].map((i) => (
-                  <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
-                    <AttractionSkeleton />
+              {hasActiveFilters ? (
+                isLoading && !isRefreshing ? (
+                  [1, 2, 3].map((i) => (
+                    <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                      <AttractionSkeleton />
+                    </View>
+                  ))
+                ) : attractions.length > 0 ? (
+                  attractions.map((attraction, index) => (
+                    <View 
+                      key={`${attraction.id}-${index}`} 
+                      className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                    >
+                      <AttractionCard
+                        {...attraction}
+                        isPopular={index % 4 === 0}
+                        isNew={index === 1}
+                        onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                      />
+                    </View>
+                  ))
+                ) : (
+                  <View className="flex-1 items-center py-10 w-full">
+                    <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
+                    <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
+                      Nenhuma atração encontrada no momento.
+                    </Text>
                   </View>
-                ))
-              ) : attractions.length > 0 ? (
-                attractions.map((attraction, index) => (
-                  <View 
-                    key={`${attraction.id}-${index}`} 
-                    className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
-                  >
-                    <AttractionCard
-                      {...attraction}
-                      isPopular={index % 4 === 0}
-                      isNew={index === 1}
-                      onPress={() => router.push(`/attraction/${attraction.id}` as any)}
-                    />
-                  </View>
-                ))
+                )
               ) : (
-                <View className="flex-1 items-center py-10 w-full">
-                  <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
-                  <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
-                    Nenhuma atração encontrada no momento.
-                  </Text>
-                </View>
+                isLoadingRecsVert && !isRefreshing ? (
+                  [1, 2, 3].map((i) => (
+                    <View key={i} className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}>
+                      <AttractionSkeleton />
+                    </View>
+                  ))
+                ) : recsVertical.length > 0 ? (
+                  recsVertical.map((attraction, index) => (
+                    <View 
+                      key={`${attraction.id}-${index}`} 
+                      className={Platform.OS === 'web' ? 'w-1/3 px-2 mb-8' : ''}
+                    >
+                      <AttractionCard
+                        {...attraction}
+                        isPopular={index % 4 === 0}
+                        isNew={index === 1}
+                        onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                      />
+                    </View>
+                  ))
+                ) : (
+                  <View className="flex-1 items-center py-10 w-full">
+                    <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
+                    <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
+                      Nenhuma recomendação encontrada no momento.
+                    </Text>
+                  </View>
+                )
               )}
             </View>
 
             <View className="mt-10">
-              {hasMore ? (
-                <Pressable
-                  onPress={() => loadMore(selectedCategory || undefined)}
-                  className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
-                >
-                  {isLoadingMore ? (
-                    <ActivityIndicator color="#fd6c28" />
-                  ) : (
-                    <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
-                  )}
-                </Pressable>
-              ) : attractions.length > 0 ? (
-                <View className="items-center justify-center py-10">
-                  <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
-                    <MaterialIcons name="route" size={32} color="#8b9296" />
-                  </View>
-                  <Text className="text-lg font-bold text-on-surface text-center mb-2">
-                    Você chegou ao fim por agora
-                  </Text>
-                  <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
-                    Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
-                  </Text>
+              {hasActiveFilters ? (
+                hasMore ? (
                   <Pressable
-                    onPress={() => console.log('Open Map')}
-                    className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
+                    onPress={() => loadMore(selectedCategory || undefined)}
+                    className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                   >
-                    <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
+                    {isLoadingMore ? (
+                      <ActivityIndicator color="#fd6c28" />
+                    ) : (
+                      <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
+                    )}
                   </Pressable>
-                </View>
-              ) : null}
-            </View>
+                ) : attractions.length > 0 ? (
+                  <View className="items-center justify-center py-10">
+                    <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
+                      <MaterialIcons name="route" size={32} color="#8b9296" />
+                    </View>
+                    <Text className="text-lg font-bold text-on-surface text-center mb-2">
+                      Você chegou ao fim por agora
+                    </Text>
+                    <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
+                      Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
+                    </Text>
+                    <Pressable
+                      onPress={() => console.log('Open Map')}
+                      className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
+                    >
+                      <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
+                    </Pressable>
+                  </View>
+                ) : null
+              ) : (
+                hasMoreRecsVert ? (
+                  <Pressable
+                    onPress={loadMoreRecsVert}
+                    className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
+                  >
+                    {isLoadingMoreRecsVert ? (
+                      <ActivityIndicator color="#fd6c28" />
+                    ) : (
+                      <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
+                    )}
+                  </Pressable>
+                ) : recsVertical.length > 0 ? (
+                  <View className="items-center justify-center py-10">
+                    <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
+                      <MaterialIcons name="route" size={32} color="#8b9296" />
+                    </View>
+                    <Text className="text-lg font-bold text-on-surface text-center mb-2">
+                      Você chegou ao fim por agora
+                    </Text>
+                    <Text className="text-sm text-on-surface-variant text-center mb-6 max-w-[250px]">
+                      Mas a cidade é enorme! Que tal buscar por regiões específicas no mapa?
+                    </Text>
+                    <Pressable
+                      onPress={() => console.log('Open Map')}
+                      className="bg-surface border-2 border-primary py-3 px-8 rounded-full w-full"
+                    >
+                      <Text className="text-primary font-bold text-center">VER MAIS NO MAPA</Text>
+                    </Pressable>
+                  </View>
+                ) : null
+              )}
+            </View>       </View>
           </View>
 
         </View>

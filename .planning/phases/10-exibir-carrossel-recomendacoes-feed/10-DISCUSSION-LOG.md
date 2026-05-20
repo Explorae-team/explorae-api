@@ -38,12 +38,12 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Opção A | Fixo & Leve: carregar apenas 10 atrações recomendadas no carrossel, sem paginação horizontal | ✓ (para o carrossel) |
+| Opção A | Fixo & Leve: carregar apenas 15 atrações recomendadas no carrossel, sem paginação horizontal | ✓ (para o carrossel) |
 | Opção B | Horizontal Infinito: paginação horizontal no carrossel superior | |
-| **Opção Custom** | Carrossel superior com 10 fixos, feed vertical principal ordenado por recomendações paginado de 10 em 10 | ✓ (para o feed) |
+| **Opção Custom** | Carrossel superior com 15 fixos, feed vertical principal ordenado por recomendações paginado de 10 em 10 | ✓ (para o feed) |
 
-**User's choice:** Carrossel superior estático limitado a 10 e reordenação do feed vertical "Descubra" no fim do dashboard para trazer as recomendações personalizadas em primeiro lugar, paginadas de 10 em 10.
-**Notes:** O carrossel horizontal de recomendações traz as 10 principais do usuário. O feed vertical principal ("Descubra") reordena as atrações no mesmo padrão de recomendações (paginado). Quando filtros específicos (categoria, preço, rating) forem aplicados no feed principal, a listagem volta a usar o endpoint geral com filtros.
+**User's choice:** Carrossel superior estático limitado a 15 e reordenação do feed vertical "Descubra" no fim do dashboard para trazer as recomendações personalizadas em primeiro lugar, paginadas de 10 em 10.
+**Notes:** O carrossel horizontal de recomendações traz as 15 principais do usuário. O feed vertical principal ("Descubra") reordena as atrações no mesmo padrão de recomendações (paginado). Quando filtros específicos (categoria, preço, rating) forem aplicados no feed principal, a listagem volta a usar o endpoint geral com filtros.
 
 ---
 
