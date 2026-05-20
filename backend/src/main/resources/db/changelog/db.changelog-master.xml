@@ -21,4 +21,5 @@
     <include file="db/changelog/changes/014-create-saved-attractions-table.xml"/>
     <include file="db/changelog/changes/015-create-categories-table.xml"/>
     <include file="db/changelog/changes/016-add-detailed-categories.xml"/>
+    <include file="db/changelog/changes/017-create-user-interactions-table.xml"/>
 </databaseChangeLog>

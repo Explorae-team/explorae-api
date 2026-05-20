@@ -22,6 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import br.edu.ifpb.explorae.domain.attraction.UserInteraction;
+import br.edu.ifpb.explorae.domain.user.Category;
+import br.edu.ifpb.explorae.domain.user.TravelPreference;
+import br.edu.ifpb.explorae.repository.TravelPreferenceRepository;
+import br.edu.ifpb.explorae.repository.UserInteractionRepository;
+import org.springframework.data.domain.PageImpl;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +41,8 @@ public class AttractionService {
     private final SavedAttractionRepository savedAttractionRepository;
     private final UserRepository userRepository;
     private final AttractionMapper attractionMapper;
+    private final TravelPreferenceRepository travelPreferenceRepository;
+    private final UserInteractionRepository userInteractionRepository;
 
     @Transactional(readOnly = true)
     public Page<AttractionResponseDTO> findAll(String category, Pageable pageable) {
@@ -45,7 +56,7 @@ public class AttractionService {
 
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AttractionDetailsResponseDTO getAttractionDetails(UUID attractionId, User principal) {
         Attraction attraction = attractionRepository.findById(attractionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Atração não encontrada"));
@@ -53,6 +64,13 @@ public class AttractionService {
         boolean isSaved = false;
         if (principal != null) {
             isSaved = savedAttractionRepository.existsByUserIdAndAttractionId(principal.getId(), attractionId);
+            
+            UserInteraction interaction = UserInteraction.builder()
+                    .user(principal)
+                    .attraction(attraction)
+                    .interactionType("VIEW")
+                    .build();
+            userInteractionRepository.save(interaction);
         }
 
         List<AttractionReview> reviews = reviewRepository.findByAttractionIdOrderByCreatedAtDesc(attractionId);
@@ -82,4 +100,91 @@ public class AttractionService {
         AttractionReview savedReview = reviewRepository.save(review);
         return attractionMapper.toReviewDTO(savedReview);
     }
+
+    @Transactional(readOnly = true)
+    public Page<AttractionResponseDTO> getRecommendations(User user, Double latitude, Double longitude, Pageable pageable) {
+        List<Attraction> attractions = attractionRepository.findAll();
+        
+        TravelPreference pref = travelPreferenceRepository.findByUser(user).orElse(null);
+        List<UserInteraction> recentInteractions = userInteractionRepository.findTop20ByUserIdAndInteractionTypeOrderByCreatedAtDesc(user.getId(), "VIEW");
+        
+        Map<String, Double> implicitScores = calculateImplicitScores(recentInteractions);
+        
+        List<AttractionResponseDTO> scoredAttractions = attractions.stream().map(attr -> {
+            double scoreExplicito = calculateExplicitScore(attr, pref);
+            double scoreImplicito = implicitScores.getOrDefault(attr.getCategory().toLowerCase(), recentInteractions.isEmpty() ? 0.5 : 0.0);
+            
+            double matchPerfilHibrido = (0.70 * scoreExplicito) + (0.30 * scoreImplicito);
+            
+            double distanciaKm = (latitude != null && longitude != null) ? calculateHaversineDistance(latitude, longitude, attr.getLatitude(), attr.getLongitude()) : 0.0;
+            double fatorDistancia = (latitude != null && longitude != null) ? (1.0 / (1.0 + distanciaKm)) : 1.0;
+            
+            double ratingNormalizado = attr.getAverageRating() != null ? attr.getAverageRating() / 5.0 : 0.0;
+            double boostParceiro = Boolean.TRUE.equals(attr.getIsPartner()) ? 1.0 : 0.0;
+            
+            double finalScore = (0.40 * matchPerfilHibrido) + (0.30 * fatorDistancia) + (0.20 * ratingNormalizado) + (0.10 * boostParceiro);
+            
+            String distanceStr = (latitude != null && longitude != null) ? String.format("%.1f km", distanciaKm).replace(".", ",") : "Localizando...";
+            
+            AttractionResponseDTO dto = AttractionResponseDTO.fromEntity(attr, distanceStr);
+            return new ScoredAttraction(dto, finalScore);
+        })
+        .sorted(Comparator.comparing(ScoredAttraction::score).reversed())
+        .map(ScoredAttraction::dto)
+        .collect(Collectors.toList());
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), scoredAttractions.size());
+        
+        List<AttractionResponseDTO> pageContent = start <= end ? scoredAttractions.subList(start, end) : List.of();
+        return new PageImpl<>(pageContent, pageable, scoredAttractions.size());
+    }
+    
+    private Map<String, Double> calculateImplicitScores(List<UserInteraction> interactions) {
+        if (interactions.isEmpty()) return new HashMap<>();
+        Map<String, Integer> counts = new HashMap<>();
+        for (UserInteraction ui : interactions) {
+            String cat = ui.getAttraction().getCategory().toLowerCase();
+            counts.put(cat, counts.getOrDefault(cat, 0) + 1);
+        }
+        Map<String, Double> scores = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            scores.put(entry.getKey(), (double) entry.getValue() / interactions.size());
+        }
+        return scores;
+    }
+    
+    private double calculateExplicitScore(Attraction attraction, TravelPreference pref) {
+        if (pref == null || pref.getInterests() == null || pref.getInterests().isEmpty()) {
+            return 0.5;
+        }
+        String attrCat = attraction.getCategory() != null ? attraction.getCategory().toLowerCase() : "";
+        for (Category interest : pref.getInterests()) {
+            String slug = interest.getSlug().toLowerCase();
+            String parent = interest.getParentCategory() != null ? interest.getParentCategory().toLowerCase() : "";
+            
+            if (attrCat.equals(slug) || attrCat.contains(slug) || slug.contains(attrCat)) {
+                return 1.0;
+            }
+            if (parent.equals("cultura") && (attrCat.equals("cultura") || attrCat.equals("histórico") || attrCat.equals("historico"))) return 0.5;
+            if (parent.equals("aventura") && (attrCat.equals("natureza") || attrCat.equals("praia") || attrCat.equals("lazer"))) return 0.5;
+            if (parent.equals("relaxamento") && (attrCat.equals("natureza") || attrCat.equals("praia") || attrCat.equals("lazer"))) return 0.5;
+            if (parent.equals("gastronomia") && attrCat.equals("lazer")) return 0.5;
+            if (parent.equals("noite") && (attrCat.equals("lazer") || attrCat.equals("cultura"))) return 0.5;
+        }
+        return 0.0;
+    }
+    
+    private double calculateHaversineDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; 
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+    
+    private record ScoredAttraction(AttractionResponseDTO dto, double score) {}
 }

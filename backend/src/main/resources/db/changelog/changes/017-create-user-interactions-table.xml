@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="017-create-user-interactions" author="explorae">
+        <createTable tableName="user_interactions">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_interaction_user" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="attraction_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_interaction_attraction" referencedTableName="attractions" referencedColumnNames="id"/>
+            </column>
+            <column name="interaction_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createIndex tableName="user_interactions" indexName="idx_user_interaction_date">
+            <column name="user_id"/>
+            <column name="interaction_type"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

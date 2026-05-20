@@ -41,6 +41,19 @@ public class AttractionController {
                 page));
     }
 
+    @GetMapping("/recommendations")
+    public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getRecommendations(
+            @AuthenticationPrincipal User principal,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @PageableDefault(size = 10) Pageable pageable) {
+            
+        Page<AttractionResponseDTO> page = attractionService.getRecommendations(principal, latitude, longitude, pageable);
+        return ResponseEntity.ok(StandardResponseDTO.success(
+                "Recomendações recuperadas com sucesso",
+                page));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<StandardResponseDTO<AttractionDetailsResponseDTO>> getAttractionDetails(
             @PathVariable UUID id,
