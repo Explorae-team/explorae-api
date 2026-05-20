@@ -19,21 +19,22 @@ import { supabase } from '../services/supabase';
 export default function RecuperarSenhaScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    general?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const validate = () => {
+    const newErrors: typeof errors = {};
     if (!email) {
-      setError('E-mail é obrigatório');
-      return false;
+      newErrors.email = 'E-mail é obrigatório';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'E-mail inválido';
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('E-mail inválido');
-      return false;
-    }
-    setError(null);
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleResetPassword = async () => {
@@ -50,13 +51,21 @@ export default function RecuperarSenhaScreen() {
       });
 
       if (resetError) {
-        setError(resetError.message);
+        const msg = resetError.message;
+        // Mapeamento de erros comuns do Supabase
+        if (msg.toLowerCase().includes('user') || msg.toLowerCase().includes('email')) {
+          setErrors({ email: 'E-mail não cadastrado ou inválido no sistema.' });
+        } else if (msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('too many')) {
+          setErrors({ general: 'Limite de envio excedido. Tente novamente em alguns minutos.' });
+        } else {
+          setErrors({ general: msg });
+        }
         return;
       }
       
       setIsSuccess(true);
     } catch (err) {
-      setError('Erro ao enviar link. Tente novamente mais tarde.');
+      setErrors({ general: 'Erro ao enviar link. Tente novamente mais tarde.' });
     } finally {
       setLoading(false);
     }
@@ -87,6 +96,14 @@ export default function RecuperarSenhaScreen() {
             />
           </View>
 
+          {errors.general && (
+            <View className="bg-red-50 p-4 rounded-xl mb-6">
+              <Text className="text-red-600 text-xs font-semibold">
+                {errors.general}
+              </Text>
+            </View>
+          )}
+
           {!isSuccess ? (
             <>
               <View className="mb-8">
@@ -106,9 +123,9 @@ export default function RecuperarSenhaScreen() {
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
-                    if (error) setError(null);
+                    if (errors.email || errors.general) setErrors({});
                   }}
-                  error={error || undefined}
+                  error={errors.email}
                   autoCapitalize="none"
                   keyboardType="email-address"
                 />

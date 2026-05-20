@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Image,
   Alert
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
@@ -18,46 +18,74 @@ import api from '../services/api';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const code = params.code as string;
+  const exchangeAttempted = useRef(false);
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    password?: string;
+    confirmPassword?: string;
+    general?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    // Busca o email do usuário a partir da sessão do Supabase (iniciada pelo link de recuperação)
-    const checkSession = async () => {
+    const processRecovery = async () => {
+      // Evita execução duplicada em React Strict Mode (especialmente em ambiente de desenvolvimento Web)
+      if (exchangeAttempted.current) return;
+      exchangeAttempted.current = true;
+
+      setLoading(true);
       try {
+        // Se houver um code na URL (fluxo PKCE), realiza a troca pelo token de sessão
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            setErrors({ general: 'Link de recuperação expirado ou inválido. Solicite um novo link.' });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Busca o usuário autenticado na sessão de recuperação
         const { data: { user } } = await supabase.auth.getUser();
         if (user && user.email) {
           setEmail(user.email);
+          setErrors({});
         } else {
-          // Se não houver usuário autenticado via fluxo de recuperação, exibe erro
-          setError('Link de recuperação expirado ou inválido. Por favor, solicite um novo link.');
+          setErrors({ general: 'Sessão de recuperação inválida ou expirada. Solicite um novo link.' });
         }
       } catch (err) {
-        setError('Erro ao validar sessão de recuperação.');
+        setErrors({ general: 'Erro ao validar a sessão de recuperação.' });
+      } finally {
+        setLoading(false);
       }
     };
-    checkSession();
-  }, []);
+
+    processRecovery();
+  }, [code]);
 
   const validate = () => {
+    const newErrors: typeof errors = {};
+    
     if (!password) {
-      setError('A nova senha é obrigatória');
-      return false;
+      newErrors.password = 'A nova senha é obrigatória';
+    } else if (password.length < 8) {
+      newErrors.password = 'A senha deve ter pelo menos 8 caracteres';
     }
-    if (password.length < 8) {
-      setError('A senha deve ter pelo menos 8 caracteres');
-      return false;
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'A confirmação de senha é obrigatória';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'As senhas não coincidem';
     }
-    if (password !== confirmPassword) {
-      setError('As senhas não coincidem');
-      return false;
-    }
-    setError(null);
-    return true;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleUpdatePassword = async () => {
@@ -71,7 +99,7 @@ export default function ResetPasswordScreen() {
       });
 
       if (updateError) {
-        setError(updateError.message);
+        setErrors({ general: updateError.message });
         setLoading(false);
         return;
       }
@@ -91,7 +119,7 @@ export default function ResetPasswordScreen() {
       
       setIsSuccess(true);
     } catch (err) {
-      setError('Erro ao redefinir a senha. Tente novamente mais tarde.');
+      setErrors({ general: 'Erro ao redefinir a senha. Tente novamente mais tarde.' });
     } finally {
       setLoading(false);
     }
@@ -122,6 +150,14 @@ export default function ResetPasswordScreen() {
             />
           </View>
 
+          {errors.general && (
+            <View className="bg-red-50 p-4 rounded-xl mb-6">
+              <Text className="text-red-600 text-xs font-semibold">
+                {errors.general}
+              </Text>
+            </View>
+          )}
+
           {!isSuccess ? (
             <>
               <View className="mb-8">
@@ -142,8 +178,9 @@ export default function ResetPasswordScreen() {
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
-                    if (error) setError(null);
+                    if (errors.password || errors.general) setErrors({});
                   }}
+                  error={errors.password}
                   autoCapitalize="none"
                 />
 
@@ -155,9 +192,9 @@ export default function ResetPasswordScreen() {
                   value={confirmPassword}
                   onChangeText={(text) => {
                     setConfirmPassword(text);
-                    if (error) setError(null);
+                    if (errors.confirmPassword || errors.general) setErrors({});
                   }}
-                  error={error || undefined}
+                  error={errors.confirmPassword}
                   autoCapitalize="none"
                 />
 

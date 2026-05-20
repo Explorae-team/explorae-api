@@ -52,7 +52,14 @@ export default function LoginScreen() {
       if (response.success) {
         router.replace("/dashboard");
       } else {
-        setErrors({ general: response.message || "Erro ao conectar-se" });
+        const msg = response.message || "";
+        if (msg === "Usuário não cadastrado.") {
+          setErrors({ email: "E-mail não cadastrado." });
+        } else if (msg === "E-mail ou senha inválidos.") {
+          setErrors({ password: "Senha incorreta." });
+        } else {
+          setErrors({ general: msg || "Erro ao conectar-se" });
+        }
       }
     } catch (error) {
       setErrors({ general: "Erro inesperado. Tente novamente." });
@@ -108,7 +115,12 @@ export default function LoginScreen() {
               iconName="mail-outline"
               placeholder="aventureiro@explorae.com"
               value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, email: text });
+                if (errors.email || errors.general) {
+                  setErrors({ ...errors, email: undefined, general: undefined });
+                }
+              }}
               error={errors.email}
               autoCapitalize="none"
               keyboardType="email-address"
@@ -120,7 +132,12 @@ export default function LoginScreen() {
               placeholder="••••••••"
               secureTextEntry={!showPassword}
               value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, password: text });
+                if (errors.password || errors.general) {
+                  setErrors({ ...errors, password: undefined, general: undefined });
+                }
+              }}
               error={errors.password}
               rightIconName={showPassword ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={() => setShowPassword(!showPassword)}
