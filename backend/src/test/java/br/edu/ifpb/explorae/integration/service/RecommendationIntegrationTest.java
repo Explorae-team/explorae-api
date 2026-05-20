@@ -7,6 +7,7 @@ import br.edu.ifpb.explorae.domain.user.Category;
 import br.edu.ifpb.explorae.domain.user.TravelPreference;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.repository.AttractionRepository;
+import br.edu.ifpb.explorae.repository.CategoryRepository;
 import br.edu.ifpb.explorae.repository.TravelPreferenceRepository;
 import br.edu.ifpb.explorae.repository.UserInteractionRepository;
 import br.edu.ifpb.explorae.repository.UserRepository;
@@ -44,6 +45,9 @@ class RecommendationIntegrationTest {
     @Autowired
     private UserInteractionRepository userInteractionRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Test
     @DisplayName("Deve priorizar atração com match híbrido (explícito e implícito)")
     void shouldPrioritizeHybridMatch() {
@@ -77,13 +81,16 @@ class RecommendationIntegrationTest {
                 .averageRating(4.0)
                 .build());
 
-        Category cat = new Category();
-        cat.setSlug("Praia");
-        cat.setParentCategory("Natureza");
+        Category cat = Category.builder()
+                .slug("Praia")
+                .name("Praia")
+                .parentCategory("Natureza")
+                .build();
+        cat = categoryRepository.save(cat);
         
         TravelPreference pref = TravelPreference.builder()
                 .user(user)
-                .interests(List.of(cat))
+                .interests(java.util.Set.of(cat))
                 .build();
         travelPreferenceRepository.save(pref);
 

@@ -4,10 +4,11 @@
 Iniciando a Sprint 03 do Exploraê. O backend está funcional com Auth e Preferências. O frontend está com fluxo de onboarding estável. Agora o foco é o conteúdo: Atrações, Feed e Recomendação.
 
 ## Current Phase
-- **Active**: Phase 9 - [SDGEU-223] Criar Algoritmo de Recomendação Baseado em Preferências (Backend)
-- **Status**: Planejamento concluído (CONTEXT.md e PLAN.md criados). Pronto para iniciar implementação.
+- **Active**: Phase 10 - [SDGEU-377] Exibir Carrossel de Recomendações no Feed (Expo/Native)
+- **Status**: Pronto para iniciar planejamento (discuss-phase).
 
 ## Recent Progress
+- [X] Phase 9: Algoritmo de recomendação híbrido concluído no backend, com suporte à persistência de interações (VIEW) e cobertura total de testes de integração.
 - Concluída a revisão de progresso real da Sprint 03.
 - Identificado que as Fases 12 (Galeria de Fotos/Carousel) e 14 (Infraestrutura Terraform OCI) já estão concluídas.
 - Concluída Sprint 02 (Perfil e Preferências).

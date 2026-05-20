@@ -42,7 +42,7 @@ class AttractionServiceTest {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Attraction> page = new PageImpl<>(List.of(attraction), pageable, 1);
         
-        when(repository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(repository.findAll(any(Pageable.class))).thenReturn(page);
 
         // Act
         Page<AttractionResponseDTO> result = service.findAll(null, pageable);
