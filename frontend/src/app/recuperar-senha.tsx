@@ -41,8 +41,12 @@ export default function RecuperarSenhaScreen() {
 
     setLoading(true);
     try {
+      const redirectToUrl = __DEV__ 
+        ? 'http://localhost:8081/reset-password' 
+        : 'https://explorae.site/reset-password';
+
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:8081/reset-password', // Altere para sua URL de produção depois
+        redirectTo: redirectToUrl,
       });
 
       if (resetError) {

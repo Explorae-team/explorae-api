@@ -2,6 +2,7 @@
   "expo": {
     "name": "Exploraê",
     "slug": "explorae-app",
+    "scheme": "explorae",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/branding/app-icon.png",
