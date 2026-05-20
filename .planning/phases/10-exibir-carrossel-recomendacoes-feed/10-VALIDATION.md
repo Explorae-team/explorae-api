@@ -58,8 +58,10 @@ created: 2026-05-20
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
+| Permissões de Inicialização (Nativo) | SDGEU-377 | Permissões de hardware de instalação no Mobile | 1. Instale o app no emulador/dispositivo.<br>2. Ao abrir o app pela primeira vez, certifique-se de que ele solicita permissões de **Câmera** E **Geolocalização** de forma ativa. |
+| Permissões de Inicialização (Web) | SDGEU-377 | Permissões de navegador na Web | 1. Abra o app pelo navegador Web.<br>2. Ao inicializar o app, certifique-se de que ele solicita **apenas** a permissão de **Geolocalização**, sem pedir câmera. |
 | Geolocalização Concedida | SDGEU-377 | Depende de permissão de hardware/SO do dispositivo | 1. No emulador/simulador, autorize a permissão de geolocalização.<br>2. Abra o dashboard.<br>3. Verifique se o carrossel exibe as distâncias em km calculadas de forma dinâmica. |
-| Geolocalização Negada | SDGEU-377 | Depende de recusa de permissão de hardware | 1. No simulador, negue a permissão de geolocalização.<br>2. Abra o app.<br>3. Verifique se as recomendações continuam carregando sem travar, mostrando a distância de fallback ("Localizando..." ou invisível). |
+| Geolocalização Negada (Fallback Jampa) | SDGEU-377 | Depende de recusa de permissão de hardware | 1. No simulador/navegador, recuse a permissão de geolocalização.<br>2. Abra o app.<br>3. Verifique se as atrações são ordenadas por proximidade a **João Pessoa, PB** (por exemplo, atrações do centro de JP aparecem com menor distância e no topo das listagens). |
 | Enforcement do Onboarding | SDGEU-22-FE | Depende da navegação de ponta a ponta na UI | 1. Abra o onboarding na tela `/preferences`.<br>2. Tente avançar na categoria de Gastronomia sem selecionar nenhum interesse.<br>3. Verifique se o Alerta é exibido e bloqueia a transição. |
 | Sincronia de Filtros | SDGEU-154 | Teste de integração de tela | 1. No Dashboard, clique em uma categoria do carrossel (ex: "Praia").<br>2. O feed "Descubra" deve exibir apenas praias.<br>3. Limpe o filtro. O feed deve voltar para as recomendações personalizadas. |
 

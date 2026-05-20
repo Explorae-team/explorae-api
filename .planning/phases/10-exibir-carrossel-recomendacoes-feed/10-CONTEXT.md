@@ -14,15 +14,15 @@ Esta fase entrega a integração completa das recomendações inteligentes perso
 ## Implementation Decisions
 
 ### 📍 Geolocalização & Permissões
-- **D-01 (Opção A ativa - size=15):** A aplicação mobile utilizará `expo-location` para solicitar a permissão de geolocalização do usuário de forma ativa ao entrar na tela principal do dashboard.
-- **D-02 (Geolocalização Fallback):** Caso a permissão seja concedida, as coordenadas reais de latitude/longitude serão obtidas e enviadas para o endpoint de recomendações `/api/v1/attractions/recommendations?size=15`. Se a permissão for negada, o fluxo prossegue com coordenadas nulas e o backend faz o cálculo sem distância de forma transparente.
+- **D-01 (Solicitação de Permissões ativas):** Ao instalar e inicializar a aplicação no ambiente nativo (Mobile), o app solicitará ativamente as permissões de **Geolocalização** (Location) e **Câmera** (Camera). No ambiente Web, apenas a permissão de **Geolocalização** será solicitada.
+- **D-02 (Geolocalização & Fallback João Pessoa):** Caso a permissão seja concedida, as coordenadas reais de latitude/longitude são enviadas na requisição do endpoint de recomendações `/api/v1/attractions/recommendations?size=15`. Se a permissão for negada, indisponível ou falhar, o frontend assumirá como fallback padrão as coordenadas de **"A grande João Pessoa, PB"** (Latitude `-7.1196`, Longitude `-34.8450`), garantindo que o backend calcule e classifique as atrações próximas a esse centro urbano principal.
 
 ### ❄️ Cold Start & Prevenção de Perfil Vazio
 - **D-03 (Enforcement no Onboarding):** Não é permitido prosseguir a partir da tela de preferências (`preferences.tsx`) sem que o usuário selecione **pelo menos 1 interesse para cada uma das cinco categorias/pilares** do onboarding (`gastronomia`, `cultura`, `aventura`, `relaxamento`, `noite`).
 - **D-04 (Eliminação de Estado Vazio):** Como o usuário é obrigado a preencher interesses válidos no onboarding antes de acessar o feed principal, o feed sempre possuirá dados explícitos para gerar recomendações personalizadas reais. Não há necessidade de fallbacks para feed vazio por falta de preferências.
 
 ### 📏 Volume de Dados & Organização do Feed (Carrossel vs Descubra)
-- **D-05 (Carrossel Superior):** O carrossel horizontal "Recomendado para você" exibirá **apenas as 10 principais atrações** recomendadas (fatiando a resposta de 15 itens). Não haverá paginação ou scroll infinito horizontal no carrossel superior para garantir performance e foco.
+- **D-05 (Carrossel Superior):** O carrossel horizontal "Recomendado para você" exibirá **apenas as 15 principais atrações** recomendadas (fatiando a resposta de 15 itens). Não haverá paginação ou scroll infinito horizontal no carrossel superior para garantir performance e foco.
 - **D-06 (Feed Descubra Personalizado):** O feed vertical principal "Descubra" localizado no fim do Dashboard também passará a trazer **primeiramente as recomendações personalizadas do usuário** ordenadas conforme suas preferências de viagem.
 - **D-07 (Paginação de 10 em 10):** O feed "Descubra" consumirá o endpoint de recomendações de forma paginada (`page=0, 1, 2...` e `size=10`). Caso filtros específicos (como categorias no carrossel de categorias, preços ou avaliações) sejam aplicados pelo usuário, o feed "Descubra" voltará a usar o endpoint geral de busca `/api/v1/attractions` respeitando esses filtros.
 
@@ -32,7 +32,7 @@ Esta fase entrega a integração completa das recomendações inteligentes perso
 
 ### the agent's Discretion
 - **F-01 (Estado de Carregamento):** O agente tem total liberdade para projetar e renderizar os skeletons (`AttractionSkeleton`) e indicadores de progresso durante as requisições paralelas do carrossel superior e do feed inferior.
-- **F-02 (Integração de Localização):** Fica a critério do agente decidir se o hook encapsulará a obtenção de localização em cache ou fará uma nova chamada assíncrona rápida a cada refresh.
+- **F-02 (Integração de Localização):** Fica a critério do agente decidir se o hook encapsulará a obtenção de localização em cache ou fará uma nova chamada assíncrona rápida a cada refresh (priorizar o cache).
 
 </decisions>
 
@@ -78,7 +78,7 @@ Esta fase entrega a integração completa das recomendações inteligentes perso
 
 <specifics>
 ## Specific Ideas
-- A validação no `usePreferencesWizard.js` deve alertar o usuário de forma amigável (via `Alert.alert`) caso ele clique em "Avançar" sem marcar pelo menos uma opção para a categoria ativa, garantindo consistência total do perfil.
+- A validação no `usePreferencesWizard.js` deve alertar o usuário de forma amigável (via Componente personalizado de avisos) caso ele clique em "Avançar" sem marcar pelo menos uma opção para a categoria ativa, garantindo consistência total do perfil.
 
 </specifics>
 

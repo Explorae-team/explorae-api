@@ -2,13 +2,13 @@
 
 ## Technical Discovery
 
-### 1. Geolocalização em Expo (expo-location)
-Para obter a localização física do usuário no frontend React Native/Expo, utilizaremos o módulo oficial `expo-location`. 
-* **Dependência**: É necessário instalar o pacote `expo-location` via `npx expo install expo-location`. Isso garante compatibilidade perfeita com a versão corrente do Expo.
-* **Uso da API**:
-  - `Location.requestForegroundPermissionsAsync()`: Solicita a permissão do usuário em primeiro plano. Retorna `{ status }`.
-  - `Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })`: Obtém a localização atual do usuário.
-* **Comportamento Web & Fallback**: O `expo-location` possui compatibilidade total com navegadores Web através do standard `navigator.geolocation` sob o capô, garantindo portabilidade para o PWA. Caso a permissão seja negada ou haja falha na requisição, capturamos o erro e retornamos coordenadas nulas (`null`), o que aciona o fallback do backend de forma transparente.
+### 1. Geolocalização e Câmera em Expo (expo-location / expo-image-picker)
+Para obter a localização física do usuário no frontend React Native/Expo, utilizaremos o módulo oficial `expo-location`. Além disso, para atender à regra de instalação, o app solicitará as permissões de geolocalização e câmera.
+* **Dependência**: É necessário instalar o pacote `expo-location` via `npx expo install expo-location`. A câmera já está suportada por `expo-image-picker` que está listado nas dependências do projeto.
+* **Uso da API no Fluxo de Inicialização**:
+  - **Ambiente Nativo (Mobile)**: Ao inicializar o app, solicitaremos simultaneamente as permissões de Câmera (`ImagePicker.requestCameraPermissionsAsync()`) e Geolocalização (`Location.requestForegroundPermissionsAsync()`).
+  - **Ambiente Web**: No navegador, solicitaremos apenas a Geolocalização (`Location.requestForegroundPermissionsAsync()`).
+* **Comportamento Web & Fallback João Pessoa**: Caso as permissões de geolocalização sejam concedidas, as coordenadas reais de latitude/longitude do dispositivo serão obtidas (`Location.getCurrentPositionAsync`). Se a permissão for negada, indisponível ou falhar, o frontend injetará silenciosamente as coordenadas padrão de **"A grande João Pessoa, PB"** (Latitude `-7.1196`, Longitude `-34.8450`), permitindo que a API do backend ordene as atrações por proximidade da capital paraibana.
 
 ### 2. Integração com Endpoint `/api/v1/attractions/recommendations`
 * **Parâmetros de Query**:
