@@ -42,7 +42,7 @@ public class SecurityConfig {
                 // Desativamos o CSRF, API REST com JWT não usa Cookies/Sessão.
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Aplica as regras de quem pode acessar o quê (CORS).
+                // Aplica as regras de quem pode acessar o quê (CORS direto na SecurityFilterChain).
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 // API é STATELESS, o servidor não guarda "quem está logado", cada requisição
@@ -84,17 +84,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Configurações de CORS
+    // Configurações de CORS do Spring Security
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Em desenvolvimento deixar geral ("*"), mas em produção trocar por os domínios
-        // reais
-        configuration.setAllowedOrigins(java.util.List.of("*"));
-        configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(java.util.List.of("*"));
+        
+        // Em produção, use o link do frontend no lugar do "*"
+        configuration.setAllowedOrigins(List.of("*")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); 
         return source;
     }
 }
