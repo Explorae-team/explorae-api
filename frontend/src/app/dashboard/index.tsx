@@ -230,8 +230,14 @@ export default function ExploreScreen() {
           <MapQuickAccess onPress={() => console.log('Open Map')} />
 
           {/* Vertical Feed (Paginated) */}
-          <View className="px-6 pb-32">
-            <View className="flex-row justify-between items-center mb-8">
+          <View style={Platform.OS === 'web'
+            ? { paddingBottom: 128 }
+            : { paddingHorizontal: 24, paddingBottom: 128 }
+          }>
+            <View style={[
+              { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 },
+              Platform.OS === 'web' ? { paddingHorizontal: 24 } : {}
+            ]}>
               <Text style={{ color: colors.onSurface }} className="text-lg font-bold">
                 Descubra
               </Text>

@@ -1,29 +1,28 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable, ActivityIndicator, FlatList, Platform } from 'react-native';
-import { Stack } from 'expo-router';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
 import { SearchBar } from '../../components/dashboard/SearchBar';
 import { CategoryCarousel } from '../../components/dashboard/CategoryCarousel';
 import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
-import AppFooter from '../../components/AppFooter';
+import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
 import { useExploreData } from '../../services/useExploreData';
+import { useRouter } from 'expo-router';
 
 export default function SearchScreen() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
 
-  // Debounce para busca textual
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Constrói objeto de filtros para o hook
   const filters = useMemo(() => ({
     name: debouncedSearch || undefined,
     category: selectedCategory || undefined,
@@ -46,93 +45,139 @@ export default function SearchScreen() {
     setSelectedCategory(prev => prev === id ? null : id);
   };
 
-  const handleApplyFilters = (filters: FilterState) => {
-    setActiveFilters(filters);
+  const handleApplyFilters = (applied: FilterState) => {
+    setActiveFilters(applied);
   };
 
-  return (
-    <View className="flex-1 bg-surface">
-      <ExploreHeader 
-        onNotificationsPress={() => console.log('Notifications')}
-      />
+  // Estilo do container de grid — 3 colunas no web, 1 coluna no mobile
+  const gridContainerStyle = Platform.OS === 'web'
+    ? { flexDirection: 'row' as const, flexWrap: 'wrap' as const, marginHorizontal: -8 }
+    : { flexDirection: 'column' as const };
 
-      <View className="flex-1">
-        <FlatList
-          data={attractions}
-          key={Platform.OS === 'web' ? 'web-grid' : 'mobile-list'}
-          numColumns={Platform.OS === 'web' ? 3 : 1}
-          columnWrapperStyle={Platform.OS === 'web' ? { paddingHorizontal: 24, gap: 16 } : null}
-          keyExtractor={(item, index) => `${item.id}-${index}`}
-          renderItem={({ item }) => (
-            <View className={Platform.OS === 'web' ? 'flex-1 mb-6' : 'px-6 mb-6'}>
-              <AttractionCard 
-                title={item.title}
-                tagline={item.tagline}
-                imageUrl={item.imageUrl}
-                rating={item.rating}
-                distance={item.distance}
-                type={item.type}
-                tags={item.tags}
-                priceRange={item.priceRange}
-                isPartner={item.isPartner}
-              />
+  // Estilo de cada item — 1/3 de largura no web, largura total no mobile
+  const cardWrapperStyle = (index: number) => Platform.OS === 'web'
+    ? { width: '33.33%' as any, paddingHorizontal: 8, marginBottom: 32 }
+    : { marginBottom: 40 };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#001b24' }}>
+      <ExploreHeader onNotificationsPress={() => {}} />
+
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 48 }}
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const isNearEnd = layoutMeasurement.height + contentOffset.y >= contentSize.height - 120;
+          if (isNearEnd && hasMore && !isLoadingMore) {
+            loadMore();
+          }
+        }}
+        scrollEventThrottle={400}
+      >
+        {/* Header da busca */}
+        <View style={{ paddingHorizontal: 24, paddingTop: 24, marginBottom: 24, gap: 24 }}>
+          <Text style={{ fontSize: 24, fontWeight: '700', color: '#bde9fe' }}>
+            Buscar Atrações
+          </Text>
+
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFilterPress={() => setIsFilterModalVisible(true)}
+          />
+
+          <View style={{ alignItems: 'center' }}>
+            <CategoryCarousel
+              selectedCategoryId={selectedCategory}
+              onSelect={handleCategorySelect}
+            />
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', color: '#c1c7cc' }}>
+              {isLoading ? 'Buscando...' : attractions.length > 0 ? 'Resultados Encontrados' : 'Nenhum resultado'}
+            </Text>
+            <Pressable
+              onPress={() => setIsFilterModalVisible(true)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#002e3c', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 }}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#fd6c28' }}>Filtros</Text>
+              <MaterialIcons name="tune" size={16} color="#fd6c28" />
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Grid de resultados */}
+        <View style={{ paddingHorizontal: Platform.OS === 'web' ? 16 : 0 }}>
+          {isLoading ? (
+            <View style={gridContainerStyle}>
+              {[1, 2, 3].map((i) => (
+                <View key={i} style={cardWrapperStyle(i)}>
+                  <AttractionSkeleton />
+                </View>
+              ))}
+            </View>
+          ) : attractions.length > 0 ? (
+            <View style={gridContainerStyle}>
+              {attractions.map((attraction, index) => (
+                <View key={`${attraction.id}-${index}`} style={cardWrapperStyle(index)}>
+                  <View style={Platform.OS !== 'web' ? { paddingHorizontal: 24 } : {}}>
+                    <AttractionCard
+                      title={attraction.title}
+                      tagline={attraction.tagline}
+                      imageUrl={attraction.imageUrl}
+                      rating={attraction.rating}
+                      distance={attraction.distance}
+                      type={attraction.type}
+                      tags={attraction.tags}
+                      priceRange={attraction.priceRange}
+                      isPartner={attraction.isPartner}
+                      isPopular={index % 4 === 0}
+                      onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={{ alignItems: 'center', paddingVertical: 80, paddingHorizontal: 40 }}>
+              <MaterialIcons name="search-off" size={48} color="#8b9296" />
+              <Text style={{ marginTop: 16, color: '#c1c7cc', fontWeight: '500', textAlign: 'center' }}>
+                {error || "Não encontramos nada com esses filtros. Tente ajustar sua busca."}
+              </Text>
             </View>
           )}
-          ListHeaderComponent={
-            <View className="px-6 pt-6 gap-y-8 mb-6">
-              <Text className="text-2xl font-bold text-on-surface">
-                Buscar Atrações
+        </View>
+
+        {/* Footer de paginação */}
+        {isLoadingMore ? (
+          <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+            <ActivityIndicator color="#fd6c28" />
+          </View>
+        ) : hasMore && attractions.length > 0 ? (
+          <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
+            <Pressable
+              onPress={loadMore}
+              style={{ paddingVertical: 16, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#002e3c', borderWidth: 1, borderColor: 'rgba(189, 233, 254, 0.1)' }}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#fd6c28', letterSpacing: 2, textTransform: 'uppercase' }}>
+                Mostrar mais atrações
               </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={{ height: 96 }} />
+        )}
+      </ScrollView>
 
-              <SearchBar 
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                onFilterPress={() => setIsFilterModalVisible(true)}
-              />
-
-              <View className="items-center">
-                <CategoryCarousel 
-                  selectedCategoryId={selectedCategory}
-                  onSelect={handleCategorySelect}
-                />
-              </View>
-
-              <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
-                {isLoading ? 'Buscando...' : (attractions.length > 0 ? 'Resultados Encontrados' : 'Nenhum resultado')}
-              </Text>
-            </View>
-          }
-          ListEmptyComponent={
-            !isLoading && (
-              <View className="items-center py-20 px-10">
-                <MaterialIcons name="search-off" size={48} color="#8b9296" />
-                <Text className="mt-4 text-on-surface-variant font-medium text-center">
-                  {error || "Não encontramos nada com esses filtros. Tente ajustar sua busca."}
-                </Text>
-              </View>
-            )
-          }
-          ListFooterComponent={
-            isLoadingMore ? (
-              <View className="py-6">
-                <ActivityIndicator color="#fd6c28" />
-              </View>
-            ) : <View className="h-24" />
-          }
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-
-      <FiltersModal 
+      <FiltersModal
         isVisible={isFilterModalVisible}
         onClose={() => setIsFilterModalVisible(false)}
         onApply={handleApplyFilters}
         initialFilters={activeFilters || undefined}
       />
-
-
     </View>
   );
 }
