@@ -28,7 +28,7 @@ export default function StatsGrid() {
     },
     { 
       icon: 'location-on', 
-      count: '12', 
+      count: (user?.checkInCount || 0).toString(), 
       label: 'Check-ins', 
       sub: 'Locais visitados',
       color: tierColor
@@ -42,7 +42,7 @@ export default function StatsGrid() {
     },
     { 
       icon: 'bolt', 
-      count: '2', 
+      count: (user?.activeChallengesCount || 0).toString(), 
       label: 'Quests', 
       sub: 'Desafios ativos',
       color: '#40E0D0' // Quests azul turquesa/raio

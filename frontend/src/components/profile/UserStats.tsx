@@ -120,7 +120,7 @@ export default function UserStats() {
     ? (user.photoUrl.startsWith('http') ? user.photoUrl : `${API_URL}${user.photoUrl}`)
     : null;
 
-  const { currentLevelProgress, xpNeededForThisLevel, progressPercentage } = calculateLevelProgress(xp, level);
+  const { progressXp, xpNeededForThisLevel, progressPercentage } = calculateLevelProgress(xp, level);
 
   return (
     <View className="items-center mt-6">
@@ -246,12 +246,11 @@ export default function UserStats() {
         variant="premium"
         fillColor={tierColor}
         style={{ marginTop: 32 }}
+        label="XP ATUAL"
+        labelColor={tierColor}
+        currentValue={progressXp}
+        targetValue={xpNeededForThisLevel}
       />
-
-      <View className="w-full flex-row justify-between mt-2 px-1">
-        <Text className="text-xs font-bold text-tertiary uppercase tracking-widest" style={{ color: tierColor }}>{currentLevelProgress} XP</Text>
-        <Text className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">{xpNeededForThisLevel} XP</Text>
-      </View>
     </View>
   );
 }

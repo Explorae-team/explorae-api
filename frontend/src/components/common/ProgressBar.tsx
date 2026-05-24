@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ViewStyle, Platform } from 'react-native';
+import { View, ViewStyle, Platform, Text } from 'react-native';
 
 export interface LevelProgress {
   levelStartXp: number;
@@ -34,6 +34,10 @@ interface ProgressBarProps {
   fillColor?: string;
   glowColor?: string;
   style?: any;
+  label?: string;
+  labelColor?: string;
+  currentValue?: number;
+  targetValue?: number;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -42,6 +46,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   fillColor = '#fd6c28', // cor primária padrão
   glowColor,
   style,
+  label,
+  labelColor,
+  currentValue,
+  targetValue,
 }) => {
   const isPremium = variant === 'premium';
   const heightClass = isPremium ? 'h-4' : 'h-3';
@@ -63,17 +71,33 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     : {};
 
   return (
-    <View 
-      className={`w-full bg-surface-container-highest rounded-full overflow-hidden relative ${heightClass}`}
-      style={[barStyle, style]}
-    >
-      <View
-        className="absolute top-0 left-0 h-full rounded-full"
-        style={{ 
-          width: `${progressPercentage}%`, 
-          backgroundColor: fillColor 
-        }}
-      />
+    <View style={style} className="w-full">
+      {label !== undefined && currentValue !== undefined && targetValue !== undefined && (
+        <View className="flex-row justify-between mb-1.5 px-0.5">
+          <Text className="text-xs font-bold tracking-widest uppercase text-on-surface-variant font-sans">
+            {label}
+          </Text>
+          <Text 
+            className="text-xs font-bold font-sans" 
+            style={{ color: labelColor || fillColor }}
+          >
+            {currentValue.toLocaleString()} / {targetValue.toLocaleString()} XP
+          </Text>
+        </View>
+      )}
+      <View 
+        className={`w-full bg-surface-container-highest rounded-full overflow-hidden relative ${heightClass}`}
+        style={barStyle}
+      >
+        <View
+          className="absolute top-0 left-0 h-full rounded-full"
+          style={{ 
+            width: `${progressPercentage}%`, 
+            backgroundColor: fillColor 
+          }}
+        />
+      </View>
     </View>
   );
 };
+

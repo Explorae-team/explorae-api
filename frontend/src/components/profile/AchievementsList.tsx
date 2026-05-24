@@ -1,14 +1,17 @@
-import React from 'react';
-import { View, Text, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Platform, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 import { useAuth } from '../../contexts/AuthContext';
-import { Image } from 'react-native';
+import { BadgeDetailModal } from './BadgeDetailModal';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function AchievementsList() {
+  const router = useRouter();
   const { user } = useAuth() as any;
+  const [selectedBadge, setSelectedBadge] = useState<any>(null);
   
   // Mapeamento de cores para categorias de medalhas
   const categoryColors = {
@@ -38,7 +41,9 @@ export default function AchievementsList() {
     <View className="mt-8">
       <View className="flex-row justify-between items-center mb-6">
         <Text className="text-xl font-bold tracking-tight text-on-surface">Minhas Medalhas</Text>
-        <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
+        <TouchableOpacity onPress={() => router.push('/dashboard/badges')}>
+          <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView 
         horizontal 
@@ -47,7 +52,12 @@ export default function AchievementsList() {
         contentContainerStyle={{ paddingRight: 20 }}
       >
         {badges.map((b: any) => (
-          <View key={b.id} className="items-center w-24 mr-4">
+          <TouchableOpacity 
+            key={b.id} 
+            onPress={() => setSelectedBadge(b)}
+            className="items-center w-24 mr-4"
+            activeOpacity={0.7}
+          >
             <View 
               className="w-20 h-20 rounded-full bg-surface-bright items-center justify-center border-2 mb-3"
               style={{ borderColor: (categoryColors as any)[b.category] || '#fd6c28' }}
@@ -65,9 +75,16 @@ export default function AchievementsList() {
             <Text className="text-[10px] font-bold uppercase text-center text-on-surface-variant tracking-tighter px-1">
               {b.name}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {/* Modal de Detalhe da Medalha */}
+      <BadgeDetailModal
+        visible={!!selectedBadge}
+        item={selectedBadge ? { type: 'BADGE', data: selectedBadge, isUnlocked: true } : null}
+        onClose={() => setSelectedBadge(null)}
+      />
     </View>
   );
 }
