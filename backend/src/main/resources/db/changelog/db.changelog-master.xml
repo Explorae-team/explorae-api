@@ -22,4 +22,6 @@
     <include file="db/changelog/changes/015-create-categories-table.xml"/>
     <include file="db/changelog/changes/016-add-detailed-categories.xml"/>
     <include file="db/changelog/changes/017-create-user-interactions-table.xml"/>
+    <include file="db/changelog/changes/018-create-challenges-tables.xml"/>
+    <include file="db/changelog/changes/019-add-coins-to-xp-history.xml"/>
 </databaseChangeLog>
