@@ -19,25 +19,33 @@ public class GamificationListener {
 
     @EventListener
     public void handlePreferenceCompleted(PreferenceCompletedEvent event) {
-        gamificationService.addXp(event.userId(), 100, "Conclusão do Onboarding de Preferências");
-        gamificationService.awardBadge(event.userId(), "PIONEIRO");
+        if (!gamificationService.hasBadge(event.userId(), "PIONEIRO")) {
+            gamificationService.addXp(event.userId(), 100, "Conclusão do Onboarding de Preferências");
+            gamificationService.awardBadge(event.userId(), "PIONEIRO");
+        }
     }
 
     @EventListener
     public void handleFavoriteCreated(FavoriteCreatedEvent event) {
-        gamificationService.addXp(event.userId(), 10, "Adicionou um favorito");
-        gamificationService.awardBadge(event.userId(), "COLECIONADOR");
+        if (!gamificationService.hasBadge(event.userId(), "COLECIONADOR")) {
+            gamificationService.addXp(event.userId(), 10, "Adicionou um favorito");
+            gamificationService.awardBadge(event.userId(), "COLECIONADOR");
+        }
     }
 
     @EventListener
     public void handleDestinationReached(DestinationReachedEvent event) {
-        gamificationService.addXp(event.userId(), 50, "Chegou ao primeiro destino");
-        gamificationService.awardBadge(event.userId(), "DESBRAVADOR");
+        if (!gamificationService.hasBadge(event.userId(), "DESBRAVADOR")) {
+            gamificationService.addXp(event.userId(), 50, "Chegou ao primeiro destino");
+            gamificationService.awardBadge(event.userId(), "DESBRAVADOR");
+        }
     }
 
     @EventListener
     public void handleReviewCreated(ReviewCreatedEvent event) {
-        gamificationService.addXp(event.userId(), 30, "Realizou a primeira avaliação");
-        gamificationService.awardBadge(event.userId(), "CRITICO");
+        if (!gamificationService.hasBadge(event.userId(), "CRITICO")) {
+            gamificationService.addXp(event.userId(), 30, "Realizou a primeira avaliação");
+            gamificationService.awardBadge(event.userId(), "CRITICO");
+        }
     }
 }

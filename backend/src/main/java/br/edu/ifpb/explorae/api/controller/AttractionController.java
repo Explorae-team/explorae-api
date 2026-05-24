@@ -5,6 +5,9 @@ import br.edu.ifpb.explorae.api.dto.AttractionResponseDTO;
 import br.edu.ifpb.explorae.api.dto.AttractionReviewDTO;
 import br.edu.ifpb.explorae.api.dto.AttractionReviewRequestDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
+import br.edu.ifpb.explorae.api.dto.ReviewResponseDTO;
+import br.edu.ifpb.explorae.api.dto.CheckInResponseDTO;
+import br.edu.ifpb.explorae.api.dto.FavoriteResponseDTO;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.service.AttractionService;
 import jakarta.validation.Valid;
@@ -65,12 +68,31 @@ public class AttractionController {
     }
 
     @PostMapping("/{id}/reviews")
-    public ResponseEntity<StandardResponseDTO<AttractionReviewDTO>> addReview(
+    public ResponseEntity<StandardResponseDTO<ReviewResponseDTO>> addReview(
             @PathVariable UUID id,
             @Valid @RequestBody AttractionReviewRequestDTO dto,
             @AuthenticationPrincipal User principal) {
 
-        AttractionReviewDTO responseDto = attractionService.addReview(id, dto, principal.getId());
-        return ResponseEntity.ok(StandardResponseDTO.success("Avaliação adicionada com sucesso", responseDto));
+        ReviewResponseDTO responseWrapper = attractionService.addReview(id, dto, principal.getId());
+        return ResponseEntity.ok(StandardResponseDTO.success("Avaliação adicionada com sucesso", responseWrapper));
+    }
+
+    @PostMapping("/{id}/check-in")
+    public ResponseEntity<StandardResponseDTO<CheckInResponseDTO>> checkIn(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User principal) {
+
+        CheckInResponseDTO responseWrapper = attractionService.checkIn(id, principal.getId());
+        return ResponseEntity.ok(StandardResponseDTO.success("Check-in realizado com sucesso", responseWrapper));
+    }
+
+    @PostMapping("/{id}/favorite")
+    public ResponseEntity<StandardResponseDTO<FavoriteResponseDTO>> toggleFavorite(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User principal) {
+
+        FavoriteResponseDTO responseWrapper = attractionService.toggleFavorite(id, principal.getId());
+        String msg = responseWrapper.isFavorite() ? "Atração favoritada com sucesso" : "Atração removida dos favoritos";
+        return ResponseEntity.ok(StandardResponseDTO.success(msg, responseWrapper));
     }
 }

@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface SavedAttractionRepository extends JpaRepository<SavedAttraction, UUID> {
     Optional<SavedAttraction> findByUserIdAndAttractionId(UUID userId, UUID attractionId);
     boolean existsByUserIdAndAttractionId(UUID userId, UUID attractionId);
+    long countByUserId(UUID userId);
 }

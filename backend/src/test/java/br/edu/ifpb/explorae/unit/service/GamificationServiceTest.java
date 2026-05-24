@@ -38,6 +38,9 @@ class GamificationServiceTest {
     @Mock
     private UserBadgeRepository userBadgeRepository;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private GamificationService gamificationService;
 

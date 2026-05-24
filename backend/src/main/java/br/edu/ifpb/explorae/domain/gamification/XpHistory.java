@@ -37,6 +37,10 @@ public class XpHistory {
     private String reason;
 
     @Builder.Default
+    @Column(name = "coins", nullable = false)
+    private Integer coins = 0;
+
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

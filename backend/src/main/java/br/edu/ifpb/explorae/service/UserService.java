@@ -6,6 +6,8 @@ import br.edu.ifpb.explorae.api.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.api.mapper.UserMapper;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.repository.UserRepository;
+import br.edu.ifpb.explorae.repository.UserInteractionRepository;
+import br.edu.ifpb.explorae.repository.ChallengeRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,11 +23,21 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserInteractionRepository userInteractionRepository;
+    private final ChallengeRepository challengeRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserService(
+            UserRepository userRepository, 
+            PasswordEncoder passwordEncoder, 
+            UserMapper userMapper,
+            UserInteractionRepository userInteractionRepository,
+            ChallengeRepository challengeRepository
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.userInteractionRepository = userInteractionRepository;
+        this.challengeRepository = challengeRepository;
     }
 
     // Busca o User e entrega pro Spring Security.
@@ -63,7 +75,28 @@ public class UserService implements UserDetailsService {
     public UserResponseDTO getUserProfile(java.util.UUID id) {
         User user = userRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-        return userMapper.toResponseDTO(user);
+        
+        UserResponseDTO baseDTO = userMapper.toResponseDTO(user);
+        
+        long checkInCount = userInteractionRepository.countDistinctAttractionsByUserIdAndInteractionType(id, "CHECK_IN");
+        long activeChallengesCount = challengeRepository.findActiveChallenges(java.time.LocalDateTime.now()).size();
+        
+        return new UserResponseDTO(
+                baseDTO.id(),
+                baseDTO.name(),
+                baseDTO.email(),
+                baseDTO.phone(),
+                baseDTO.bio(),
+                baseDTO.photoUrl(),
+                baseDTO.xp(),
+                baseDTO.level(),
+                baseDTO.coins(),
+                baseDTO.levelName(),
+                baseDTO.hasPreferences(),
+                baseDTO.badges(),
+                (int) checkInCount,
+                (int) activeChallengesCount
+        );
     }
 
     @Transactional

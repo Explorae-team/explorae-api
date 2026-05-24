@@ -15,5 +15,11 @@ public record UserResponseDTO(
     Integer coins,
     String levelName,
     boolean hasPreferences,
-    List<BadgeResponseDTO> badges
-) {}
+    List<BadgeResponseDTO> badges,
+    Integer checkInCount,
+    Integer activeChallengesCount
+) {
+    public UserResponseDTO(UUID id, String name, String email, String phone, String bio, String photoUrl, Integer xp, Integer level, Integer coins, String levelName, boolean hasPreferences, List<BadgeResponseDTO> badges) {
+        this(id, name, email, phone, bio, photoUrl, xp, level, coins, levelName, hasPreferences, badges, 0, 0);
+    }
+}

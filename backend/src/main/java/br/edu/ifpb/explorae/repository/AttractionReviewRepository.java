@@ -10,4 +10,7 @@ import java.util.UUID;
 @Repository
 public interface AttractionReviewRepository extends JpaRepository<AttractionReview, UUID> {
     List<AttractionReview> findByAttractionIdOrderByCreatedAtDesc(UUID attractionId);
+    
+    long countByUserIdAndAttractionCategoryIgnoreCase(UUID userId, String category);
+    long countByUserId(UUID userId);
 }

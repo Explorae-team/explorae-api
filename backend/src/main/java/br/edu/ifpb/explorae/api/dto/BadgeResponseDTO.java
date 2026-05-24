@@ -7,5 +7,11 @@ public record BadgeResponseDTO(
     String name,
     String description,
     String iconUrl,
-    String category
-) {}
+    String category,
+    Integer currentValue,
+    Integer targetValue
+) {
+    public BadgeResponseDTO(UUID id, String name, String description, String iconUrl, String category) {
+        this(id, name, description, iconUrl, category, null, null);
+    }
+}
