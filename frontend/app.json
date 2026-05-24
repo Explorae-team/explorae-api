@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/branding/logo-main.png",
       "resizeMode": "contain",
-      "backgroundColor": "#00161e" 
+      "backgroundColor": "#00161e"
     },
     "ios": {
       "supportsTablet": true
@@ -40,7 +40,9 @@
       ]
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

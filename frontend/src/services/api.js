@@ -35,9 +35,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado ou inválido - poderia disparar um logout global aqui
-      console.warn('Sessão expirada. Redirecionando para login...');
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn('Sessão expirada ou inválida. Limpando armazenamento...');
       await storage.removeItem('auth_token');
       await storage.removeItem('user_data');
     }

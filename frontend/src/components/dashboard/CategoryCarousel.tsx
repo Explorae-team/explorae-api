@@ -28,7 +28,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
   onSelect,
 }) => {
   return (
-    <View style={{ gap: 24 }}>
+    <View style={{ width: '100%', gap: 24 }}>
       <Text
         style={{
           fontSize: 12,
@@ -49,19 +49,19 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
         style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
         contentContainerStyle={{
           paddingHorizontal: 24,
-          gap: 16,
         }}
       >
-        {CATEGORIES.map((category) => {
+        {CATEGORIES.map((category, index) => {
           const isAll = category.id === 'all';
           const isSelected = (isAll && !selectedCategoryId) || selectedCategoryId === category.id;
+          const isLast = index === CATEGORIES.length - 1;
 
           return (
-            <Pressable
-              key={category.id}
-              onPress={() => onSelect?.(isAll ? '' : category.id)}
-              style={{ alignItems: 'center' }}
-            >
+            <View key={category.id} style={!isLast ? { marginRight: 16 } : undefined}>
+              <Pressable
+                onPress={() => onSelect?.(isAll ? 'all' : category.id)}
+                style={{ alignItems: 'center' }}
+              >
               <View
                 style={{
                   width: 64,
@@ -100,7 +100,8 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
               >
                 {category.name.toUpperCase()}
               </Text>
-            </Pressable>
+              </Pressable>
+            </View>
           );
         })}
       </ScrollView>

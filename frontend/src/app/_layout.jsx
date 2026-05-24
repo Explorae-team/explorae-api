@@ -7,6 +7,7 @@ import { Stack, useRouter, useSegments, useGlobalSearchParams } from 'expo-route
 import { useFonts } from 'expo-font';
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { BadgeCelebrationProvider } from '../contexts/BadgeCelebrationContext';
 import AppFooter from '../components/AppFooter';
 
 function InitialLayout() {
@@ -58,7 +59,7 @@ function InitialLayout() {
     const subRoute = segments[1];
 
     if (route === 'dashboard') {
-      if (subRoute === 'profile') return 'profile';
+      if (subRoute === 'profile' || subRoute === 'badges') return 'profile';
       if (subRoute === 'routes') return 'routes';
       if (subRoute === 'coupons') return 'coupons';
       if (subRoute === 'search') return 'search';
@@ -95,6 +96,7 @@ function InitialLayout() {
         <Stack.Screen name="cadastro" options={{ title: 'Criar Conta', headerShown: false }} />
         <Stack.Screen name="dashboard/index" options={{ title: 'Dashboard', headerShown: false }} />
         <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
+        <Stack.Screen name="dashboard/badges" options={{ title: 'Medalhas & Desafios', headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
         <Stack.Screen
           name="attraction/[id]"
@@ -128,7 +130,9 @@ export default function RootLayout() {
     <SafeAreaProvider style={{ flex: 1, backgroundColor: '#00161e' }}>
       <View style={{ flex: 1, height: Platform.OS === 'web' ? '100vh' : '100%', backgroundColor: '#00161e', overflow: 'hidden' }}>
         <AuthProvider>
-          <InitialLayout />
+          <BadgeCelebrationProvider>
+            <InitialLayout />
+          </BadgeCelebrationProvider>
         </AuthProvider>
       </View>
     </SafeAreaProvider>

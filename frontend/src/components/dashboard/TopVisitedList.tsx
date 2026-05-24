@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+
+const StatefulImage: React.FC<{ uri: string; className?: string; resizeMode?: any }> = ({ uri, className, resizeMode }) => {
+  const defaultFallback = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';
+  const [src, setSrc] = useState({ uri });
+  
+  useEffect(() => {
+    setSrc({ uri });
+  }, [uri]);
+
+  return (
+    <Image 
+      source={src} 
+      className={className} 
+      resizeMode={resizeMode} 
+      onError={() => setSrc({ uri: defaultFallback })}
+    />
+  );
+};
 
 interface TopAttraction {
   id: string;
@@ -32,7 +50,7 @@ export const TopVisitedList: React.FC<TopVisitedListProps> = ({ attractions }) =
         </View>
       </View>
 
-      <View className="flex-col gap-y-4">
+      <View style={{ flexDirection: 'column', gap: 16 }}>
         {attractions.slice(0, 3).map((item, index) => (
           <Pressable 
             key={item.id}
@@ -41,8 +59,8 @@ export const TopVisitedList: React.FC<TopVisitedListProps> = ({ attractions }) =
           >
             {/* Image Container with Rank Overlay */}
             <View className="relative">
-              <Image 
-                source={{ uri: item.imageUrl }} 
+              <StatefulImage 
+                uri={item.imageUrl} 
                 className="w-20 h-20 rounded-[20px]"
                 resizeMode="cover"
               />

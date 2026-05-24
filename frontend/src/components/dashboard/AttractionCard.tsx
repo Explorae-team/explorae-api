@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, Image, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 interface AttractionCardProps {
@@ -47,16 +48,47 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   onPress,
   onFavoritePress,
 }) => {
+  const defaultFallback = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';
+  const [imgUri, setImgUri] = useState(imageUrl || defaultFallback);
+
+  useEffect(() => {
+    if (imageUrl) {
+      setImgUri(imageUrl);
+    } else {
+      setImgUri(defaultFallback);
+    }
+  }, [imageUrl]);
   // --- VARIANT: COMPACT (Used in horizontal carousels) ---
   if (variant === 'compact') {
     return (
       <Pressable 
         onPress={onPress}
-        style={{ backgroundColor: colors.surfaceContainerHigh }}
+        style={{ 
+          backgroundColor: colors.surfaceContainerHigh,
+          ...Platform.select({
+            ios: {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+            },
+            android: {
+              elevation: 2,
+            },
+            web: {
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            }
+          } as any)
+        }}
         className="rounded-xl overflow-hidden border border-white/5 w-40"
       >
         <View className="h-28 w-full">
-          <Image source={{ uri: imageUrl }} resizeMode="cover" className="w-full h-full" />
+          <Image 
+            source={{ uri: imgUri }} 
+            resizeMode="cover" 
+            className="w-full h-full" 
+            onError={() => setImgUri(defaultFallback)}
+          />
           <View className="absolute top-2 right-2 bg-black/40 rounded-full p-1">
             <MaterialIcons name="star" size={10} color={colors.tertiary} />
           </View>
@@ -73,15 +105,32 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   return (
     <Pressable 
       onPress={onPress}
-      style={{ backgroundColor: colors.surfaceContainerHigh }}
-      className="rounded-2xl overflow-hidden shadow-2xl border border-transparent"
+      style={{ 
+        backgroundColor: colors.surfaceContainerHigh,
+        ...Platform.select({
+          ios: {
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+          },
+          android: {
+            elevation: 4,
+          },
+          web: {
+            boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
+          }
+        } as any)
+      }}
+      className="rounded-2xl overflow-hidden border border-white/5"
     >
       {/* SECTION 1: HERO IMAGE */}
       <View className="h-40 w-full relative">
         <Image 
-          source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500' }} 
+          source={{ uri: imgUri }} 
           resizeMode="cover" 
           className="w-full h-full" 
+          onError={() => setImgUri(defaultFallback)}
         />
         
         {/* Category Badge (Top-Left) */}

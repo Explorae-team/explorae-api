@@ -47,23 +47,26 @@ export default function ExploreScreen() {
   useEffect(() => {
     async function requestPermissionsAndGetLocation() {
       try {
-        if (Platform.OS === 'web') {
-          const { status } = await Location.requestForegroundPermissionsAsync();
-          if (status === 'granted') {
-            const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          // Timeout de 3 segundos para evitar travamentos infinitos no GPS do celular
+          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+          const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+          
+          const loc = await Promise.race([locationPromise, timeoutPromise]);
+          if (loc) {
             setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
           } else {
-            setCoords({ latitude: -7.1196, longitude: -34.8450 });
+            // Se der timeout, tenta a última localização conhecida ou usa o fallback
+            const lastLoc = await Location.getLastKnownPositionAsync({});
+            if (lastLoc) {
+              setCoords({ latitude: lastLoc.coords.latitude, longitude: lastLoc.coords.longitude });
+            } else {
+              setCoords({ latitude: -7.1196, longitude: -34.8450 });
+            }
           }
         } else {
-          await ImagePicker.requestCameraPermissionsAsync();
-          const { status } = await Location.requestForegroundPermissionsAsync();
-          if (status === 'granted') {
-            const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-            setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
-          } else {
-            setCoords({ latitude: -7.1196, longitude: -34.8450 });
-          }
+          setCoords({ latitude: -7.1196, longitude: -34.8450 });
         }
       } catch (err) {
         console.error('Erro ao obter localização/permissões:', err);
@@ -123,7 +126,10 @@ export default function ExploreScreen() {
   };
 
   const handleCategorySelect = (id: string) => {
-    setSelectedCategory(prev => prev === id ? null : id);
+    setSelectedCategory(prev => {
+      if (id === 'all') return null;
+      return prev === id ? null : id;
+    });
   };
 
   const handleApplyFilters = (filters: FilterState) => {
@@ -155,7 +161,7 @@ export default function ExploreScreen() {
           />
         }
       >
-        <View className="gap-y-14">
+        <View style={{ gap: 32 }}>
 
           {/* Hero: User Stats */}
           <UserProgressHero
@@ -175,12 +181,10 @@ export default function ExploreScreen() {
           />
 
           {/* Categories */}
-          <View className="items-center">
-            <CategoryCarousel 
-              selectedCategoryId={selectedCategory}
-              onSelect={handleCategorySelect}
-            />
-          </View>
+          <CategoryCarousel 
+            selectedCategoryId={selectedCategory}
+            onSelect={handleCategorySelect}
+          />
 
           {/* Recommendations Feed */}
           <View style={{ gap: 24 }}>
@@ -198,10 +202,12 @@ export default function ExploreScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
-                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+                contentContainerStyle={{ paddingHorizontal: 24 }}
               >
                 {[1, 2, 3].map((i) => (
-                  <AttractionSkeleton key={i} variant="compact" />
+                  <View key={i} style={{ marginRight: 12 }}>
+                    <AttractionSkeleton variant="compact" />
+                  </View>
                 ))}
               </ScrollView>
             ) : (
@@ -209,15 +215,16 @@ export default function ExploreScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
-                contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
+                contentContainerStyle={{ paddingHorizontal: 24 }}
               >
-                {recsTop.slice(0, 10).map((attraction) => (
-                  <AttractionCard
-                    key={attraction.id}
-                    {...attraction}
-                    variant="compact"
-                    onPress={() => router.push(`/attraction/${attraction.id}` as any)}
-                  />
+                {recsTop.slice(0, 10).map((attraction, index) => (
+                  <View key={attraction.id} style={index < Math.min(recsTop.length, 10) - 1 ? { marginRight: 12 } : undefined}>
+                    <AttractionCard
+                      {...attraction}
+                      variant="compact"
+                      onPress={() => router.push(`/attraction/${attraction.id}` as any)}
+                    />
+                  </View>
                 ))}
               </ScrollView>
             )}
@@ -273,7 +280,7 @@ export default function ExploreScreen() {
                     </View>
                   ))
                 ) : (
-                  <View className="flex-1 items-center py-10 w-full">
+                  <View className="items-center py-10 w-full">
                     <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
                     <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
                       Nenhuma atração encontrada no momento.
@@ -302,7 +309,7 @@ export default function ExploreScreen() {
                     </View>
                   ))
                 ) : (
-                  <View className="flex-1 items-center py-10 w-full">
+                  <View className="items-center py-10 w-full">
                     <MaterialIcons name="search-off" size={48} color={colors.onSurfaceVariant} />
                     <Text style={{ color: colors.onSurfaceVariant }} className="mt-2 text-center">
                       Nenhuma recomendação encontrada no momento.

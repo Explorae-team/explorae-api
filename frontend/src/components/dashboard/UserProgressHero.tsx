@@ -35,19 +35,14 @@ export const UserProgressHero: React.FC<UserProgressHeroProps> = ({
         </View>
       </View>
 
-      <View className="space-y-2 mt-2">
-        <View className="flex-row justify-between">
-          <Text className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">
-            XP ATUAL
-          </Text>
-          <Text className="text-tertiary text-xs font-bold">
-            {progressXp.toLocaleString()} / {xpNeededForThisLevel.toLocaleString()} XP
-          </Text>
-        </View>
+      <View className="mt-2">
         <ProgressBar
           progressPercentage={progressPercentage}
           fillColor="#ffba26" // cor correspondente ao bg-tertiary
           variant="compact"
+          label="XP ATUAL"
+          currentValue={progressXp}
+          targetValue={xpNeededForThisLevel}
         />
       </View>
     </View>
