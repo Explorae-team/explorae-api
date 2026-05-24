@@ -7,9 +7,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 interface AttractionActionHeaderProps {
   onBack: () => void;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
 }
 
-export default function AttractionActionHeader({ onBack }: AttractionActionHeaderProps) {
+export default function AttractionActionHeader({ onBack, isSaved = false, onToggleSave }: AttractionActionHeaderProps) {
   const insets = useSafeAreaInsets();
 
   const handleShare = async () => {
@@ -39,13 +41,30 @@ export default function AttractionActionHeader({ onBack }: AttractionActionHeade
         <MaterialCommunityIcons name="arrow-left" size={24} color="#F2641F" />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={handleShare}
-        className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
-      >
-        <BlurView intensity={20} className="absolute inset-0" />
-        <MaterialCommunityIcons name="share-variant" size={24} color="#F2641F" />
-      </TouchableOpacity>
+      <View className="flex-row items-center gap-2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {onToggleSave && (
+          <TouchableOpacity
+            testID="favorite-button"
+            onPress={onToggleSave}
+            className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
+          >
+            <BlurView intensity={20} className="absolute inset-0" />
+            <MaterialCommunityIcons 
+              name={isSaved ? "heart" : "heart-outline"} 
+              size={24} 
+              color={isSaved ? "#ef4444" : "#F2641F"} 
+            />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          onPress={handleShare}
+          className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
+        >
+          <BlurView intensity={20} className="absolute inset-0" />
+          <MaterialCommunityIcons name="share-variant" size={24} color="#F2641F" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

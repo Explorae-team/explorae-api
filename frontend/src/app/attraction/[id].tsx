@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -7,6 +7,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import PhotoGalleryCarousel from '../../components/attraction/PhotoGalleryCarousel';
 import PrimaryButton from '../../components/PrimaryButton';
 import api from '../../services/api';
+import { useCelebration } from '../../contexts/BadgeCelebrationContext';
+import { ReviewModal } from '../../components/attraction/ReviewModal';
 
 // Sub-componentes Especializados
 import AttractionActionHeader from '../../components/attraction/AttractionActionHeader';
@@ -17,10 +19,16 @@ import AttractionCommunityTips from '../../components/attraction/AttractionCommu
 const AttractionDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { triggerCelebration } = useCelebration();
 
   const [attraction, setAttraction] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Controle do modal de avaliação
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [isSavingAttraction, setIsSavingAttraction] = useState(false);
 
   useEffect(() => {
     const fetchAttraction = async () => {
@@ -40,6 +48,76 @@ const AttractionDetail = () => {
 
     fetchAttraction();
   }, [id]);
+
+  const handleCheckIn = async () => {
+    if (isCheckingIn) return;
+    try {
+      setIsCheckingIn(true);
+      const response = await api.post(`/api/v1/attractions/${id}/check-in`);
+      
+      const unlockedBadges = response.data?.data?.unlockedBadges;
+      if (unlockedBadges && unlockedBadges.length > 0) {
+        triggerCelebration(unlockedBadges);
+      } else {
+        alert('Check-in realizado com sucesso!');
+      }
+    } catch (err) {
+      console.error('Erro ao realizar check-in:', err);
+      alert('Não foi possível realizar o check-in no momento.');
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
+  const handleToggleSave = async () => {
+    if (isSavingAttraction) return;
+    try {
+      setIsSavingAttraction(true);
+      const response = await api.post(`/api/v1/attractions/${id}/favorite`);
+      
+      const newSavedState = response.data?.data?.isFavorite;
+      setAttraction((prev: any) => {
+        if (!prev) return null;
+        return { ...prev, isSaved: newSavedState };
+      });
+      
+      const unlockedBadges = response.data?.data?.unlockedBadges;
+      if (unlockedBadges && unlockedBadges.length > 0) {
+        triggerCelebration(unlockedBadges);
+      } else {
+        alert(newSavedState ? 'Atração salva nos favoritos!' : 'Atração removida dos favoritos!');
+      }
+    } catch (err) {
+      console.error('Erro ao favoritar/salvar atração:', err);
+      alert('Não foi possível salvar a atração no momento.');
+    } finally {
+      setIsSavingAttraction(false);
+    }
+  };
+
+  const handleAddReview = async (rating: number, content: string) => {
+    try {
+      const response = await api.post(`/api/v1/attractions/${id}/reviews`, {
+        content,
+        rating
+      });
+      
+      const unlockedBadges = response.data?.data?.unlockedBadges;
+
+      // Recarregar os detalhes da atração
+      const attractionRes = await api.get(`/api/v1/attractions/${id}`);
+      setAttraction(attractionRes.data?.data);
+
+      if (unlockedBadges && unlockedBadges.length > 0) {
+        triggerCelebration(unlockedBadges);
+      } else {
+        alert('Obrigado pela sua avaliação!');
+      }
+    } catch (err) {
+      console.error('Erro ao adicionar avaliação:', err);
+      alert('Não foi possível enviar sua avaliação no momento.');
+      throw err; // Propaga para o modal tratar o estado interno de envio
+    }
+  };
 
   if (isLoading) {
     return (
@@ -74,6 +152,8 @@ const AttractionDetail = () => {
     <View className="flex-1 bg-[#003646]">
       {/* Cabeçalho de Ações */}
       <AttractionActionHeader 
+        isSaved={attraction?.isSaved}
+        onToggleSave={handleToggleSave}
         onBack={() => {
           if (router.canGoBack()) {
             router.back();
@@ -83,7 +163,7 @@ const AttractionDetail = () => {
         }} 
       />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 150 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 220 }} showsVerticalScrollIndicator={false}>
         {/* Galeria de Fotos */}
         <PhotoGalleryCarousel images={attraction.imageUrls || []} />
 
@@ -132,17 +212,35 @@ const AttractionDetail = () => {
 
           {/* Dicas da Comunidade */}
           <AttractionCommunityTips reviews={attraction.reviews} />
+
+          {/* Botão de Nova Review */}
+          <TouchableOpacity 
+            onPress={() => setReviewModalVisible(true)}
+            className="mt-6 border border-dashed border-[#F2641F]/40 bg-[#F2641F]/5 p-4 rounded-2xl flex-row justify-center items-center gap-2"
+          >
+            <MaterialCommunityIcons name="plus-circle-outline" size={18} color="#F2641F" />
+            <Text className="text-[#F2641F] font-bold font-sans">Adicionar Nova Dica</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
       {/* Botão de Check-in Flutuante */}
       <View className="absolute bottom-10 left-6 right-6">
         <PrimaryButton 
-          title="CHECK-IN NO LOCAL"
+          title={isCheckingIn ? "REALIZANDO CHECK-IN..." : "CHECK-IN NO LOCAL"}
+          onPress={handleCheckIn}
+          disabled={isCheckingIn}
           className="bg-[#FFB700] shadow-[#FFB700]/30"
-          rightIcon={<MaterialCommunityIcons name="checkbox-marked-circle" size={20} color="#00161e" />}
+          rightIcon={isCheckingIn ? <ActivityIndicator size="small" color="#00161e" /> : <MaterialCommunityIcons name="checkbox-marked-circle" size={20} color="#00161e" />}
         />
       </View>
+
+      {/* Modal de Nova Review Reutilizável */}
+      <ReviewModal 
+        visible={reviewModalVisible} 
+        onClose={() => setReviewModalVisible(false)} 
+        onSubmit={handleAddReview} 
+      />
     </View>
   );
 };

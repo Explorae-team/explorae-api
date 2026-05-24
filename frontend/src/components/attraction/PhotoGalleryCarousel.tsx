@@ -1,7 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, Dimensions, TouchableOpacity, FlatList, Modal, SafeAreaView, Pressable, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const StatefulImage = ({ uri, style, resizeMode }: any) => {
+  const defaultFallback = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';
+  const [src, setSrc] = useState({ uri });
+  
+  useEffect(() => {
+    setSrc({ uri });
+  }, [uri]);
+
+  return (
+    <Image 
+      source={src} 
+      style={style} 
+      resizeMode={resizeMode} 
+      onError={() => setSrc({ uri: defaultFallback })}
+    />
+  );
+};
 
 interface PhotoGalleryCarouselProps {
   images: string[];
@@ -46,8 +64,8 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
             onPress={() => handleImagePress(index)}
             style={{ width: windowWidth, height: 530 }}
           >
-            <Image
-              source={{ uri: item }}
+            <StatefulImage
+              uri={item}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
             />
@@ -99,8 +117,8 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
                 onPress={() => setIsModalVisible(false)}
                 style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
               >
-                <Image
-                  source={{ uri: safeImages[viewerIndex] }}
+                <StatefulImage
+                  uri={safeImages[viewerIndex]}
                   style={{ width: windowWidth, height: '100%' }}
                   resizeMode="contain"
                 />
