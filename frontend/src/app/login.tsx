@@ -17,6 +17,7 @@ import { LoginForm, LoginErrors } from '../types/login.types';
 import { Ionicons } from "@expo/vector-icons";
 import AuthInput from "../components/auth/AuthInput";
 import PrimaryButton from "../components/PrimaryButton";
+import Logo from "../components/brand/LogoWithText";
 
 export default function LoginScreen() {
   const { login } = useAuth() as any;
@@ -84,12 +85,8 @@ export default function LoginScreen() {
         
         {/* Central Card */}
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
-          <View className="items-center mb-6">
-            <Image 
-              source={require("../../assets/branding/logo-main.png")} 
-              style={{ width: 180, height: 60 }}
-              resizeMode="contain"
-            />
+          <View className="items-center mb-8">
+            <Logo size={80} />
           </View>
 
           <View className="mb-8">

@@ -15,6 +15,7 @@ import { CadastroFormData, CadastroErrorMap } from '../types/cadastro.types';
 import { useAuth } from '../contexts/AuthContext';
 import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
+import Logo from '../components/brand/LogoWithText';
 
 /**
  * Tela de Cadastro do Exploraê - Design 'Modern Navigator'
@@ -102,12 +103,8 @@ export default function CadastroScreen() {
 
         {/* Main Card */}
         <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
-          <View className="items-center mb-6">
-            <Image 
-              source={require("../../assets/branding/logo-main.png")} 
-              style={{ width: 180, height: 60 }}
-              resizeMode="contain"
-            />
+          <View className="items-center mb-8">
+            <Logo size={80} />
           </View>
           <View className="mb-6 items-center">
             <Text className="text-[#003646] font-black text-2xl text-center leading-7">

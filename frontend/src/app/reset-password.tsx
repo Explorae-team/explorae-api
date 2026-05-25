@@ -13,6 +13,7 @@ import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
+import Logo from '../components/brand/Logo';
 import { supabase } from '../services/supabase';
 import api from '../services/api';
 
@@ -142,12 +143,8 @@ export default function ResetPasswordScreen() {
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-[#fd6c28]/10 rounded-full blur-[80px]" />
 
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center border border-white/20">
-          <View className="items-center mb-6">
-            <Image
-              source={require("../../assets/branding/logo-main.png")}
-              style={{ width: 180, height: 60 }}
-              resizeMode="contain"
-            />
+          <View className="items-center mb-8">
+            <Logo width={80} height={80} />
           </View>
 
           {errors.general && (
