@@ -116,6 +116,15 @@ public class AttractionService {
         AttractionReview savedReview = reviewRepository.save(review);
         eventPublisher.publishEvent(new ReviewCreatedEvent(userId));
 
+        // Recalcular e atualizar a média de avaliações (averageRating) da atração
+        List<AttractionReview> reviews = reviewRepository.findByAttractionIdOrderByCreatedAtDesc(attractionId);
+        double averageRating = reviews.stream()
+                .mapToInt(AttractionReview::getRating)
+                .average()
+                .orElse(0.0);
+        attraction.setAverageRating(averageRating);
+        attractionRepository.save(attraction);
+
         AttractionReviewDTO reviewDto = attractionMapper.toReviewDTO(savedReview);
         List<BadgeResponseDTO> unlockedBadges = badgeMapper.toBadgeDTOList(BadgeUnlockTracker.getAndClear());
 

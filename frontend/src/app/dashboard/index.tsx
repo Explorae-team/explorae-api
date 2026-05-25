@@ -15,6 +15,7 @@ import { useExploreData } from '../../services/useExploreData';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import { useRecommendations } from '../../services/useRecommendations';
+import api from '../../services/api';
 
 // Components
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
@@ -116,12 +117,32 @@ export default function ExploreScreen() {
 
   const router = useRouter();
 
+  const [challenges, setChallenges] = useState<any[]>([]);
+  const [isLoadingChallenges, setIsLoadingChallenges] = useState(true);
+
+  const fetchChallenges = async () => {
+    try {
+      setIsLoadingChallenges(true);
+      const response = await api.get('/api/v1/challenges');
+      setChallenges(response.data?.data || []);
+    } catch (err) {
+      console.error('Erro ao buscar desafios:', err);
+    } finally {
+      setIsLoadingChallenges(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChallenges();
+  }, []);
+
   const handleRefresh = async () => {
     await Promise.all([
       refresh(selectedCategory || undefined),
       refreshRecsTop(),
       refreshRecsVert(),
-      updateUserPreferences()
+      updateUserPreferences(),
+      fetchChallenges()
     ]);
   };
 
@@ -171,14 +192,52 @@ export default function ExploreScreen() {
             nextLevelXp={(user?.level || 1) * 100} // Fórmula baseada na decisão técnica
           />
 
-          {/* Daily Challenge */}
-          <DailyChallengeCard
-            title="Caminho das Artes"
-            description="Visite 3 murais icônicos para desbloquear esta conquista."
-            progress={0.66}
-            progressLabel="2/3 murais"
-            rewardXp={450}
-          />
+          {/* Active Challenges Carousel */}
+          <View style={{ gap: 16 }}>
+            <View className="flex-row justify-between items-center px-6">
+              <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
+                Seus Desafios Ativos
+              </Text>
+            </View>
+
+            {isLoadingChallenges ? (
+              <View className="mx-6 p-6 rounded-2xl bg-[#002532] border border-white/10 items-center justify-center">
+                <ActivityIndicator size="small" color="#fd6c28" />
+              </View>
+            ) : challenges.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
+                contentContainerStyle={{ paddingHorizontal: 24 }}
+              >
+                {challenges.map((challenge, index) => (
+                  <View 
+                    key={challenge.id || index} 
+                    style={{ 
+                      width: 290, 
+                      marginRight: index < challenges.length - 1 ? 16 : 0 
+                    }}
+                  >
+                    <DailyChallengeCard
+                      title={challenge.title}
+                      description={challenge.description}
+                      type={challenge.type}
+                      progress={challenge.targetValue > 0 ? (challenge.currentValue / challenge.targetValue) : 0}
+                      progressLabel={`${challenge.currentValue}/${challenge.targetValue}`}
+                      rewardXp={challenge.xpReward}
+                    />
+                  </View>
+                ))}
+              </ScrollView>
+            ) : (
+              <View className="mx-6 p-6 rounded-2xl bg-[#002532] border border-white/10 items-center">
+                <Text className="text-white/60 text-sm italic">
+                  Todos os desafios completados! Volte amanhã.
+                </Text>
+              </View>
+            )}
+          </View>
 
           {/* Categories */}
           <CategoryCarousel 

@@ -19,6 +19,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
       alert('Por favor, escreva o conteúdo da dica.');
       return;
     }
+    if (content.length > 500) {
+      alert('A sua dica deve ter no máximo 500 caracteres.');
+      return;
+    }
     try {
       setIsSubmitting(true);
       await onSubmit(rating, content);
@@ -56,7 +60,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
       </View>
 
       {/* Input de Texto */}
-      <Text className="text-white/60 text-xs font-bold uppercase mb-2 font-sans">Sua Experiência</Text>
+      <View className="flex-row justify-between items-center mb-2">
+        <Text className="text-white/60 text-xs font-bold uppercase font-sans">Sua Experiência</Text>
+        <Text className={`text-xs font-sans ${content.length > 450 ? 'text-[#F2641F]' : 'text-white/40'}`}>
+          {content.length}/500
+        </Text>
+      </View>
       <TextInput
         placeholder="Compartilhe uma dica valiosa sobre o local..."
         placeholderTextColor="rgba(255,255,255,0.3)"
@@ -64,6 +73,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
         numberOfLines={4}
         value={content}
         onChangeText={setContent}
+        maxLength={500}
         className="bg-[#00161e] border border-white/5 rounded-2xl p-4 text-white text-sm font-sans mb-6 h-24 align-top"
       />
 
@@ -97,15 +107,22 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
       visible={visible}
       onRequestClose={onClose}
     >
-      {Platform.OS === 'web' ? (
-        <View className="flex-1 bg-black/60 justify-center items-center">
-          {modalContent}
-        </View>
-      ) : (
-        <BlurView intensity={30} tint="dark" className="flex-1 justify-center items-center bg-black/40">
-          {modalContent}
-        </BlurView>
-      )}
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        {Platform.OS !== 'web' && (
+          <BlurView 
+            intensity={30} 
+            tint="dark" 
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0 
+            }} 
+          />
+        )}
+        {modalContent}
+      </View>
     </Modal>
   );
 };

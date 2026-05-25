@@ -8,6 +8,7 @@ interface DailyChallengeCardProps {
   progress: number; // 0 to 1
   progressLabel: string;
   rewardXp: number;
+  type?: string; // DAILY, WEEKLY, SPECIAL
   onPress?: () => void;
 }
 
@@ -17,47 +18,77 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
   progress,
   progressLabel,
   rewardXp,
+  type = 'DAILY',
   onPress,
 }) => {
+  const getTypeConfig = (challengeType: string) => {
+    switch (challengeType) {
+      case 'WEEKLY':
+        return {
+          label: 'Desafio Semanal',
+          icon: 'workspace-premium' as const,
+          iconColor: '#00e5ff',
+          tagColor: 'text-[#00e5ff]',
+        };
+      case 'SPECIAL':
+        return {
+          label: 'Desafio Especial',
+          icon: 'stars' as const,
+          iconColor: '#ffea00',
+          tagColor: 'text-[#ffea00]',
+        };
+      case 'DAILY':
+      default:
+        return {
+          label: 'Desafio Diário',
+          icon: 'emoji-events' as const,
+          iconColor: '#fd6c28',
+          tagColor: 'text-[#fd6c28]',
+        };
+    }
+  };
+
+  const config = getTypeConfig(type);
+
   return (
     <Pressable 
       onPress={onPress}
-      className="mx-6 rounded-2xl bg-surface-container-high border border-outline-variant/10 overflow-hidden"
+      className="rounded-2xl bg-[#002532] border border-white/10 overflow-hidden w-full"
     >
       <View className="p-6 space-y-4">
         <View className="flex-row justify-between items-start">
-          <View className="space-y-1">
-            <Text className="text-[10px] font-black uppercase tracking-[0.2em] text-on-primary-container">
-              Desafio do Dia
+          <View className="space-y-1 flex-1 pr-2">
+            <Text className={`text-[10px] font-black uppercase tracking-[0.2em] ${config.tagColor}`}>
+              {config.label}
             </Text>
-            <Text className="text-xl font-bold text-on-surface">{title}</Text>
+            <Text className="text-lg font-bold text-white leading-tight">{title}</Text>
           </View>
-          <View className="bg-on-primary-container p-3 rounded-2xl shadow-lg">
-            <MaterialIcons name="emoji-events" size={24} color="#591c00" />
+          <View className="bg-white/5 p-3 rounded-2xl border border-white/10 shadow-lg">
+            <MaterialIcons name={config.icon} size={24} color={config.iconColor} />
           </View>
         </View>
 
-        <Text className="text-on-surface-variant text-sm leading-relaxed">
+        <Text className="text-white/70 text-sm leading-relaxed min-h-[40px]">
           {description}
         </Text>
 
         <View className="space-y-3 mt-2">
           <View className="flex-row items-center justify-between">
-            <Text className="text-xs font-bold text-on-surface">Progresso</Text>
-            <Text className="text-xs font-bold text-on-primary-container">{progressLabel}</Text>
+            <Text className="text-xs font-bold text-white">Progresso</Text>
+            <Text className="text-xs font-bold text-white/80">{progressLabel}</Text>
           </View>
-          <View className="h-2 w-full bg-surface-container-lowest rounded-full overflow-hidden">
+          <View className="h-2 w-full bg-white/5 border border-white/10 rounded-full overflow-hidden">
             <View 
-              className="h-full bg-on-primary-container" 
-              style={{ width: `${progress * 100}%` }} 
+              className="h-full bg-[#FFB700]" 
+              style={{ width: `${Math.min(Math.max(progress, 0), 1) * 100}%` }} 
             />
           </View>
         </View>
 
         <View className="flex-row items-center space-x-2 pt-2">
-          <Text className="text-tertiary font-bold">+{rewardXp} XP</Text>
-          <View className="w-1 h-1 rounded-full bg-outline-variant" />
-          <Text className="text-on-surface-variant text-xs">Emblema Raro</Text>
+          <Text className="text-[#FFB700] font-bold">+{rewardXp} XP</Text>
+          <View className="w-1 h-1 rounded-full bg-white/20" />
+          <Text className="text-white/60 text-xs">Desafio Ativo</Text>
         </View>
       </View>
     </Pressable>
