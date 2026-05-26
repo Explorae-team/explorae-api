@@ -15,6 +15,8 @@ import { useExploreData } from '../../services/useExploreData';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import { useRecommendations } from '../../services/useRecommendations';
+import { useFavorites } from '../../services/useFavorites';
+import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import api from '../../services/api';
 
 // Components
@@ -120,6 +122,9 @@ export default function ExploreScreen() {
   const [challenges, setChallenges] = useState<any[]>([]);
   const [isLoadingChallenges, setIsLoadingChallenges] = useState(true);
 
+  const { favoriteIds, toggleFavorite, fetchFavorites } = useFavorites();
+  const { triggerCelebration } = useCelebration();
+
   const fetchChallenges = async () => {
     try {
       setIsLoadingChallenges(true);
@@ -129,6 +134,13 @@ export default function ExploreScreen() {
       console.error('Erro ao buscar desafios:', err);
     } finally {
       setIsLoadingChallenges(false);
+    }
+  };
+
+  const handleToggleFavorite = async (id: string) => {
+    const result = await toggleFavorite(id);
+    if (result && result.unlockedBadges && result.unlockedBadges.length > 0) {
+      triggerCelebration(result.unlockedBadges);
     }
   };
 
@@ -142,7 +154,8 @@ export default function ExploreScreen() {
       refreshRecsTop(),
       refreshRecsVert(),
       updateUserPreferences(),
-      fetchChallenges()
+      fetchChallenges(),
+      fetchFavorites(true)
     ]);
   };
 
@@ -226,6 +239,7 @@ export default function ExploreScreen() {
                       progress={challenge.targetValue > 0 ? (challenge.currentValue / challenge.targetValue) : 0}
                       progressLabel={`${challenge.currentValue}/${challenge.targetValue}`}
                       rewardXp={challenge.xpReward}
+                      rewardCoins={challenge.coinsReward}
                     />
                   </View>
                 ))}
@@ -281,6 +295,8 @@ export default function ExploreScreen() {
                     <AttractionCard
                       {...attraction}
                       variant="compact"
+                      isFavorite={favoriteIds.includes(attraction.id)}
+                      onFavoritePress={() => handleToggleFavorite(attraction.id)}
                       onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                     />
                   </View>
@@ -334,6 +350,8 @@ export default function ExploreScreen() {
                         {...attraction}
                         isPopular={index % 4 === 0}
                         isNew={index === 1}
+                        isFavorite={favoriteIds.includes(attraction.id)}
+                        onFavoritePress={() => handleToggleFavorite(attraction.id)}
                         onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                       />
                     </View>
@@ -363,6 +381,8 @@ export default function ExploreScreen() {
                         {...attraction}
                         isPopular={index % 4 === 0}
                         isNew={index === 1}
+                        isFavorite={favoriteIds.includes(attraction.id)}
+                        onFavoritePress={() => handleToggleFavorite(attraction.id)}
                         onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                       />
                     </View>

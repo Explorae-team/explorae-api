@@ -59,15 +59,21 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
           shadowColor: color, 
           shadowOffset: { width: 0, height: 4 }, 
           shadowOpacity: 0.3, 
-          shadowRadius: 10 
+          shadowRadius: 10,
+          overflow: 'hidden'
         }}
       >
         {type === 'BADGE' ? (
           data.iconUrl ? (
             <Image 
               source={{ uri: data.iconUrl.startsWith('http') ? data.iconUrl : `${API_URL}${data.iconUrl}` }}
-              style={{ width: 72, height: 72, opacity: isUnlocked ? 1 : 0.3 }}
-              resizeMode="contain"
+              style={{ 
+                width: '115%', 
+                height: '115%', 
+                opacity: isUnlocked ? 1 : 0.3,
+                borderRadius: 64
+              }}
+              resizeMode="cover"
             />
           ) : (
             <MaterialIcons name="emoji-events" size={48} color={isUnlocked ? color : '#3a5866'} />

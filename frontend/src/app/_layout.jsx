@@ -97,6 +97,7 @@ function InitialLayout() {
         <Stack.Screen name="dashboard/index" options={{ title: 'Dashboard', headerShown: false }} />
         <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
         <Stack.Screen name="dashboard/badges" options={{ title: 'Medalhas & Desafios', headerShown: false }} />
+        <Stack.Screen name="dashboard/favorites" options={{ title: 'Meus Favoritos', headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
         <Stack.Screen
           name="attraction/[id]"

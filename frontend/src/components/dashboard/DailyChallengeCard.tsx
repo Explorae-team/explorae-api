@@ -8,6 +8,7 @@ interface DailyChallengeCardProps {
   progress: number; // 0 to 1
   progressLabel: string;
   rewardXp: number;
+  rewardCoins?: number;
   type?: string; // DAILY, WEEKLY, SPECIAL
   onPress?: () => void;
 }
@@ -18,6 +19,7 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
   progress,
   progressLabel,
   rewardXp,
+  rewardCoins = 0,
   type = 'DAILY',
   onPress,
 }) => {
@@ -85,9 +87,18 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
           </View>
         </View>
 
-        <View className="flex-row items-center space-x-2 pt-2">
-          <Text className="text-[#FFB700] font-bold">+{rewardXp} XP</Text>
-          <View className="w-1 h-1 rounded-full bg-white/20" />
+        <View className="flex-row items-center pt-2">
+          <View className="flex-row items-center mr-3">
+            <MaterialIcons name="star" size={14} color="#FFB700" style={{ marginRight: 4 }} />
+            <Text className="text-[#FFB700] font-bold text-xs">+{rewardXp} XP</Text>
+          </View>
+          {rewardCoins > 0 && (
+            <View className="flex-row items-center mr-3">
+              <MaterialIcons name="monetization-on" size={14} color="#ffba26" style={{ marginRight: 4 }} />
+              <Text className="text-[#ffba26] font-bold text-xs">+{rewardCoins} Moedas</Text>
+            </View>
+          )}
+          <View className="w-1 h-1 rounded-full bg-white/20 mr-3" />
           <Text className="text-white/60 text-xs">Desafio Ativo</Text>
         </View>
       </View>

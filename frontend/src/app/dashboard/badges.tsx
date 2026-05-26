@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
-  Dimensions
+  Dimensions,
+  RefreshControl
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -64,15 +65,16 @@ export default function BadgesScreen() {
   const [allBadges, setAllBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     type: 'BADGE' | 'CHALLENGE';
     data: any;
     isUnlocked?: boolean;
   } | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) setIsLoading(true);
       await updateUserPreferences();
 
       const [badgesRes, challengesRes] = await Promise.all([
@@ -90,7 +92,13 @@ export default function BadgesScreen() {
       console.error('Erro ao buscar dados de conquistas:', error);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchData(true);
   };
 
   useEffect(() => {
@@ -113,9 +121,7 @@ export default function BadgesScreen() {
           <Ionicons name="arrow-back" size={20} color="white" />
         </TouchableOpacity>
         <Text className="text-white text-lg font-bold font-sans">Conquistas & Desafios</Text>
-        <TouchableOpacity onPress={fetchData} className="p-2 rounded-full bg-white/5">
-          <Ionicons name="refresh" size={20} color="white" />
-        </TouchableOpacity>
+        <View className="w-10 h-10" />
       </View>
 
       {/* Tabs */}
@@ -160,6 +166,13 @@ export default function BadgesScreen() {
           className="flex-1 px-6"
           contentContainerStyle={{ paddingVertical: 24, paddingBottom: 120 }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor="#fd6c28"
+            />
+          }
         >
           {activeTab === 'MEDALS' ? (
             <View>
@@ -199,15 +212,20 @@ export default function BadgesScreen() {
                         className="w-20 h-20 rounded-full bg-[#002532] items-center justify-center border-2 mb-2 relative"
                         style={{
                           borderColor: isUnlocked ? color : 'rgba(255,255,255,0.05)',
-                          opacity: isUnlocked ? 1 : 0.6
+                          opacity: isUnlocked ? 1 : 0.6,
+                          overflow: 'hidden'
                         }}
                       >
                         {badge.iconUrl ? (
                           <Image
                             source={{ uri: badge.iconUrl.startsWith('http') ? badge.iconUrl : `${API_URL}${badge.iconUrl}` }}
-                            className="w-12 h-12"
-                            resizeMode="contain"
-                            style={{ opacity: isUnlocked ? 1 : 0.2 }}
+                            style={{ 
+                              width: '115%', 
+                              height: '115%', 
+                              opacity: isUnlocked ? 1 : 0.2,
+                              borderRadius: 46
+                            }}
+                            resizeMode="cover"
                           />
                         ) : (
                           <Ionicons name="trophy-outline" size={32} color={isUnlocked ? color : '#3a5866'} />

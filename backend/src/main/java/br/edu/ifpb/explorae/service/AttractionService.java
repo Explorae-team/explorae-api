@@ -291,6 +291,15 @@ public class AttractionService {
         return new FavoriteResponseDTO(isFavorite, unlockedBadges);
     }
 
+    @Transactional(readOnly = true)
+    public List<AttractionResponseDTO> getSavedAttractions(UUID userId) {
+        List<SavedAttraction> savedList = savedAttractionRepository.findAllByUserId(userId);
+        return savedList.stream()
+                .map(SavedAttraction::getAttraction)
+                .map(attraction -> AttractionResponseDTO.fromEntity(attraction, "Salvo"))
+                .collect(Collectors.toList());
+    }
+
     private record ScoredAttraction(AttractionResponseDTO dto, double score) {
     }
 }

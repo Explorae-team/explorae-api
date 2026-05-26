@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/attractions")
@@ -84,6 +85,13 @@ public class AttractionController {
 
         CheckInResponseDTO responseWrapper = attractionService.checkIn(id, principal.getId());
         return ResponseEntity.ok(StandardResponseDTO.success("Check-in realizado com sucesso", responseWrapper));
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<StandardResponseDTO<List<AttractionResponseDTO>>> getSavedAttractions(
+            @AuthenticationPrincipal User principal) {
+        List<AttractionResponseDTO> list = attractionService.getSavedAttractions(principal.getId());
+        return ResponseEntity.ok(StandardResponseDTO.success("Atrações salvas recuperadas com sucesso", list));
     }
 
     @PostMapping("/{id}/favorite")

@@ -8,7 +8,10 @@ import { FiltersModal, FilterState } from '../../components/dashboard/FiltersMod
 import { AttractionCard } from '../../components/dashboard/AttractionCard';
 import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
 import { useExploreData } from '../../services/useExploreData';
+import { useFavorites } from '../../services/useFavorites';
+import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { useRouter } from 'expo-router';
+import api from '../../services/api';
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -17,6 +20,15 @@ export default function SearchScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
+  const { favoriteIds, toggleFavorite } = useFavorites();
+  const { triggerCelebration } = useCelebration();
+
+  const handleToggleFavorite = async (id: string) => {
+    const result = await toggleFavorite(id);
+    if (result && result.unlockedBadges && result.unlockedBadges.length > 0) {
+      triggerCelebration(result.unlockedBadges);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
@@ -135,6 +147,8 @@ export default function SearchScreen() {
                       priceRange={attraction.priceRange}
                       isPartner={attraction.isPartner}
                       isPopular={index % 4 === 0}
+                      isFavorite={favoriteIds.includes(attraction.id)}
+                      onFavoritePress={() => handleToggleFavorite(attraction.id)}
                       onPress={() => router.push(`/attraction/${attraction.id}` as any)}
                     />
                   </View>

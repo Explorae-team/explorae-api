@@ -60,13 +60,20 @@ export default function AchievementsList() {
           >
             <View 
               className="w-20 h-20 rounded-full bg-surface-bright items-center justify-center border-2 mb-3"
-              style={{ borderColor: (categoryColors as any)[b.category] || '#fd6c28' }}
+              style={{ 
+                borderColor: (categoryColors as any)[b.category] || '#fd6c28',
+                overflow: 'hidden'
+              }}
             >
               {b.iconUrl ? (
                 <Image 
                   source={{ uri: b.iconUrl.startsWith('http') ? b.iconUrl : `${API_URL}${b.iconUrl}` }}
-                  className="w-14 h-14"
-                  resizeMode="contain"
+                  style={{ 
+                    width: '115%', 
+                    height: '115%',
+                    borderRadius: 46
+                  }}
+                  resizeMode="cover"
                 />
               ) : (
                 <MaterialIcons name="emoji-events" size={36} color={(categoryColors as any)[b.category] || '#fd6c28'} />

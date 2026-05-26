@@ -24,10 +24,18 @@ public class ChallengeScheduler {
     @EventListener(ApplicationReadyEvent.class)
     public void initChallengesOnStartup() {
         LocalDateTime now = LocalDateTime.now();
-        List<Challenge> active = challengeRepository.findActiveChallenges(now);
-        if (active.isEmpty()) {
-            System.out.println("Nenhum desafio ativo encontrado na inicialização. Gerando desafios iniciais...");
+        
+        // Verificar e gerar desafios diários se não houver nenhum ativo para o dia
+        List<Challenge> activeDailies = challengeRepository.findByTypeAndStartDateBeforeAndEndDateAfter("DAILY", now, now);
+        if (activeDailies.isEmpty()) {
+            System.out.println("Nenhum desafio diário ativo encontrado na inicialização. Gerando desafios diários...");
             generateDailyChallenges();
+        }
+
+        // Verificar e gerar desafios semanais se não houver nenhum ativo para a semana
+        List<Challenge> activeWeeklies = challengeRepository.findByTypeAndStartDateBeforeAndEndDateAfter("WEEKLY", now, now);
+        if (activeWeeklies.isEmpty()) {
+            System.out.println("Nenhum desafio semanal ativo encontrado na inicialização. Gerando desafios semanais...");
             generateWeeklyChallenges();
         }
     }
