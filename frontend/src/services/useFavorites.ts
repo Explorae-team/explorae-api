@@ -1,22 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from './api';
-
-export interface SavedAttraction {
-  id: string;
-  title: string;
-  tagline: string;
-  imageUrl: string;
-  rating: number;
-  distance: string;
-  type: string;
-  tags: string[];
-  priceRange?: number;
-  isPartner?: boolean;
-}
+import { mapBackendAttractionToFrontend, Attraction } from './attractionMapper';
 
 export const useFavorites = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
-  const [favorites, setFavorites] = useState<SavedAttraction[]>([]);
+  const [favorites, setFavorites] = useState<Attraction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,21 +16,7 @@ export const useFavorites = () => {
       if (response.data && response.data.data) {
         const data = response.data.data;
         
-        const mapped = data.map((item: any) => {
-          const rawImageUrl = item.mainImageUrl || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b';
-          return {
-            id: item.id,
-            title: item.name,
-            tagline: item.shortDescription,
-            imageUrl: rawImageUrl,
-            rating: item.averageRating || 0.0,
-            distance: item.distance || 'Salvo',
-            type: item.category || 'Atração',
-            tags: item.tags || [],
-            priceRange: item.priceRange || 2,
-            isPartner: item.isPartner || false
-          };
-        });
+        const mapped = data.map((item: any) => mapBackendAttractionToFrontend(item, 'Salvo'));
 
         setFavorites(mapped);
         setFavoriteIds(mapped.map((fav: any) => fav.id));
