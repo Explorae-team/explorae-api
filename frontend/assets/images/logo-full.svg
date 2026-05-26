@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200">
+  <style>
+    .text {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 900;
+      font-size: 76px;
+      letter-spacing: -1px;
+      fill: #0E566A;
+    }
+    .text-e {
+      fill: #F37640;
+    }
+  </style>
+
+  <!-- Nested SVG for the Compass Icon -->
+  <svg x="0" y="15" width="170" height="170" viewBox="0 0 200 240" preserveAspectRatio="xMidYMid meet">
+    <g>
+      <path d="M100,10 C50.29,10 10,50.29 10,100 C10,167.5 100,230 100,230 C100,230 190,167.5 190,100 C190,50.29 149.71,10 100,10 Z" fill="#F26732" />
+      <path d="M100,10 C149.71,10 190,50.29 190,100 C190,167.5 100,230 100,230 Z" fill="#E05423" />
+    </g>
+    <g fill="#FFFFFF">
+      <path d="M 93,85 L 107,85 L 100,52 Z" />
+      <path d="M 93,115 L 107,115 L 100,148 Z" />
+      <path d="M 85,93 L 85,107 L 52,100 Z" />
+      <path d="M 115,93 L 115,107 L 148,100 Z" />
+    </g>
+    <path d="M 84.5,74 L 84.5,126 L 130.5,100 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+    <g transform="translate(100, 100) rotate(55)">
+      <path d="M 0,-24 L -8,0 L 0,24 Z" fill="#F26732" />
+      <path d="M 0,-24 L 8,0 L 0,24 Z" fill="#E05423" />
+      <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+    </g>
+    <g fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="22px" text-anchor="middle">
+      <text x="100" y="42">N</text>
+      <text x="100" y="178">S</text>
+      <text x="32" y="108">O</text>
+      <text x="168" y="108">L</text>
+    </g>
+  </svg>
+
+  <!-- Text -->
+  <text x="520" y="130" class="text" text-anchor="end">Explora<tspan class="text-e">e</tspan></text>
+
+  <!-- Accent over the 'e' -->
+  <svg x="480" y="42" width="41.8" height="38" viewBox="0 0 100 90">
+    <path d="M 50 0 L 0 90 L 50 90 L 50 55 L 25 70 L 50 30 Z" fill="#F37640" />
+    <path d="M 50 0 L 50 30 L 75 70 L 50 55 L 50 90 L 100 90 Z" fill="#DF6430" />
+  </svg>
+</svg>
