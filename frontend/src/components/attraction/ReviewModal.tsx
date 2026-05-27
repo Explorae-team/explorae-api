@@ -109,7 +109,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
         value={content}
         onChangeText={setContent}
         maxLength={500}
-        className="bg-[#00161e] border border-white/5 rounded-2xl p-4 text-white text-sm font-sans mb-4 h-24 align-top"
+        className="bg-[#00161e] border border-white/5 rounded-2xl p-4 text-white text-sm font-sans mb-4 h-24"
+        style={{ textAlignVertical: 'top' }}
       />
 
       {/* Seção de Foto Opcional */}
@@ -179,6 +180,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
           <BlurView 
             intensity={30} 
             tint="dark" 
+            pointerEvents="none"
             style={{ 
               position: 'absolute', 
               top: 0, 
