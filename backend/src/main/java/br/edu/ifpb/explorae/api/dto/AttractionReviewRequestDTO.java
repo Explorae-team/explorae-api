@@ -14,5 +14,8 @@ public record AttractionReviewRequestDTO(
     @NotNull(message = "A nota é obrigatória")
     @Min(value = 1, message = "A nota mínima é 1")
     @Max(value = 5, message = "A nota máxima é 5")
-    Integer rating
+    Integer rating,
+
+    @Size(max = 255, message = "A URL da foto não pode ter mais de 255 caracteres")
+    String photoUrl
 ) {}
