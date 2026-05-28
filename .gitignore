@@ -89,8 +89,8 @@ HELP.md
 /explorae-user-service/target/
 # GSD / Planning
 .planning/
-
-
+.gsd/
+.bg-shell/
 # Terraform
 .terraform/
 *.tfstate
@@ -103,3 +103,22 @@ HELP.md
 *.tfvars
 .env
 backend/.m2/
+
+# ── GSD baseline (auto-generated) ──
+.gsd
+.gsd-id
+.mcp.json
+*.swo
+*.code-workspace
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+venv/
+vendor/
+.cache/
+tmp/
+
+#remotion
+explorae-pitch/

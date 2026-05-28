@@ -3,6 +3,7 @@ package br.edu.ifpb.explorae.api.controller;
 import br.edu.ifpb.explorae.api.dto.AuthLoginResponseDTO;
 import br.edu.ifpb.explorae.api.dto.LoginDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
+import br.edu.ifpb.explorae.api.dto.ResetPasswordDTO;
 import br.edu.ifpb.explorae.api.dto.UserRegistrationDTO;
 import br.edu.ifpb.explorae.api.dto.UserResponseDTO;
 import br.edu.ifpb.explorae.service.AuthService;
@@ -55,5 +56,15 @@ public class AuthController {
 
         return ResponseEntity.ok(StandardResponseDTO.success(
                 "Show! Login realizado com sucesso. Bem-vindo de volta!", responseDTO));
+    }
+
+    /**
+     * Endpoint de Redefinição de Senha:
+     * Redefine a senha de um usuário existente.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<StandardResponseDTO<Void>> resetPassword(@RequestBody @Valid ResetPasswordDTO dto) {
+        userService.resetPassword(dto.email(), dto.password());
+        return ResponseEntity.ok(StandardResponseDTO.success("Senha redefinida com sucesso!", null));
     }
 }

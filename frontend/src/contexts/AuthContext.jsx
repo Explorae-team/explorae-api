@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
 import storage from '../utils/storage';
+import { supabase } from '../services/supabase';
 
 
 const AuthContext = createContext({});
@@ -70,7 +71,23 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      // O endpoint de cadastro retorna StandardResponseDTO<UserResponseDTO>
+      // 1. Tenta cadastrar o usuário no Supabase Auth para habilitar recuperação de senha e OAuth
+      try {
+        await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              name: formData.name
+            }
+          }
+        });
+      } catch (supabaseError) {
+        // Loga erro mas não bloqueia o fluxo principal do Spring Boot
+        console.warn('Erro ao registrar no Supabase Auth:', supabaseError);
+      }
+
+      // 2. O endpoint de cadastro principal retorna StandardResponseDTO<UserResponseDTO>
       const response = await api.post('/api/v1/auth/register', formData);
       return { success: true, data: response.data.data };
     } catch (error) {
