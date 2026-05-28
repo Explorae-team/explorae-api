@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Vibration } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Vibration, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -114,7 +114,16 @@ const AttractionDetail = () => {
         const type = match ? `image/${match[1]}` : 'image/jpeg';
         
         const formData = new FormData();
-        formData.append('file', { uri: localUri, name: filename, type } as any);
+        
+        if (Platform.OS === 'web') {
+          // No ambiente web/browser: converte o blob URL local para um objeto Blob real
+          const blobResponse = await fetch(localUri);
+          const blob = await blobResponse.blob();
+          formData.append('file', blob, filename);
+        } else {
+          // No ambiente nativo (Android/iOS): passa o wrapper de arquivo padrão
+          formData.append('file', { uri: localUri, name: filename, type } as any);
+        }
         
         const uploadResponse = await api.post('/api/v1/attractions/reviews/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
