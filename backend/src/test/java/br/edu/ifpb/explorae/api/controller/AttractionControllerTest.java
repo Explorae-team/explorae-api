@@ -57,8 +57,10 @@ class AttractionControllerTest {
     @Test
     @DisplayName("Deve retornar dados paginados corretamente")
     void shouldReturnPaginatedData() throws Exception {
+        // ADICIONADO: new AttractionResponseDTO.CoordinateDTO(...) como 10º parâmetro
         AttractionResponseDTO dto = new AttractionResponseDTO(
-                UUID.randomUUID(), "Farol", "Cat", "Short", 4.5, "url", "2.5 km", 2, false
+                UUID.randomUUID(), "Farol", "Cat", "Short", 4.5, "url", "2.5 km", 2, false,
+                new AttractionResponseDTO.CoordinateDTO(-7.14, -34.80) 
         );
         Page<AttractionResponseDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
 

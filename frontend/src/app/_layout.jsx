@@ -28,6 +28,9 @@ function InitialLayout() {
   const protectedRoutes = ['dashboard', 'preferences', 'settings', 'attraction'];
   const inAppGroup = protectedRoutes.includes(segments[0]);
   const isAuthRoute = segments[0] === 'login' || segments[0] === 'cadastro';
+  
+  // NOVO: Verifica se a rota atual é o mapa de rotas
+  const isMapRoute = segments[0] === 'dashboard' && segments[1] === 'routes';
 
   useEffect(() => {
     setIsMounted(true);
@@ -51,8 +54,8 @@ function InitialLayout() {
     }
   }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode, isMounted]);
 
-
-  const showFooter = isAuthenticated && inAppGroup && segments[0] !== 'preferences';
+  // NOVO: Adicionado !isMapRoute para esconder o footer automaticamente no mapa
+  const showFooter = isAuthenticated && inAppGroup && segments[0] !== 'preferences' && !isMapRoute;
 
   const getActiveTab = () => {
     const route = segments[0];
@@ -98,6 +101,10 @@ function InitialLayout() {
         <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
         <Stack.Screen name="dashboard/badges" options={{ title: 'Medalhas & Desafios', headerShown: false }} />
         <Stack.Screen name="dashboard/favorites" options={{ title: 'Meus Favoritos', headerShown: false }} />
+        
+        {/* NOVO: Tela de rotas (Mapa) adicionada ao Stack */}
+        <Stack.Screen name="dashboard/routes" options={{ title: 'Rotas', headerShown: false }} />
+        
         <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
         <Stack.Screen
           name="attraction/[id]"
