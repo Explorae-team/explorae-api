@@ -6,7 +6,7 @@ import storage from '../utils/storage';
  * O prefixo EXPO_PUBLIC_ permite que o Expo carregue a variável do arquivo .env automaticamente.
  */
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.13:8080',
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.7:8080',
   timeout: 10000,
   // Força o adaptador 'http' em ambiente de teste para evitar conflitos com polyfills de fetch/streams do Expo no Node/Jest
   adapter: process.env.NODE_ENV === 'test' ? 'http' : undefined,
