@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import '../styles/global.css'; // Importando Tailwind globalmente para o ambiente Web/Native
+import '../styles/global.css'; 
 
 import { Platform, ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -29,7 +29,7 @@ function InitialLayout() {
   const inAppGroup = protectedRoutes.includes(segments[0]);
   const isAuthRoute = segments[0] === 'login' || segments[0] === 'cadastro';
   
-  // NOVO: Verifica se a rota atual é o mapa de rotas
+  // Lógica para detectar se estamos na rota do mapa e esconder o footer
   const isMapRoute = segments[0] === 'dashboard' && segments[1] === 'routes';
 
   useEffect(() => {
@@ -40,21 +40,17 @@ function InitialLayout() {
     if (!isMounted || isLoading) return;
 
     if (!isAuthenticated && inAppGroup) {
-      // Se não está logado e tenta acessar área restrita, vai pro login
       router.replace('/login');
     } else if (isAuthenticated) {
-      // Se está logado...
       if (!user?.hasPreferences && segments[0] !== 'preferences') {
-        // ...mas não tem preferências e não está na tela de preferências, redireciona pra lá
         router.replace('/preferences');
       } else if (user?.hasPreferences && (isAuthRoute || (segments[0] === 'preferences' && !isEditMode) || segments[0] === undefined)) {
-        // ...e tem preferências, se tentar ir pra login/cadastro ou preferences (sem ser modo edit), vai pro dashboard
         router.replace('/dashboard');
       }
     }
   }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode, isMounted]);
 
-  // NOVO: Adicionado !isMapRoute para esconder o footer automaticamente no mapa
+  // Footer só aparece se não estivermos no mapa
   const showFooter = isAuthenticated && inAppGroup && segments[0] !== 'preferences' && !isMapRoute;
 
   const getActiveTab = () => {
@@ -83,13 +79,9 @@ function InitialLayout() {
     <View style={{ flex: 1 }}>
       <Stack
         screenOptions={{
-          headerStyle: {
-            backgroundColor: '#007AFF',
-          },
+          headerStyle: { backgroundColor: '#007AFF' },
           headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          headerTitleStyle: { fontWeight: 'bold' },
           headerBackTitle: 'Voltar',
           contentStyle: { backgroundColor: '#00161e' },
         }}
@@ -101,17 +93,11 @@ function InitialLayout() {
         <Stack.Screen name="dashboard/profile" options={{ title: 'Perfil', headerShown: false }} />
         <Stack.Screen name="dashboard/badges" options={{ title: 'Medalhas & Desafios', headerShown: false }} />
         <Stack.Screen name="dashboard/favorites" options={{ title: 'Meus Favoritos', headerShown: false }} />
-        
-        {/* NOVO: Tela de rotas (Mapa) adicionada ao Stack */}
         <Stack.Screen name="dashboard/routes" options={{ title: 'Rotas', headerShown: false }} />
-        
         <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
         <Stack.Screen
           name="attraction/[id]"
-          options={{
-            title: 'Detalhes da Atração',
-            headerShown: false
-          }}
+          options={{ title: 'Detalhes da Atração', headerShown: false }}
         />
       </Stack>
 
@@ -123,7 +109,6 @@ function InitialLayout() {
 }
 
 export default function RootLayout() {
-  // Registro de Service Worker para PWA (Task [S1-P2-T4])
   useEffect(() => {
     if (Platform.OS === 'web' && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {

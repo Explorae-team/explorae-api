@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Logo from '../brand/Logo';
 
 import { useRouter } from 'expo-router';
 
@@ -24,12 +25,8 @@ export const ExploreHeader: React.FC<ExploreHeaderProps> = ({
       style={{ paddingTop: insets.top + 16 }}
       className="bg-[#00161e] border-b border-white/5 px-6 pb-4 flex-row justify-between items-center"
     >
-      <View style={{ width: 150, height: 40 }}>
-        <Image 
-          source={require('../../../assets/branding/logo-main.png')}
-          style={{ width: '100%', height: '100%' }}
-          resizeMode="contain"
-        />
+      <View style={{ width: 130, height: 40, justifyContent: 'center' }}>
+        <Logo width={120} height={40} />
       </View>
 
       <View className="flex-row items-center">

@@ -17,6 +17,7 @@ import { LoginForm, LoginErrors } from '../types/login.types';
 import { Ionicons } from "@expo/vector-icons";
 import AuthInput from "../components/auth/AuthInput";
 import PrimaryButton from "../components/PrimaryButton";
+import Logo from "../components/brand/LogoWithText";
 
 export default function LoginScreen() {
   const { login } = useAuth() as any;
@@ -52,7 +53,14 @@ export default function LoginScreen() {
       if (response.success) {
         router.replace("/dashboard");
       } else {
-        setErrors({ general: response.message || "Erro ao conectar-se" });
+        const msg = response.message || "";
+        if (msg === "Usuário não cadastrado.") {
+          setErrors({ email: "E-mail não cadastrado." });
+        } else if (msg === "E-mail ou senha inválidos.") {
+          setErrors({ password: "Senha incorreta." });
+        } else {
+          setErrors({ general: msg || "Erro ao conectar-se" });
+        }
       }
     } catch (error) {
       setErrors({ general: "Erro inesperado. Tente novamente." });
@@ -77,12 +85,8 @@ export default function LoginScreen() {
         
         {/* Central Card */}
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
-          <View className="items-center mb-6">
-            <Image 
-              source={require("../../assets/branding/logo-main.png")} 
-              style={{ width: 180, height: 60 }}
-              resizeMode="contain"
-            />
+          <View className="items-center mb-8">
+            <Logo size={80} />
           </View>
 
           <View className="mb-8">
@@ -108,7 +112,12 @@ export default function LoginScreen() {
               iconName="mail-outline"
               placeholder="aventureiro@explorae.com"
               value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, email: text });
+                if (errors.email || errors.general) {
+                  setErrors({ ...errors, email: undefined, general: undefined });
+                }
+              }}
               error={errors.email}
               autoCapitalize="none"
               keyboardType="email-address"
@@ -120,7 +129,12 @@ export default function LoginScreen() {
               placeholder="••••••••"
               secureTextEntry={!showPassword}
               value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, password: text });
+                if (errors.password || errors.general) {
+                  setErrors({ ...errors, password: undefined, general: undefined });
+                }
+              }}
               error={errors.password}
               rightIconName={showPassword ? "eye-off-outline" : "eye-outline"}
               onRightIconPress={() => setShowPassword(!showPassword)}

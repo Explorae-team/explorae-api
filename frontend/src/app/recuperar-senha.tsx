@@ -14,26 +14,28 @@ import { Stack, useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
+import Logo from '../components/brand/Logo';
 import { supabase } from '../services/supabase';
 
 export default function RecuperarSenhaScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    general?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const validate = () => {
+    const newErrors: typeof errors = {};
     if (!email) {
-      setError('E-mail é obrigatório');
-      return false;
+      newErrors.email = 'E-mail é obrigatório';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'E-mail inválido';
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('E-mail inválido');
-      return false;
-    }
-    setError(null);
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleResetPassword = async () => {
@@ -41,18 +43,30 @@ export default function RecuperarSenhaScreen() {
 
     setLoading(true);
     try {
+      const redirectToUrl = __DEV__ 
+        ? 'http://localhost:8081/reset-password' 
+        : 'https://explorae.site/reset-password';
+
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:8081/reset-password', // Altere para sua URL de produção depois
+        redirectTo: redirectToUrl,
       });
 
       if (resetError) {
-        setError(resetError.message);
+        const msg = resetError.message;
+        // Mapeamento de erros comuns do Supabase
+        if (msg.toLowerCase().includes('user') || msg.toLowerCase().includes('email')) {
+          setErrors({ email: 'E-mail não cadastrado ou inválido no sistema.' });
+        } else if (msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('too many')) {
+          setErrors({ general: 'Limite de envio excedido. Tente novamente em alguns minutos.' });
+        } else {
+          setErrors({ general: msg });
+        }
         return;
       }
       
       setIsSuccess(true);
     } catch (err) {
-      setError('Erro ao enviar link. Tente novamente mais tarde.');
+      setErrors({ general: 'Erro ao enviar link. Tente novamente mais tarde.' });
     } finally {
       setLoading(false);
     }
@@ -75,13 +89,17 @@ export default function RecuperarSenhaScreen() {
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-[#fd6c28]/10 rounded-full blur-[80px]" />
 
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center border border-white/20">
-          <View className="items-center mb-6">
-            <Image
-              source={require("../../assets/branding/logo-main.png")}
-              style={{ width: 180, height: 60 }}
-              resizeMode="contain"
-            />
+          <View className="items-center mb-8">
+            <Logo width={80} height={80} />
           </View>
+
+          {errors.general && (
+            <View className="bg-red-50 p-4 rounded-xl mb-6">
+              <Text className="text-red-600 text-xs font-semibold">
+                {errors.general}
+              </Text>
+            </View>
+          )}
 
           {!isSuccess ? (
             <>
@@ -102,9 +120,9 @@ export default function RecuperarSenhaScreen() {
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
-                    if (error) setError(null);
+                    if (errors.email || errors.general) setErrors({});
                   }}
-                  error={error || undefined}
+                  error={errors.email}
                   autoCapitalize="none"
                   keyboardType="email-address"
                 />
