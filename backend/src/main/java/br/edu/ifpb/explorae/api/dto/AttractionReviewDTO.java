@@ -9,5 +9,6 @@ public record AttractionReviewDTO(
     String userPhotoUrl,
     String content,
     Integer rating,
+    String photoUrl,
     LocalDateTime createdAt
 ) {}

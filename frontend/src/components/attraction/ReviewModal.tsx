@@ -1,18 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, Modal, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, Modal, Platform, Image } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import * as ImagePicker from 'expo-image-picker';
 
 interface ReviewModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (rating: number, content: string) => Promise<void>;
+  onSubmit: (rating: number, content: string, photoUri?: string) => Promise<void>;
 }
 
 export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSubmit }) => {
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handlePickImage = async (useCamera: boolean) => {
+    try {
+      const permissionResult = useCamera 
+        ? await ImagePicker.requestCameraPermissionsAsync() 
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        alert(`Permissão para usar a ${useCamera ? 'câmera' : 'galeria'} é necessária.`);
+        return;
+      }
+
+      const result = useCamera
+        ? await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch (err) {
+      console.error('Erro ao capturar imagem:', err);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!content.trim()) {
@@ -25,9 +59,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
     }
     try {
       setIsSubmitting(true);
-      await onSubmit(rating, content);
+      await onSubmit(rating, content, photoUri || undefined);
       setContent('');
       setRating(5);
+      setPhotoUri(null);
       onClose();
     } catch (err) {
       console.error('Erro ao enviar avaliação:', err);
@@ -74,8 +109,41 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
         value={content}
         onChangeText={setContent}
         maxLength={500}
-        className="bg-[#00161e] border border-white/5 rounded-2xl p-4 text-white text-sm font-sans mb-6 h-24 align-top"
+        className="bg-[#00161e] border border-white/5 rounded-2xl p-4 text-white text-sm font-sans mb-4 h-24"
+        style={{ textAlignVertical: 'top' }}
       />
+
+      {/* Seção de Foto Opcional */}
+      <Text className="text-white/60 text-xs font-bold uppercase mb-2 font-sans">Anexar Foto (Opcional)</Text>
+      
+      {photoUri ? (
+        <View className="relative rounded-2xl overflow-hidden mb-6 border border-white/10 h-28 w-full">
+          <Image source={{ uri: photoUri }} className="w-full h-full object-cover" />
+          <TouchableOpacity 
+            onPress={() => setPhotoUri(null)}
+            className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 border border-white/20"
+          >
+            <MaterialCommunityIcons name="trash-can-outline" size={16} color="#F2641F" />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View className="flex-row gap-3 mb-6">
+          <TouchableOpacity 
+            onPress={() => handlePickImage(true)}
+            className="flex-1 py-3 border border-dashed border-white/10 bg-white/5 rounded-xl flex-row justify-center items-center gap-2"
+          >
+            <MaterialCommunityIcons name="camera" size={16} color="#FFB700" />
+            <Text className="text-white/80 font-bold font-sans text-xs">Câmera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => handlePickImage(false)}
+            className="flex-1 py-3 border border-dashed border-white/10 bg-white/5 rounded-xl flex-row justify-center items-center gap-2"
+          >
+            <MaterialCommunityIcons name="image-multiple" size={16} color="#FFB700" />
+            <Text className="text-white/80 font-bold font-sans text-xs">Galeria</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Botões */}
       <View className="flex-row justify-end gap-3">
@@ -112,6 +180,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
           <BlurView 
             intensity={30} 
             tint="dark" 
+            pointerEvents="none"
             style={{ 
               position: 'absolute', 
               top: 0, 

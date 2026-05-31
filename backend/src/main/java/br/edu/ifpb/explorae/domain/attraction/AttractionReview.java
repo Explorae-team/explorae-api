@@ -36,6 +36,9 @@ public class AttractionReview {
     @Column(nullable = false)
     private Integer rating;
 
+    @Column(name = "photo_url", length = 255)
+    private String photoUrl;
+
     @Builder.Default
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

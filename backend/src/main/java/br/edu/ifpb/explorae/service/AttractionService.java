@@ -111,6 +111,7 @@ public class AttractionService {
                 .user(user)
                 .content(dto.content())
                 .rating(dto.rating())
+                .photoUrl(dto.photoUrl())
                 .build();
 
         AttractionReview savedReview = reviewRepository.save(review);

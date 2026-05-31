@@ -36,44 +36,38 @@ const colors = {
   primary: '#fd6c28',
 };
 
+interface LocationCoords {
+  latitude: number;
+  longitude: number;
+}
+
 export default function ExploreScreen() {
   const { user, updateUserPreferences } = useAuth() as any;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
 
-  const [coords, setCoords] = useState<{ latitude: number | null; longitude: number | null }>({
-    latitude: null,
-    longitude: null,
-  });
+  const [coords, setCoords] = useState<LocationCoords>({
+  latitude: -7.1196,
+  longitude: -34.8450,
+});
 
   useEffect(() => {
     async function requestPermissionsAndGetLocation() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
-          // Timeout de 3 segundos para evitar travamentos infinitos no GPS do celular
-          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-          const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
-          
-          const loc = await Promise.race([locationPromise, timeoutPromise]);
-          if (loc) {
-            setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
-          } else {
-            // Se der timeout, tenta a última localização conhecida ou usa o fallback
-            const lastLoc = await Location.getLastKnownPositionAsync({});
-            if (lastLoc) {
-              setCoords({ latitude: lastLoc.coords.latitude, longitude: lastLoc.coords.longitude });
-            } else {
-              setCoords({ latitude: -7.1196, longitude: -34.8450 });
-            }
-          }
-        } else {
-          setCoords({ latitude: -7.1196, longitude: -34.8450 });
+          const location = await Location.getCurrentPositionAsync({ 
+            accuracy: Location.Accuracy.Balanced 
+          });
+          setCoords({ 
+            latitude: location.coords.latitude, 
+            longitude: location.coords.longitude 
+          });
         }
+        // Se não concedido, ele mantém o valor inicial de João Pessoa
       } catch (err) {
-        console.error('Erro ao obter localização/permissões:', err);
-        setCoords({ latitude: -7.1196, longitude: -34.8450 });
+        console.error('Erro ao obter localização:', err);
       }
     }
     requestPermissionsAndGetLocation();

@@ -9,6 +9,7 @@ interface Review {
   userPhotoUrl?: string;
   content: string;
   rating?: number;
+  photoUrl?: string;
 }
 
 interface AttractionCommunityTipsProps {
@@ -56,6 +57,7 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
               text={review.content} 
               rating={review.rating}
               userPhotoUrl={review.userPhotoUrl}
+              photoUrl={review.photoUrl}
             />
           ))
         ) : (
@@ -68,9 +70,13 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
   );
 }
 
-const Comment = ({ author, text, rating, userPhotoUrl }: { author: string; text: string; rating?: number; userPhotoUrl?: string }) => {
+const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: string; text: string; rating?: number; userPhotoUrl?: string; photoUrl?: string }) => {
   const avatarUrl = userPhotoUrl 
     ? (userPhotoUrl.startsWith('http') ? userPhotoUrl : `${API_URL}${userPhotoUrl}`)
+    : null;
+
+  const reviewPhotoUrl = photoUrl 
+    ? (photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`)
     : null;
 
   return (
@@ -102,6 +108,13 @@ const Comment = ({ author, text, rating, userPhotoUrl }: { author: string; text:
           )}
         </View>
         <Text className="text-[#003646]/70 text-sm mt-1 leading-5">{text}</Text>
+        {reviewPhotoUrl && (
+          <Image 
+            source={{ uri: reviewPhotoUrl }} 
+            className="w-full h-44 rounded-2xl mt-3" 
+            resizeMode="cover"
+          />
+        )}
       </View>
     </View>
   );

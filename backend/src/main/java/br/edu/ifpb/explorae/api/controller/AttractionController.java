@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import br.edu.ifpb.explorae.service.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.UUID;
 import java.util.List;
 
@@ -34,6 +37,7 @@ import java.util.List;
 public class AttractionController {
 
     private final AttractionService attractionService;
+    private final FileStorageService fileStorageService;
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getAll(
@@ -102,5 +106,14 @@ public class AttractionController {
         FavoriteResponseDTO responseWrapper = attractionService.toggleFavorite(id, principal.getId());
         String msg = responseWrapper.isFavorite() ? "Atração favoritada com sucesso" : "Atração removida dos favoritos";
         return ResponseEntity.ok(StandardResponseDTO.success(msg, responseWrapper));
+    }
+
+    @PostMapping("/reviews/upload")
+    public ResponseEntity<StandardResponseDTO<String>> uploadReviewPhoto(
+            @AuthenticationPrincipal User principal,
+            @RequestParam("file") MultipartFile file) {
+
+        String photoUrl = fileStorageService.saveFile(file, "reviews");
+        return ResponseEntity.ok(StandardResponseDTO.success("Imagem da dica enviada com sucesso", photoUrl));
     }
 }

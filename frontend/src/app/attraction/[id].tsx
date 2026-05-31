@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Vibration, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -55,14 +55,21 @@ const AttractionDetail = () => {
       setIsCheckingIn(true);
       const response = await api.post(`/api/v1/attractions/${id}/check-in`);
       
+      // Feedback tátil de sucesso
+      Vibration.vibrate(100);
+
       const unlockedBadges = response.data?.data?.unlockedBadges;
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert('Check-in realizado com sucesso!');
+        alert('Check-in realizado com sucesso! Compartilhe sua dica com a galera.');
       }
+      
+      // Abre automaticamente o modal de dica pós check-in
+      setReviewModalVisible(true);
     } catch (err) {
       console.error('Erro ao realizar check-in:', err);
+      Vibration.vibrate([100, 100, 100]); // Vibrar erro
       alert('Não foi possível realizar o check-in no momento.');
     } finally {
       setIsCheckingIn(false);
@@ -94,11 +101,40 @@ const AttractionDetail = () => {
     }
   };
 
-  const handleAddReview = async (rating: number, content: string) => {
+  const handleAddReview = async (rating: number, content: string, photoUri?: string) => {
     try {
+      let photoUrl = undefined;
+      
+      // Se houver uma foto selecionada, realizar o upload antes
+      if (photoUri) {
+        const localUri = photoUri;
+        const filename = localUri.split('/').pop() || 'photo.jpg';
+        
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        
+        const formData = new FormData();
+        
+        if (Platform.OS === 'web') {
+          // No ambiente web/browser: converte o blob URL local para um objeto Blob real
+          const blobResponse = await fetch(localUri);
+          const blob = await blobResponse.blob();
+          formData.append('file', blob, filename);
+        } else {
+          // No ambiente nativo (Android/iOS): passa o wrapper de arquivo padrão
+          formData.append('file', { uri: localUri, name: filename, type } as any);
+        }
+        
+        const uploadResponse = await api.post('/api/v1/attractions/reviews/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        photoUrl = uploadResponse.data?.data; // URL pública retornada pelo Supabase Storage
+      }
+
       const response = await api.post(`/api/v1/attractions/${id}/reviews`, {
         content,
-        rating
+        rating,
+        photoUrl
       });
       
       const unlockedBadges = response.data?.data?.unlockedBadges;
