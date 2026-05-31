@@ -2,6 +2,7 @@ export default {
   expo: {
     name: "Exploraê",
     slug: "explorae-app",
+    scheme: "explorae", // <-- Mesclado da main
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/branding/app-icon.png",
@@ -16,18 +17,21 @@ export default {
       supportsTablet: true
     },
     android: {
-      permissions: [
+      package: "com.herbertcarvalho021.exploraenew", // <-- Da sua branch
+      adaptiveIcon: { // <-- Mesclado da main
+        foregroundImage: "./assets/branding/app-icon.png",
+        backgroundColor: "#F4F4F9"
+      },
+      permissions: [ // <-- Da sua branch
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
-      config: {
+      config: { // <-- Da sua branch
         googleMaps: {
-          // AQUI ESTÁ A MÁGICA: Usando a variável do .env
           apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
         }
       },
-      predictiveBackGestureEnabled: false,
-      package: "com.herbertcarvalho021.exploraenew"
+      predictiveBackGestureEnabled: false
     },
     web: {
       favicon: "./assets/branding/favicon.png",
@@ -51,7 +55,7 @@ export default {
       "expo-router",
       "expo-font",
       "expo-secure-store",
-      [
+      [ // <-- Da sua branch
         "expo-build-properties",
         {
           android: {
