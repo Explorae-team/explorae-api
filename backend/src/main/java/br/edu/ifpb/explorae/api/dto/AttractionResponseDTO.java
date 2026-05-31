@@ -14,7 +14,7 @@ public record AttractionResponseDTO(
         String distance,
         Integer priceRange,
         Boolean isPartner,
-        CoordinateDTO coordinate // NOVO CAMPO: Objeto aninhado para o mapa
+        CoordinateDTO coordinate
 ) {
     // Record interno para gerar o formato JSON: "coordinate": { "latitude": X, "longitude": Y }
     public record CoordinateDTO(Double latitude, Double longitude) {}
@@ -36,7 +36,7 @@ public record AttractionResponseDTO(
                 distance != null ? distance : "Localizando...",
                 attraction.getPriceRange(),
                 attraction.getIsPartner(),
-                new CoordinateDTO(attraction.getLatitude(), attraction.getLongitude()) // Preenchendo as coordenadas
+                new CoordinateDTO(attraction.getLatitude(), attraction.getLongitude())
         );
     }
 }

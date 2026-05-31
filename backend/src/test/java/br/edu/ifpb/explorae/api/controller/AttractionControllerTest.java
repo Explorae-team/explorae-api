@@ -57,11 +57,20 @@ class AttractionControllerTest {
     @Test
     @DisplayName("Deve retornar dados paginados corretamente")
     void shouldReturnPaginatedData() throws Exception {
-        // ADICIONADO: new AttractionResponseDTO.CoordinateDTO(...) como 10º parâmetro
+        // Agora incluímos o 10º parâmetro: new CoordinateDTO(...)
         AttractionResponseDTO dto = new AttractionResponseDTO(
-                UUID.randomUUID(), "Farol", "Cat", "Short", 4.5, "url", "2.5 km", 2, false,
+                UUID.randomUUID(), 
+                "Farol", 
+                "Cat", 
+                "Short", 
+                4.5, 
+                "url", 
+                "2.5 km", 
+                2, 
+                false,
                 new AttractionResponseDTO.CoordinateDTO(-7.14, -34.80) 
         );
+        
         Page<AttractionResponseDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
 
         when(service.findAll(any(), any())).thenReturn(page);
@@ -70,6 +79,9 @@ class AttractionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].name").value("Farol"))
+                // Adicionamos a expectativa para o campo de coordenadas, garantindo a integração com o mapa
+                .andExpect(jsonPath("$.data.content[0].coordinate.latitude").value(-7.14))
+                .andExpect(jsonPath("$.data.content[0].coordinate.longitude").value(-34.80))
                 .andExpect(jsonPath("$.data.totalElements").value(1))
                 .andExpect(jsonPath("$.data.size").value(5));
     }
