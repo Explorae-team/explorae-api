@@ -74,6 +74,11 @@ coverage/
 # Testes
 reports/
 test-results/
+playwright-report/
+e2e_*_report.md
+frontend/e2e_report.md
+frontend/scripts/*.png
+docs/e2e_testing_roadmap_and_gaps.md
 
 # Documentação e outras exceções
 HELP.md

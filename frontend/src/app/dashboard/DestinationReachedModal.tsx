@@ -25,21 +25,21 @@ export default function DestinationReachedModal({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        {/* Top Navigation */}
         <View style={styles.navBar}>
-          <TouchableOpacity onPress={onClose} style={styles.iconButton}>
+          <TouchableOpacity 
+            onPress={onClose} 
+            style={styles.iconButton}
+            testID="close-modal-btn"
+          >
             <MaterialIcon name="close" size={24} color="#fd6c28" />
           </TouchableOpacity>
           <Text style={styles.navTitle}>Destino Alcançado</Text>
-          <View style={{ width: 40 }} /> {/* Spacer */}
+          <View style={{ width: 40 }} />
         </View>
 
-        {/* Main Content */}
         <View style={styles.mainContent}>
-          {/* Background Ambient Glow (Simulado) */}
           <View style={styles.glowBackground} />
 
-          {/* Achievement Badge */}
           <View style={styles.badgeContainer}>
             <View style={styles.badgeCircle}>
               <MaterialIcon name="military-tech" size={80} color="#00161e" />
@@ -50,7 +50,6 @@ export default function DestinationReachedModal({
             </View>
           </View>
 
-          {/* Typography */}
           <View style={styles.textContainer}>
             <Text style={styles.headline}>
               Você chegou a {destinationName}!
@@ -64,15 +63,18 @@ export default function DestinationReachedModal({
             </Text>
           </View>
 
-          {/* Action Button */}
           <View style={styles.actionContainer}>
-            <TouchableOpacity style={styles.primaryButton} onPress={onConfirm} activeOpacity={0.8}>
+            <TouchableOpacity 
+              style={styles.primaryButton} 
+              onPress={onConfirm} 
+              activeOpacity={0.8}
+              testID="confirm-modal-btn"
+            >
               <Text style={styles.primaryButtonText}>Confirmar e Continuar</Text>
             </TouchableOpacity>
             <Text style={styles.earlyAccessText}>Exploraê Early Access</Text>
           </View>
 
-          {/* Bento Stats */}
           <View style={styles.bentoGrid}>
             <View style={styles.bentoCard}>
               <Text style={styles.bentoLabel}>Média</Text>
