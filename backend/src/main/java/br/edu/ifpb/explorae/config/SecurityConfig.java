@@ -1,5 +1,6 @@
 package br.edu.ifpb.explorae.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,9 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${cors.allowed.origins:*}")
+    private String allowedOrigins;
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final br.edu.ifpb.explorae.api.security.RateLimitFilter rateLimitFilter;
@@ -89,10 +93,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Em produção, use o link do frontend no lugar do "*"
-        configuration.setAllowedOrigins(List.of("*")); 
+        if ("*".equals(allowedOrigins)) {
+            // Se for "*", usamos allowedOriginPatterns para suportar credenciais e cabeçalhos de forma flexível
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            // Caso contrário, dividimos as origens configuradas por vírgula
+            configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        }
+        
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // Permitir envio de headers de autenticação (Authorization)
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); 
