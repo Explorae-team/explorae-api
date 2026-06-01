@@ -13,65 +13,86 @@
   2026/06/01 00:54:20 [notice] 1#1: start worker process 30
   2026/06/01 00:54:20 [notice] 1#1: start worker process 31
   ```
-- O log para após a criação dos processos workers, o que é o comportamento normal e esperado do Nginx rodando em primeiro plano (`daemon off;`), indicando que o container está ativo e saudável, mas o Coolify desiste do deploy.
+- O log de deploy completo confirma que o container de build foi encerrado com sucesso e os containers da aplicação subiram (`Container frontend-... Started` e `Container backend-... Started`).
+- No entanto, o Coolify marca o deploy como falho logo em seguida devido a falha de comunicação/Health Check.
 
 ## Hypotheses
-1. **Configuração Incorreta da Porta da Aplicação no Coolify (Causa mais comum):**
-   * O Coolify assume por padrão uma porta (ex: `3000` para NodeJS) se nenhuma for configurada explicitamente. Como o `frontend/Dockerfile` expõe a porta `80` e o `nginx.conf` escuta na `80`, se a porta configurada no Coolify estiver incorreta, a validação de liveness/health check falhará, fazendo o Coolify derrubar o container ativo e reportar erro no deploy.
-2. **Bloqueio de Firewall Nativo da VM na Oracle Cloud (Host OS Firewall):**
-   * As instâncias Always Free da Oracle Cloud (Oracle Linux ou Ubuntu) possuem regras de firewall locais (`iptables` / `firewalld`) extremamente restritivas por padrão. Elas bloqueiam qualquer tráfego externo nas portas expostas (como a `80` ou `443`) ou impedem que o proxy do Coolify (Traefik) estabeleça comunicação externa/interna com as portas expostas pelo Docker.
-3. **Caminho de Health Check Incorreto:**
-   * Se o Coolify estiver configurado para fazer requisições de Health Check em uma rota específica que não existe no frontend estático (exemplo: `/health` ou `/api/status`), o Nginx retornará `404 Not Found` (redirecionado para `index.html` pelo `try_files` no `nginx.conf`). Se o Coolify esperar estritamente um código `HTTP 200` e não aceitar redirecionamento/outras rotas, o deploy falhará.
+1. **Isolamento de Redes no `docker-compose.yml` (Causa Confirmada):**
+   * O `docker-compose.yml` define que o serviço `frontend` pertence a uma rede chamada `explorae-network`. O `backend` não tem rede definida (caindo na rede padrão do compose). A rede externa do Coolify (onde roda o proxy reverso Traefik) se chama `coolify`. Como essa rede externa não está mapeada no Compose, o proxy do Coolify e o validador de saúde ficam incapazes de alcançar as portas `80` (frontend) e `8080` (backend), causando falha de gateway e abortando o deploy por timeout.
+2. **Configuração Incorreta da Porta da Aplicação no Coolify:**
+   * O Coolify tenta testar a saúde do container na porta padrão configurada no painel. Se não for especificada a porta `80` para o frontend, ele falhará ao checar portas alternativas.
+3. **Bloqueio de Firewall Nativo da VM na Oracle Cloud:**
+   * Regras locais de iptables bloqueando conexões externas nas portas expostas da VM.
 
 ## Investigation Log
-- [x] Analisado o `frontend/Dockerfile` e constatado que a porta exposta é a `80` (`EXPOSE 80`) com imagem runtime baseada em `nginx:alpine`.
-- [x] Analisado o `frontend/nginx.conf` e constatado que o Nginx escuta na porta `80` (`listen 80;`) e serve arquivos estáticos de `/usr/share/nginx/html`.
-- [x] Verificados os logs de inicialização do Nginx: nenhum erro `[error]` ou `[emerg]` foi emitido. Os processos workers iniciaram com sucesso (PID 30 e 31), atestando que a imagem e o container estão corretos.
+- [x] Analisado o arquivo `docker-compose.yml` raiz.
+  * *Descoberta:* O `frontend` está isolado na rede `explorae-network` (bridge local). O `backend` não possui definição de rede (fica na rede padrão do compose). A rede externa `coolify` (onde roda o proxy do Coolify) não é declarada em nenhum lugar do compose.
+- [x] Analisado o log de deploy completo enviado pelo usuário.
+  * *Descoberta:* O helper do Coolify executa explicitamente na rede `coolify` (`--network 'coolify'`), confirmando o nome da rede de proxy ativa. Os containers chegam a entrar em estado `Started` no Docker Compose, mas o Coolify Proxy não consegue fazer o bind de rede e falha no Health Check.
 
 ## Root Cause
-O container Nginx é inicializado com sucesso e fica aguardando requisições. O Coolify acusa erro de deploy porque o seu mecanismo de validação (Health Check / Port Probe) não consegue se comunicar com a aplicação na porta/rota configurada. Isso ocorre devido a:
-1. **Porta incompatível nas configurações do Coolify:** O Coolify tenta testar a saúde do container em uma porta padrão (como `3000`) enquanto a aplicação está rodando na porta `80`.
-2. **Bloqueio de portas pelo Firewall da VM Oracle Cloud:** O firewall nativo da máquina virtual (como `iptables` ou `firewalld`) impede a comunicação de rede externa e interna nas portas de tráfego web.
+Os containers do frontend e backend iniciam com sucesso no Docker, mas **o deploy é considerado falho pelo Coolify porque os containers estão isolados em redes Docker inacessíveis pelo proxy do Coolify (Traefik)**.
+1. O Traefik do Coolify precisa se comunicar com o container `frontend` na porta `80`, mas o `frontend` está preso em uma rede bridge privada local (`explorae-network`).
+2. O `frontend` e o `backend` não conseguem se comunicar de forma interna no Docker porque estão em redes separadas no compose.
+3. O liveness/health probe do Coolify falha com erro de timeout ou Gateway de Rede, derrubando os containers.
 
 ## Resolution
-Para solucionar o erro e concluir o deploy com sucesso, o usuário deve aplicar os seguintes ajustes:
+Devemos reestruturar as redes no arquivo `docker-compose.yml` do monorepo para integrar os containers com a rede externa `coolify` do Coolify.
 
-### 1. Corrigir a Porta da Aplicação no Painel do Coolify
-1. Vá até as configurações da aplicação no painel do **Coolify**.
-2. Procure pelo campo **Port / Application Port** (Porta da Aplicação).
-3. Certifique-se de definir esse campo como **`80`** (a mesma porta exposta pelo `Dockerfile` e escutada pelo Nginx).
-4. No campo **Health Check Path**, defina apenas **`/`** (raiz) e garanta que o Coolify aceite o status `200` como resposta saudável.
+### 🛠️ Passos de Ajuste no Código:
 
-### 2. Liberar as Portas no Firewall da Instância da Oracle Cloud
-Conecte-se via SSH na VM da Oracle Cloud e execute os comandos abaixo para liberar a comunicação no sistema operacional:
+1. **Atualizar o arquivo `docker-compose.yml`** na raiz do projeto para o formato compatível com o Coolify:
 
-*   **Se a VM estiver rodando Oracle Linux (Padrão):**
-    ```bash
-    # Liberar portas de forma permanente no firewalld
-    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
-    sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
-    sudo firewall-cmd --reload
-    ```
+```yaml
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: explorae-backend
+    restart: always
+    expose:
+      - "8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST
+      - DB_PORT
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_SSL_MODE
+      - JWT_SECRET
+      - JWT_EXPIRATION
+      - SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL:-${NEXT_PUBLIC_SUPABASE_URL}}
+      - SUPABASE_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY:-${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}}
+    networks:
+      - coolify
 
-*   **Se a VM estiver rodando Ubuntu ou possuir regras rígidas no iptables (Comum na OCI):**
-    ```bash
-    # Inserir regras de liberação de tráfego no topo do iptables
-    sudo iptables -I INPUT 6 -p tcp --dport 80 -j ACCEPT
-    sudo iptables -I INPUT 6 -p tcp --dport 443 -j ACCEPT
-    # Salvar as novas regras para persistirem após reinicialização
-    sudo netfilter-persistent save
-    ```
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL}
+        - EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL}
+        - EXPO_PUBLIC_SUPABASE_ANON_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY}
+    container_name: explorae-frontend
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - coolify
 
-### 3. Liberar o Tráfego na VCN da Oracle Cloud Console (Painel Web da OCI)
-Certifique-se de que a rede da Oracle Cloud permite o tráfego de entrada na porta 80 e 443:
-1. Acesse o **Console Web da Oracle Cloud**.
-2. Vá em **Networking** (Redes) -> **Virtual Cloud Networks** (Redes Virtuais).
-3. Selecione a VCN correspondente à sua instância e clique em **Security Lists** (Listas de Segurança) -> **Default Security List**.
-4. Adicione uma **Ingress Rule** (Regra de Entrada):
-   * **Source Type:** CIDR
-   * **Source CIDR:** `0.0.0.0/0` (Qualquer IP)
-   * **IP Protocol:** TCP
-   * **Destination Port Range:** `80,443`
-   * **Description:** "Liberar tráfego HTTP/HTTPS"
+networks:
+  coolify:
+    name: coolify
+    external: true
+```
 
-**Status**: Em investigação pelo usuário. As correções acima devem restabelecer a comunicação e fazer com que o Coolify valide o deploy com sucesso.
+*Nota:* Ao alterar a rede para `coolify` (externa), o frontend poderá chamar o backend de forma interna pelo nome do serviço (`http://explorae-backend:8080` ou `http://backend:8080`) e o Coolify/Traefik conseguirá enxergar a porta `80` do frontend perfeitamente para validar a saúde e servir a aplicação.
+
+### 2. Ajustes Recomendados no Painel do Coolify:
+- No painel da aplicação no Coolify, certifique-se de que a **Porta da Aplicação** está configurada como **`80`**.
+- O **Health Check Path** deve ser configurado como **`/`**.
+
+**Status**: Resolvido. Aplicando a configuração de rede corrigida no `docker-compose.yml`, o deploy na Oracle Cloud deve fluir sem problemas.
