@@ -25,4 +25,6 @@
     <include file="db/changelog/changes/018-create-challenges-tables.xml"/>
     <include file="db/changelog/changes/019-add-coins-to-xp-history.xml"/>
     <include file="db/changelog/changes/020-add-photo-to-attraction-reviews.xml"/>
+    <include file="db/changelog/changes/021-create-rewards-tables.xml"/>
+    <include file="db/changelog/changes/022-add-expires-at-to-vouchers.xml"/>
 </databaseChangeLog>
