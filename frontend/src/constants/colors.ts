@@ -14,6 +14,7 @@ export const colors = {
   
   // Cores de Identidade de Marca (Branding/Logo)
   brandBlue: '#0E566A',
+  brandBlueLight: '#29b6f6', // Azul celeste brilhante para contrastar no tema escuro
   brandOrangeLight: '#F37640',
   brandOrangeDark: '#DF6430',
   brandCompassLight: '#F26732',

@@ -6,6 +6,7 @@ import { colors } from '../../constants/colors';
 
 interface LogoWithTextProps {
   size?: number; // Altura geral recomendada do componente (ex: 80, 100, 120)
+  textColor?: string; // Cor customizada opcional para o texto "Explora"
   style?: StyleProp<ViewStyle>;
 }
 
@@ -18,6 +19,7 @@ interface LogoWithTextProps {
  */
 export const LogoWithText: React.FC<LogoWithTextProps> = ({ 
   size = 100,
+  textColor,
   style 
 }) => {
   // Fatores de escala dinâmicos com base no tamanho fornecido
@@ -44,7 +46,7 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
 
       {/* 2. Bloco de Texto Unificado (Garante baseline perfeito e evita desalinhamento vertical) */}
       <View style={styles.textWrapper}>
-        <Text style={[styles.textBase, { fontSize, lineHeight: fontSize * 1.25 }]}>
+        <Text style={[styles.textBase, { fontSize, lineHeight: fontSize * 1.25 }, textColor ? { color: textColor } : null]}>
           Explora
           <Text style={styles.textE}>e</Text>
         </Text>
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
   textBase: {
     fontFamily: 'System', // Excelente renderização e alinhamento cross-platform
     fontWeight: '900',
-    color: colors.brandBlue,
+    color: colors.brandBlueLight,
     letterSpacing: -1,
   },
   textE: {
