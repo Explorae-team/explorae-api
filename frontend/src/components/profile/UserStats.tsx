@@ -108,10 +108,10 @@ export default function UserStats() {
   };
 
   const getTierColor = (xp: number) => {
-    if (xp < 1000) return '#CD7F32'; // Bronze/Cobre
-    if (xp < 2000) return '#C0C0C0'; // Prata
-    if (xp < 3000) return '#FFD700'; // Ouro
-    return '#40E0D0'; // Platina/Turquesa
+    if (xp < 1000) return '#CD7F32';
+    if (xp < 2000) return '#C0C0C0';
+    if (xp < 3000) return '#FFD700';
+    return '#40E0D0';
   };
 
   const tierColor = getTierColor(xp);
@@ -146,7 +146,6 @@ export default function UserStats() {
                   <MaterialIcons name="person" size={64} color={tierColor} />
                 </View>
               )}
-              {/* Overlay de Câmera */}
               <View className="absolute inset-0 bg-black/20 items-center justify-center rounded-full opacity-0 hover:opacity-100">
                  <MaterialIcons name="camera-alt" size={24} color="white" />
               </View>

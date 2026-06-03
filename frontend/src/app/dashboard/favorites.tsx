@@ -35,19 +35,18 @@ export default function FavoritesScreen() {
     }
   };
 
-  // Estilo do container de grid — 3 colunas no web, 1 coluna no mobile
+  // Grid responsivo: 3 colunas na web e 1 no mobile
   const gridContainerStyle = Platform.OS === 'web'
     ? { flexDirection: 'row' as const, flexWrap: 'wrap' as const, marginHorizontal: -8 }
     : { flexDirection: 'column' as const };
 
-  // Estilo de cada item — 1/3 de largura no web, largura total no mobile
+  // Ajusta o tamanho do card conforme a tela
   const cardWrapperStyle = (index: number) => Platform.OS === 'web'
     ? { width: '33.33%' as any, paddingHorizontal: 8, marginBottom: 32 }
     : { marginBottom: 40 };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#001b24', paddingTop: insets.top }}>
-      {/* Header Personalizado */}
       <View style={{ 
         flexDirection: 'row', 
         alignItems: 'center', 
@@ -94,7 +93,7 @@ export default function FavoritesScreen() {
               </Text>
               <TouchableOpacity 
                 onPress={() => fetchFavorites()}
-                style={{ marginTop: 24, backgroundColor: '#002e3c', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, borderHeight: 1, borderColor: 'rgba(255,255,255,0.1)' }}
+                style={{ marginTop: 24, backgroundColor: '#002e3c', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}
               >
                 <Text style={{ color: '#fd6c28', fontWeight: '700' }}>Tentar Novamente</Text>
               </TouchableOpacity>
@@ -121,7 +120,7 @@ export default function FavoritesScreen() {
               <Text style={{ fontSize: 18, fontWeight: '700', color: '#bde9fe', marginBottom: 8, textAlign: 'center' }}>
                 Sua lista está vazia
               </Text>
-              <Text style={{ fontSize: 14, color: '#8b9296', textAlign: 'center', marginBottom: 24, leadingHeight: 20 }}>
+              <Text style={{ fontSize: 14, color: '#8b9296', textAlign: 'center', marginBottom: 24, lineHeight: 20 }}>
                 Salve as atrações que você mais gostou clicando no ícone de coração na tela de detalhes para visualizá-las aqui.
               </Text>
               <TouchableOpacity 

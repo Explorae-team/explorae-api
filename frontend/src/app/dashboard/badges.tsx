@@ -112,7 +112,7 @@ export default function BadgesScreen() {
 
   return (
     <View className="flex-1 bg-[#00161e]">
-      {/* Header Fixo */}
+      {/* Cabeçalho da tela */}
       <View
         className="flex-row justify-between items-center px-6 pb-4 border-b border-white/5 bg-[#00161e]/95 z-10"
         style={{ paddingTop: insets.top + 16 }}
@@ -124,7 +124,7 @@ export default function BadgesScreen() {
         <View className="w-10 h-10" />
       </View>
 
-      {/* Tabs */}
+      {/* Abas de navegação */}
       <View className="flex-row px-6 py-4 bg-[#002532]/40 border-b border-white/5">
         <TouchableOpacity
           onPress={() => setActiveTab('MEDALS')}
@@ -155,7 +155,6 @@ export default function BadgesScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Conteúdo */}
       {isLoading ? (
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#fd6c28" />
@@ -176,7 +175,7 @@ export default function BadgesScreen() {
         >
           {activeTab === 'MEDALS' ? (
             <View>
-              {/* Resumo de Medalhas */}
+              {/* Progresso de conquistas da coleção */}
               <LinearGradient
                 colors={['#002532', '#001b25']}
                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}
@@ -195,7 +194,7 @@ export default function BadgesScreen() {
                 </View>
               </LinearGradient>
 
-              {/* Grid de Medalhas */}
+              {/* Grade de medalhas do explorador */}
               <View className="flex-row flex-wrap justify-between">
                 {allBadges.map((badge) => {
                   const isUnlocked = unlockedBadgeIds.has(badge.id);
@@ -252,7 +251,6 @@ export default function BadgesScreen() {
             </View>
           ) : (
             <View>
-              {/* Desafios Diários */}
               <Text className="text-white/50 text-xs font-bold uppercase tracking-widest mb-4 font-sans">
                 Desafios Diários
               </Text>
@@ -270,7 +268,6 @@ export default function BadgesScreen() {
                 ))
               )}
 
-              {/* Desafios Semanais */}
               <Text className="text-white/50 text-xs font-bold uppercase tracking-widest mt-4 mb-4 font-sans">
                 Desafios Semanais
               </Text>
@@ -288,7 +285,6 @@ export default function BadgesScreen() {
                 ))
               )}
 
-              {/* Desafios Especiais */}
               {specialChallenges.length > 0 && (
                 <>
                   <Text className="text-white/50 text-xs font-bold uppercase tracking-widest mt-4 mb-4 font-sans">
@@ -308,7 +304,7 @@ export default function BadgesScreen() {
         </ScrollView>
       )}
 
-      {/* Modal de Detalhes Reutilizável */}
+      {/* Modal de detalhes da conquista selecionada */}
       <BadgeDetailModal
         visible={!!selectedItem}
         item={selectedItem}

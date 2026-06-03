@@ -24,7 +24,7 @@ export default function StatsGrid() {
       count: coins.toLocaleString(), 
       label: 'ExploraCoins', 
       sub: 'Ir para a Loja',
-      color: '#FFD700' // Moedas sempre douradas
+      color: '#FFD700'
     },
     { 
       icon: 'location-on', 
@@ -45,7 +45,7 @@ export default function StatsGrid() {
       count: (user?.activeChallengesCount || 0).toString(), 
       label: 'Quests', 
       sub: 'Desafios ativos',
-      color: '#40E0D0' // Quests azul turquesa/raio
+      color: '#40E0D0'
     },
   ];
 

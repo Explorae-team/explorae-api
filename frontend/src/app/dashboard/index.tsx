@@ -19,7 +19,6 @@ import { useFavorites } from '../../services/useFavorites';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import api from '../../services/api';
 
-// Components
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
 import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
 import { DailyChallengeCard } from '../../components/dashboard/DailyChallengeCard';
@@ -57,13 +56,24 @@ export default function ExploreScreen() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({ 
-            accuracy: Location.Accuracy.Balanced 
-          });
-          setCoords({ 
-            latitude: location.coords.latitude, 
-            longitude: location.coords.longitude 
-          });
+          // Timeout de 3 segundos para evitar travamentos infinitos no GPS do celular
+          const locationPromise = Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+          const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+          
+          const loc = await Promise.race([locationPromise, timeoutPromise]) as any;
+          if (loc && loc.coords) {
+            setCoords({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+          } else {
+            // Se der timeout, tenta a última localização conhecida ou usa o fallback
+            const lastLoc = await Location.getLastKnownPositionAsync({});
+            if (lastLoc) {
+              setCoords({ latitude: lastLoc.coords.latitude, longitude: lastLoc.coords.longitude });
+            } else {
+              setCoords({ latitude: -7.1196, longitude: -34.8450 });
+            }
+          }
+        } else {
+          setCoords({ latitude: -7.1196, longitude: -34.8450 });
         }
         // Se não concedido, ele mantém o valor inicial de João Pessoa
       } catch (err) {
@@ -75,7 +85,6 @@ export default function ExploreScreen() {
 
   const hasActiveFilters = selectedCategory !== null || activeFilters !== null;
 
-  // Constrói objeto de filtros para o hook
   const filters = useMemo(() => ({
     category: selectedCategory || undefined,
     minRating: activeFilters?.minRating || undefined,
@@ -94,14 +103,14 @@ export default function ExploreScreen() {
     loadMore
   } = useExploreData(filters);
 
-  // Carrossel superior (size 15 - sliced to top 10)
+  // Recomendação horizontal de maior afinidade e geolocalização (limita a 10 itens)
   const {
     recommendations: recsTop,
     isLoading: isLoadingRecsTop,
     refresh: refreshRecsTop
   } = useRecommendations(coords.latitude, coords.longitude, 15);
 
-  // Feed vertical "Descubra" paginado (size 10)
+  // Feed de recomendação paginado para rolagem vertical
   const {
     recommendations: recsVertical,
     isLoading: isLoadingRecsVert,
@@ -191,15 +200,13 @@ export default function ExploreScreen() {
       >
         <View style={{ gap: 32 }}>
 
-          {/* Hero: User Stats */}
           <UserProgressHero
             userName={user?.name || 'Explorador'}
             level={user?.level || 1}
             currentXp={user?.xp || 0}
-            nextLevelXp={(user?.level || 1) * 100} // Fórmula baseada na decisão técnica
+            nextLevelXp={(user?.level || 1) * 100} // Fórmula padrão de progressão: nível * 100 XP
           />
 
-          {/* Active Challenges Carousel */}
           <View style={{ gap: 16 }}>
             <View className="flex-row justify-between items-center px-6">
               <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
@@ -247,13 +254,11 @@ export default function ExploreScreen() {
             )}
           </View>
 
-          {/* Categories */}
           <CategoryCarousel 
             selectedCategoryId={selectedCategory}
             onSelect={handleCategorySelect}
           />
 
-          {/* Recommendations Feed */}
           <View style={{ gap: 24 }}>
             <View className="flex-row justify-between items-center px-6">
               <Text className="text-sm font-bold uppercase tracking-widest text-on-surface-variant">
@@ -299,13 +304,10 @@ export default function ExploreScreen() {
             )}
           </View>
 
-          {/* Top Visited */}
           <TopVisitedList attractions={attractions} />
 
-          {/* Map Quick Access */}
           <MapQuickAccess onPress={() => console.log('Open Map')} />
 
-          {/* Vertical Feed (Paginated) */}
           <View style={Platform.OS === 'web'
             ? { paddingBottom: 128 }
             : { paddingHorizontal: 24, paddingBottom: 128 }

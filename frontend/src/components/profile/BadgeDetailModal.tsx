@@ -6,7 +6,6 @@ import { ProgressBar } from '../common/ProgressBar';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
-// Mapeamento de cores para categorias de medalhas
 const CATEGORY_COLORS = {
   'ONBOARDING': '#ffba26',
   'EXPLORACAO': '#fd6c28',
@@ -41,7 +40,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
 
   const modalContent = (
     <View className="bg-[#002532] rounded-3xl p-6 border border-white/10 w-[90%] max-w-[400px] items-center">
-      {/* Header com Categoria */}
       <View className="w-full flex-row justify-between items-center mb-4">
         <Text className="text-white/40 text-xs font-bold uppercase tracking-widest">
           {type === 'BADGE' ? `Medalha • ${CATEGORY_LABELS[data.category as keyof typeof CATEGORY_LABELS] || data.category}` : 'Desafio'}
@@ -51,7 +49,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
         </TouchableOpacity>
       </View>
 
-      {/* Ícone */}
       <View 
         className="w-28 h-28 rounded-full bg-[#00161e] items-center justify-center border-4 mb-4 relative"
         style={{ 
@@ -89,7 +86,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
         )}
       </View>
 
-      {/* Título e Descrição */}
       <Text className="text-white text-xl font-bold text-center mb-2 font-sans">
         {type === 'BADGE' ? data.name : data.title}
       </Text>
@@ -97,7 +93,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
         {type === 'BADGE' ? data.description : data.description}
       </Text>
 
-      {/* Status / Recompensas */}
       {type === 'BADGE' ? (
         <View className="w-full mb-6">
           <View className="w-full bg-[#00161e] p-4 rounded-2xl border border-white/5 items-center mb-4">
@@ -117,7 +112,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
             </View>
           </View>
 
-          {/* Barra de Progresso da Medalha Bloqueada */}
           {!isUnlocked && data.targetValue !== undefined && data.targetValue !== null && (
             <View className="bg-[#00161e] p-4 rounded-2xl border border-white/5">
               <View className="flex-row justify-between items-center mb-2">
@@ -135,7 +129,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
         </View>
       ) : (
         <View className="w-full mb-6">
-          {/* Barra de Progresso no Modal */}
           <View className="bg-[#00161e] p-4 rounded-2xl border border-white/5 mb-4">
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-white/60 text-xs font-bold font-sans">Progresso</Text>
@@ -149,7 +142,6 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
             />
           </View>
 
-          {/* Recompensas */}
           <View className="flex-row justify-between">
             <View className="flex-1 bg-[#00161e] p-3 rounded-2xl border border-white/5 items-center mr-2">
               <Text className="text-white/40 text-[10px] font-bold uppercase mb-1">XP</Text>

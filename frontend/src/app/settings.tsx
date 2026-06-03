@@ -54,10 +54,10 @@ export default function SettingsScreen() {
   };
 
   return (
-    // KeyboardAvoidingView + flex:1 no View raiz garante scroll correto no mobile
+    // Container principal configurado com a cor escura do app
     <View style={{ flex: 1, backgroundColor: '#001b24' }}>
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Header fixo fora do ScrollView */}
+        {/* Cabeçalho superior fixo */}
         <View
           style={{
             flexDirection: 'row',
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
           <View style={{ width: 40 }} />
         </View>
 
-        {/* ScrollView ocupa o resto — flex:1 aqui é crítico para o scroll funcionar */}
+        {/* ScrollView flexível para permitir rolagem das opções no mobile */}
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 48 }}
@@ -86,7 +86,6 @@ export default function SettingsScreen() {
           bounces={true}
           alwaysBounceVertical={false}
         >
-          {/* Grupo 1: Experiência */}
           <SettingsGroup>
             <SettingsItem
               icon="explore"
@@ -108,7 +107,6 @@ export default function SettingsScreen() {
             />
           </SettingsGroup>
 
-          {/* Grupo 2: Privacidade & Notificações */}
           <SettingsGroup>
             <SettingsItem
               icon="lock"
@@ -136,7 +134,6 @@ export default function SettingsScreen() {
             />
           </SettingsGroup>
 
-          {/* Grupo 3: Segurança & Dados */}
           <SettingsGroup>
             <SettingsItem
               icon="shield"
@@ -158,7 +155,15 @@ export default function SettingsScreen() {
             />
           </SettingsGroup>
 
-          {/* Logout */}
+          <SettingsGroup>
+            <SettingsItem
+              icon="qr-code-scanner"
+              title="Validador de Vouchers"
+              description="Escanear e validar benefícios de clientes"
+              onPress={() => router.push('/dashboard/scanner' as any)}
+            />
+          </SettingsGroup>
+
           <TouchableOpacity
             onPress={handleLogout}
             style={{

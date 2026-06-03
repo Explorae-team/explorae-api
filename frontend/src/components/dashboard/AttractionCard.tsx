@@ -20,7 +20,6 @@ interface AttractionCardProps {
   onFavoritePress?: () => void;
 }
 
-// Tokens de Cor do Design System Exploraê
 const colors = {
   surfaceContainerHigh: '#002e3c',
   surfaceBright: '#0d3e4e',
@@ -58,7 +57,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
       setImgUri(defaultFallback);
     }
   }, [imageUrl]);
-  // --- VARIANT: COMPACT (Used in horizontal carousels) ---
+  // Variante compacta para carrosséis horizontais
   if (variant === 'compact') {
     return (
       <Pressable 
@@ -101,7 +100,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
     );
   }
 
-  // --- VARIANT: DEFAULT (Full premium layout for vertical feed) ---
+  // Variante padrão para o feed vertical principal
   return (
     <Pressable 
       onPress={onPress}
@@ -124,7 +123,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
       }}
       className="rounded-2xl overflow-hidden border border-white/5"
     >
-      {/* SECTION 1: HERO IMAGE */}
       <View className="h-40 w-full relative">
         <Image 
           source={{ uri: imgUri }} 
@@ -133,7 +131,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           onError={() => setImgUri(defaultFallback)}
         />
         
-        {/* Category Badge (Top-Left) */}
         <View 
           style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
           className="absolute top-3 left-3 px-3 py-1 rounded-full flex-row items-center space-x-1.5 shadow-sm"
@@ -147,7 +144,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </Text>
         </View>
 
-        {/* Favorite Button (Top-Right) */}
         <Pressable 
           onPress={onFavoritePress}
           testID="favorite-button"
@@ -161,7 +157,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           />
         </Pressable>
 
-        {/* Status Badges (Top-Left - Below Category) */}
         <View className="absolute top-12 left-3 flex-col space-y-1.5">
           {isPopular && (
             <View 
@@ -191,9 +186,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         </View>
       </View>
 
-      {/* SECTION 2: CONTENT AREA (padding: 16px, gap: 8px) */}
       <View className="p-4 flex-col">
-        {/* Metadata Row (Rating & Distance) */}
         <View className="flex-row items-center space-x-4 mb-2">
           <View className="flex-row items-center space-x-1">
             <MaterialIcons name="star" size={14} color={colors.tertiary} />
@@ -210,7 +203,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </View>
         </View>
 
-        {/* Title + Tagline */}
         <View className="mb-2">
           <Text 
             numberOfLines={2} 
@@ -228,7 +220,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </Text>
         </View>
 
-        {/* Tags Row */}
         <View className="flex-row flex-wrap gap-2 mt-1">
           {tags.slice(0, 3).map((tag, index) => (
             <View 

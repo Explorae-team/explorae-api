@@ -80,10 +80,9 @@ export default function LoginScreen() {
         className="px-6"
         showsVerticalScrollIndicator={false}
       >
-        {/* Decorative Background Elements (Representação simplificada de UI em Native) */}
+        {/* Círculo decorativo laranja desfocado ao fundo */}
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-[#fd6c28]/10 rounded-full blur-[80px]" />
         
-        {/* Central Card */}
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
           <View className="items-center mb-8">
             <Logo size={80} />
@@ -157,7 +156,6 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        {/* Footer Link */}
         <View className="mt-10 flex-row justify-center">
           <Text className="text-[#bde9fe] font-medium text-sm">
             Não tem uma conta?
