@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, Modal, SafeAreaView, Pressable, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
 
@@ -72,6 +72,9 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
 }
 
 const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: string; text: string; rating?: number; userPhotoUrl?: string; photoUrl?: string }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
+
   const avatarUrl = userPhotoUrl 
     ? (userPhotoUrl.startsWith('http') ? userPhotoUrl : `${API_URL}${userPhotoUrl}`)
     : null;
@@ -110,11 +113,46 @@ const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: str
         </View>
         <Text className="text-explora-blue/70 text-sm mt-1 leading-5">{text}</Text>
         {reviewPhotoUrl && (
-          <Image 
-            source={{ uri: reviewPhotoUrl }} 
-            className="w-full h-44 rounded-2xl mt-3" 
-            resizeMode="cover"
-          />
+          <>
+            <Pressable onPress={() => setIsModalVisible(true)}>
+              <Image 
+                source={{ uri: reviewPhotoUrl }} 
+                className="w-full h-44 rounded-2xl mt-3" 
+                resizeMode="cover"
+              />
+            </Pressable>
+
+            <Modal
+              visible={isModalVisible}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => setIsModalVisible(false)}
+            >
+              <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999 }}>
+                <SafeAreaView style={{ flex: 1 }}>
+                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Pressable
+                      style={{ position: 'absolute', top: 30, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
+                      onPress={() => setIsModalVisible(false)}
+                    >
+                      <MaterialCommunityIcons name="close" size={30} color={colors.accent} />
+                    </Pressable>
+
+                    <Pressable
+                      onPress={() => setIsModalVisible(false)}
+                      style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <Image
+                        source={{ uri: reviewPhotoUrl }}
+                        style={{ width: windowWidth, height: '100%' }}
+                        resizeMode="contain"
+                      />
+                    </Pressable>
+                  </View>
+                </SafeAreaView>
+              </View>
+            </Modal>
+          </>
         )}
       </View>
     </View>
