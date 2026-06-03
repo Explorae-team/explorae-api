@@ -432,7 +432,7 @@ export default function RoutesScreen() {
           <MapView
             ref={mapRef}
             style={StyleSheet.absoluteFill}
-            provider={PROVIDER_GOOGLE}
+            provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
             showsUserLocation={true} 
             showsMyLocationButton={false} 
             customMapStyle={mapStyleOptions}
