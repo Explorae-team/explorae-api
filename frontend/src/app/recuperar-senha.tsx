@@ -89,14 +89,14 @@ export default function RecuperarSenhaScreen() {
         {/* Efeito Atmosférico */}
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-primary/10 rounded-full blur-[80px]" />
 
-        <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center border border-white/20">
+        <View className="bg-surface-container-high rounded-3xl p-8 w-full max-w-[440px] self-center border border-white/5">
           <View className="items-center mb-8">
             <Logo width={80} height={80} />
           </View>
 
           {errors.general && (
-            <View className="bg-red-50 p-4 rounded-xl mb-6">
-              <Text className="text-red-600 text-xs font-semibold">
+            <View className="bg-error/10 p-4 rounded-xl mb-6 border border-error/20">
+              <Text className="text-error text-xs font-semibold">
                 {errors.general}
               </Text>
             </View>
@@ -105,10 +105,10 @@ export default function RecuperarSenhaScreen() {
           {!isSuccess ? (
             <>
               <View className="mb-8">
-                <Text className="text-explora-blue font-bold text-2xl mb-1">
+                <Text className="text-on-surface font-bold text-2xl mb-1">
                   Recuperar Senha
                 </Text>
-                <Text className="text-slate-500 text-sm leading-5">
+                <Text className="text-on-surface-variant text-sm leading-5">
                   Não se preocupe! Informe seu e-mail abaixo e enviaremos as instruções para você criar uma nova senha.
                 </Text>
               </View>
@@ -140,14 +140,14 @@ export default function RecuperarSenhaScreen() {
             </>
           ) : (
             <View className="items-center py-4">
-              <View className="bg-green-100 p-4 rounded-full mb-6">
+              <View className="bg-success/10 p-4 rounded-full mb-6 border border-success/20">
                 <Ionicons name="checkmark-circle" size={64} color={colors.success} />
               </View>
-              <Text className="text-explora-blue font-bold text-2xl mb-2 text-center">
+              <Text className="text-on-surface font-bold text-2xl mb-2 text-center">
                 Link Enviado!
               </Text>
-              <Text className="text-slate-500 text-sm text-center mb-8 leading-5">
-                Verifique sua caixa de entrada em <Text className="font-bold text-explora-blue">{email}</Text> e siga as instruções para redefinir sua senha.
+              <Text className="text-on-surface-variant text-sm text-center mb-8 leading-5">
+                Verifique sua caixa de entrada em <Text className="font-bold text-primary">{email}</Text> e siga as instruções para redefinir sua senha.
               </Text>
               
               <PrimaryButton
