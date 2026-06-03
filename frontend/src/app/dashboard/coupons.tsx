@@ -22,12 +22,9 @@ import { RedeemConfirmationModal } from '../../components/reward/RedeemConfirmat
 import { RedeemSuccessModal } from '../../components/reward/RedeemSuccessModal';
 import { VoucherQRCodeModal } from '../../components/reward/VoucherQRCodeModal';
 import { VoucherHistoryAccordion } from '../../components/reward/VoucherHistoryAccordion';
+import { colors } from '../../constants/colors';
 
 const { width } = Dimensions.get('window');
-
-const colors = {
-  tertiary: '#ffba26',
-};
 
 export default function CouponsScreen() {
   const router = useRouter();
@@ -127,10 +124,10 @@ export default function CouponsScreen() {
   const inactiveVouchers = vouchers.filter(v => v.status === 'USED' || v.status === 'EXPIRED');
 
   return (
-    <View className="flex-1 bg-[#00161e]">
+    <View className="flex-1 bg-background">
       
       <View
-        className="flex-row justify-between items-center px-6 pb-4 border-b border-white/5 bg-[#00161e]/95 z-10"
+        className="flex-row justify-between items-center px-6 pb-4 border-b border-white/5 bg-background/95 z-10"
         style={{ paddingTop: insets.top + 16 }}
       >
         <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-white/5">
@@ -142,7 +139,7 @@ export default function CouponsScreen() {
 
       <View className="px-6 pt-4">
         <LinearGradient
-          colors={['#002532', '#001b25']}
+          colors={[colors.surfaceContainer, colors.surfaceContainerLow]}
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           className="p-5 rounded-2xl border border-white/5"
         >
@@ -152,7 +149,7 @@ export default function CouponsScreen() {
               Explore a cidade, complete desafios e troque seu saldo por vouchers de parceiros locais.
             </Text>
           </View>
-          <View className="flex-row items-center bg-[#fd6c28]/10 border border-[#fd6c28]/25 px-3 py-2 rounded-xl">
+          <View className="flex-row items-center bg-primary/10 border border-primary/25 px-3 py-2 rounded-xl">
             <MaterialIcons name="monetization-on" size={22} color={colors.tertiary} style={{ marginRight: 6 }} />
             <Text style={{ color: colors.tertiary }} className="text-lg font-black font-sans">
               {user?.coins || 0}
@@ -161,16 +158,16 @@ export default function CouponsScreen() {
         </LinearGradient>
       </View>
 
-      <View className="flex-row px-6 py-4 mt-2 bg-[#002532]/40 border-b border-white/5">
+      <View className="flex-row px-6 py-4 mt-2 bg-surface-container/40 border-b border-white/5">
         <TouchableOpacity
           onPress={() => setActiveTab('STORE')}
           className="flex-1 py-3 rounded-xl items-center flex-row justify-center"
-          style={{ backgroundColor: activeTab === 'STORE' ? '#fd6c28' : 'transparent' }}
+          style={{ backgroundColor: activeTab === 'STORE' ? colors.primary : 'transparent' }}
         >
-          <Ionicons name="storefront-outline" size={18} color={activeTab === 'STORE' ? '#00161e' : 'white'} />
+          <Ionicons name="storefront-outline" size={18} color={activeTab === 'STORE' ? colors.background : 'white'} />
           <Text
             className="font-bold ml-2 font-sans text-xs"
-            style={{ color: activeTab === 'STORE' ? '#00161e' : 'white' }}
+            style={{ color: activeTab === 'STORE' ? colors.background : 'white' }}
           >
             Loja
           </Text>
@@ -179,12 +176,12 @@ export default function CouponsScreen() {
         <TouchableOpacity
           onPress={() => setActiveTab('VOUCHERS')}
           className="flex-1 py-3 rounded-xl items-center flex-row justify-center relative"
-          style={{ backgroundColor: activeTab === 'VOUCHERS' ? '#fd6c28' : 'transparent' }}
+          style={{ backgroundColor: activeTab === 'VOUCHERS' ? colors.primary : 'transparent' }}
         >
-          <Ionicons name="ticket-outline" size={18} color={activeTab === 'VOUCHERS' ? '#00161e' : 'white'} />
+          <Ionicons name="ticket-outline" size={18} color={activeTab === 'VOUCHERS' ? colors.background : 'white'} />
           <Text
             className="font-bold ml-2 font-sans text-xs"
-            style={{ color: activeTab === 'VOUCHERS' ? '#00161e' : 'white' }}
+            style={{ color: activeTab === 'VOUCHERS' ? colors.background : 'white' }}
           >
             Meus Vouchers
           </Text>
@@ -198,7 +195,7 @@ export default function CouponsScreen() {
 
       {isLoading ? (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#fd6c28" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text className="text-white/60 mt-4 font-sans text-xs">Carregando dados da loja...</Text>
         </View>
       ) : (
@@ -210,7 +207,7 @@ export default function CouponsScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={handleRefresh}
-              tintColor="#fd6c28"
+              tintColor={colors.primary}
             />
           }
         >
@@ -223,8 +220,8 @@ export default function CouponsScreen() {
           {activeTab === 'STORE' ? (
             <View>
               {rewards.length === 0 ? (
-                <View className="bg-[#002532]/40 border border-white/5 rounded-2xl p-8 items-center mt-4">
-                  <Ionicons name="basket-outline" size={40} color="#3a5866" className="mb-3" />
+                <View className="bg-surface-container/40 border border-white/5 rounded-2xl p-8 items-center mt-4">
+                  <Ionicons name="basket-outline" size={40} color={colors.outlineVariant} className="mb-3" />
                   <Text className="text-white/60 text-sm font-bold text-center font-sans">Sem recompensas no momento</Text>
                   <Text className="text-white/40 text-xs text-center mt-1 font-sans">Volte mais tarde para conferir as novidades!</Text>
                 </View>
@@ -241,8 +238,8 @@ export default function CouponsScreen() {
           ) : (
             <View>
               {vouchers.length === 0 ? (
-                <View className="bg-[#002532]/40 border border-white/5 rounded-2xl p-8 items-center mt-4">
-                  <Ionicons name="ticket-outline" size={40} color="#3a5866" className="mb-3" />
+                <View className="bg-surface-container/40 border border-white/5 rounded-2xl p-8 items-center mt-4">
+                  <Ionicons name="ticket-outline" size={40} color={colors.outlineVariant} className="mb-3" />
                   <Text className="text-white/60 text-sm font-bold text-center font-sans">Nenhum cupom resgatado</Text>
                   <Text className="text-white/40 text-xs text-center mt-1 font-sans">Você ainda não tem cupons ativos. Vá para a aba "Loja" para trocar suas moedas!</Text>
                 </View>
@@ -257,7 +254,7 @@ export default function CouponsScreen() {
                       />
                     ))
                   ) : (
-                    <View className="bg-[#002532]/20 border border-dashed border-white/5 rounded-2xl p-6 items-center mb-6">
+                    <View className="bg-surface-container/20 border border-dashed border-white/5 rounded-2xl p-6 items-center mb-6">
                       <Text className="text-white/40 text-xs font-sans text-center">Nenhum cupom ativo no momento.</Text>
                     </View>
                   )}

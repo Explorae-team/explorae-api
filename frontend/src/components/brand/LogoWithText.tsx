@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { CompassIcon } from './CompassIcon';
+import { colors } from '../../constants/colors';
 
 interface LogoWithTextProps {
   size?: number; // Altura geral recomendada do componente (ex: 80, 100, 120)
@@ -69,13 +70,13 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
             {/* Metade Esquerda (Laranja Base / Claro) */}
             <Path 
               d="M 50 0 L 0 90 L 50 90 L 50 55 L 25 70 L 50 30 Z" 
-              fill="#F37640" 
+              fill={colors.brandOrangeLight} 
             />
             
             {/* Metade Direita (Laranja Escuro - Sombra) */}
             <Path 
               d="M 50 0 L 50 30 L 75 70 L 50 55 L 50 90 L 100 90 Z" 
-              fill="#DF6430" 
+              fill={colors.brandOrangeDark} 
             />
           </Svg>
         </View>
@@ -98,11 +99,11 @@ const styles = StyleSheet.create({
   textBase: {
     fontFamily: 'System', // Excelente renderização e alinhamento cross-platform
     fontWeight: '900',
-    color: '#0E566A',
+    color: colors.brandBlue,
     letterSpacing: -1,
   },
   textE: {
-    color: '#F37640',
+    color: colors.brandOrangeLight,
   },
   accentWrapper: {
     position: 'absolute',

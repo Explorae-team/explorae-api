@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -20,7 +21,7 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
   return (
     <View className="mt-12 bg-white rounded-[40px] p-8">
       <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-xl font-black text-[#003646]">Dicas da Galera</Text>
+        <Text className="text-xl font-black text-explora-blue">Dicas da Galera</Text>
         {reviews && reviews.length > 0 && (
           <View className="flex-row">
             {reviews.slice(0, 3).map((review, i) => {
@@ -35,12 +36,12 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
                 />
               ) : (
                 <View key={i} className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-gray-300 items-center justify-center">
-                  <MaterialCommunityIcons name="account" size={14} color="#003646" />
+                  <MaterialCommunityIcons name="account" size={14} color={colors.exploraBlue} />
                 </View>
               );
             })}
             {reviews.length > 3 && (
-              <View className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-[#F2641F] items-center justify-center">
+              <View className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-accent items-center justify-center">
                 <Text className="text-[10px] text-white font-bold">+{reviews.length - 3}</Text>
               </View>
             )}
@@ -61,7 +62,7 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
             />
           ))
         ) : (
-          <Text className="text-[#003646]/50 italic text-sm">
+          <Text className="text-explora-blue/50 italic text-sm">
             Nenhuma dica ainda. Seja o primeiro a explorar e comentar!
           </Text>
         )}
@@ -88,12 +89,12 @@ const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: str
         />
       ) : (
         <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center">
-           <MaterialCommunityIcons name="account" size={20} color="#003646" />
+           <MaterialCommunityIcons name="account" size={20} color={colors.exploraBlue} />
         </View>
       )}
       <View className="flex-1">
         <View className="flex-row justify-between items-center">
-          <Text className="font-bold text-[#003646] text-sm">{author}</Text>
+          <Text className="font-bold text-explora-blue text-sm">{author}</Text>
           {rating !== undefined && (
             <View className="flex-row gap-0.5">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -101,13 +102,13 @@ const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: str
                   key={star} 
                   name={star <= rating ? "star" : "star-border"} 
                   size={14} 
-                  color="#FFB700" 
+                  color={colors.exploraGold} 
                 />
               ))}
             </View>
           )}
         </View>
-        <Text className="text-[#003646]/70 text-sm mt-1 leading-5">{text}</Text>
+        <Text className="text-explora-blue/70 text-sm mt-1 leading-5">{text}</Text>
         {reviewPhotoUrl && (
           <Image 
             source={{ uri: reviewPhotoUrl }} 

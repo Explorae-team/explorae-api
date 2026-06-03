@@ -12,6 +12,7 @@ import { useFavorites } from '../../services/useFavorites';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { useRouter } from 'expo-router';
 import api from '../../services/api';
+import { colors } from '../../constants/colors';
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function SearchScreen() {
     : { marginBottom: 40 };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#001b24' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ExploreHeader onNotificationsPress={() => {}} />
 
       <ScrollView
@@ -90,7 +91,7 @@ export default function SearchScreen() {
       >
         {/* Header da busca */}
         <View style={{ paddingHorizontal: 24, paddingTop: 24, marginBottom: 24, gap: 24 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: '#bde9fe' }}>
+          <Text style={{ fontSize: 24, fontWeight: '700', color: colors.onBackground }}>
             Buscar Atrações
           </Text>
 
@@ -108,15 +109,15 @@ export default function SearchScreen() {
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', color: '#c1c7cc' }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase', color: colors.onSurfaceVariant }}>
               {isLoading ? 'Buscando...' : attractions.length > 0 ? 'Resultados Encontrados' : 'Nenhum resultado'}
             </Text>
             <Pressable
               onPress={() => setIsFilterModalVisible(true)}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#002e3c', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceContainerHigh, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#fd6c28' }}>Filtros</Text>
-              <MaterialIcons name="tune" size={16} color="#fd6c28" />
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary }}>Filtros</Text>
+              <MaterialIcons name="tune" size={16} color={colors.primary} />
             </Pressable>
           </View>
         </View>
@@ -157,8 +158,8 @@ export default function SearchScreen() {
             </View>
           ) : (
             <View style={{ alignItems: 'center', paddingVertical: 80, paddingHorizontal: 40 }}>
-              <MaterialIcons name="search-off" size={48} color="#8b9296" />
-              <Text style={{ marginTop: 16, color: '#c1c7cc', fontWeight: '500', textAlign: 'center' }}>
+              <MaterialIcons name="search-off" size={48} color={colors.outline} />
+              <Text style={{ marginTop: 16, color: colors.onSurfaceVariant, fontWeight: '500', textAlign: 'center' }}>
                 {error || "Não encontramos nada com esses filtros. Tente ajustar sua busca."}
               </Text>
             </View>
@@ -168,15 +169,15 @@ export default function SearchScreen() {
         {/* Footer de paginação */}
         {isLoadingMore ? (
           <View style={{ paddingVertical: 24, alignItems: 'center' }}>
-            <ActivityIndicator color="#fd6c28" />
+            <ActivityIndicator color={colors.primary} />
           </View>
         ) : hasMore && attractions.length > 0 ? (
           <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
             <Pressable
               onPress={() => loadMore()}
-              style={{ paddingVertical: 16, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#002e3c', borderWidth: 1, borderColor: 'rgba(189, 233, 254, 0.1)' }}
+              style={{ paddingVertical: 16, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: colors.surfaceContainerHigh, borderWidth: 1, borderColor: 'rgba(189, 233, 254, 0.1)' }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#fd6c28', letterSpacing: 2, textTransform: 'uppercase' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary, letterSpacing: 2, textTransform: 'uppercase' }}>
                 Mostrar mais atrações
               </Text>
             </Pressable>

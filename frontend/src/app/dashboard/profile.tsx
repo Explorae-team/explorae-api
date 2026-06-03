@@ -11,6 +11,8 @@ import StatsGrid from '../../components/profile/StatsGrid';
 import AchievementsList from '../../components/profile/AchievementsList';
 import RecentActivity from '../../components/profile/RecentActivity';
 
+import { colors } from '../../constants/colors';
+
 export default function ExplorerProfile() {
   const { updateUserPreferences } = useAuth() as any;
   const [isRefreshing, setIsRefreshing] = useState(true);
@@ -30,7 +32,7 @@ export default function ExplorerProfile() {
   if (isRefreshing) {
     return (
       <View className="flex-1 bg-surface justify-center items-center">
-        <ActivityIndicator size="large" color="#fd6c28" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text className="mt-4 text-primary font-sans">Carregando explorador...</Text>
       </View>
     );

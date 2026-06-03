@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { colors } from '../../constants/colors';
 
 interface AttractionActionHeaderProps {
   onBack: () => void;
@@ -30,15 +31,15 @@ export default function AttractionActionHeader({ onBack, isSaved = false, onTogg
       style={{ paddingTop: insets.top + 8, paddingBottom: 8 }}
     >
       <LinearGradient
-        colors={['rgba(0,54,70,0.8)', 'rgba(0,54,70,0.4)', 'transparent']}
+        colors={['rgba(13, 62, 78, 0.8)', 'rgba(13, 62, 78, 0.4)', 'transparent']}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top + 100 }}
       />
       <TouchableOpacity
         onPress={onBack}
-        className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
+        className="w-12 h-12 items-center justify-center rounded-full bg-surface-bright/50 overflow-hidden"
       >
         <BlurView intensity={20} className="absolute inset-0" />
-        <MaterialCommunityIcons name="arrow-left" size={24} color="#F2641F" />
+        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.accent} />
       </TouchableOpacity>
 
       <View className="flex-row items-center gap-2" style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -46,23 +47,23 @@ export default function AttractionActionHeader({ onBack, isSaved = false, onTogg
           <TouchableOpacity
             testID="favorite-button"
             onPress={onToggleSave}
-            className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
+            className="w-12 h-12 items-center justify-center rounded-full bg-surface-bright/50 overflow-hidden"
           >
             <BlurView intensity={20} className="absolute inset-0" />
             <MaterialCommunityIcons 
               name={isSaved ? "heart" : "heart-outline"} 
               size={24} 
-              color={isSaved ? "#ef4444" : "#F2641F"} 
+              color={isSaved ? colors.error : colors.accent} 
             />
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
           onPress={handleShare}
-          className="w-12 h-12 items-center justify-center rounded-full bg-[#0d3e4e]/50 overflow-hidden"
+          className="w-12 h-12 items-center justify-center rounded-full bg-surface-bright/50 overflow-hidden"
         >
           <BlurView intensity={20} className="absolute inset-0" />
-          <MaterialCommunityIcons name="share-variant" size={24} color="#F2641F" />
+          <MaterialCommunityIcons name="share-variant" size={24} color={colors.accent} />
         </TouchableOpacity>
       </View>
     </View>

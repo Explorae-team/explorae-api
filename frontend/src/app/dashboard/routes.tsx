@@ -25,6 +25,7 @@ if (Platform.OS !== 'web') {
 
 import api from '../../services/api'; 
 import DestinationReachedModal from '../dashboard/DestinationReachedModal';
+import { colors } from '../../constants/colors';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 const SHEET_MAX_HEIGHT = SCREEN_HEIGHT * 0.45;
@@ -60,7 +61,7 @@ const getCategoryStyle = (category: string) => {
   if (lowerCat.includes('cultura') || lowerCat.includes('arte') || lowerCat.includes('museu')) return { icon: 'palette', color: '#8338ec' };
   if (lowerCat.includes('história') || lowerCat.includes('histórico') || lowerCat.includes('monumento')) return { icon: 'account-balance', color: '#e76f51' };
   
-  return { icon: 'place', color: '#fd6c28' }; 
+  return { icon: 'place', color: colors.primary }; 
 };
 
 export default function RoutesScreen() {
@@ -453,7 +454,7 @@ export default function RoutesScreen() {
               <Polyline 
                 key={`route-line-${transportMode}`} // A MÁGICA ESTÁ AQUI!
                 coordinates={routePolyline}
-                strokeColor="#fd6c28"
+                strokeColor={colors.primary}
                 strokeWidth={4}
                 lineDashPattern={transportMode === 'walking' ? [10, 10] : undefined}
               />
@@ -537,21 +538,21 @@ export default function RoutesScreen() {
                 style={[styles.transportBtn, transportMode === 'driving' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('driving')}
               >
-                <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={[styles.transportBtn, transportMode === 'transit' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('transit')}
               >
-                <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={[styles.transportBtn, transportMode === 'walking' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('walking')}
               >
-                <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
               
               <View style={styles.routeMetaInfo}>
@@ -582,7 +583,7 @@ export default function RoutesScreen() {
           <View style={styles.cardsContainer}>
             {isLoadingData ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fd6c28" />
+                <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.loadingText}>Carregando pontos turísticos...</Text>
               </View>
             ) : (
@@ -682,7 +683,7 @@ const styles = StyleSheet.create({
   },
   searchBar: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(6, 35, 43, 0.9)', borderRadius: 9999, height: 48, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.2)' },
   searchInput: { flex: 1, paddingHorizontal: 8, color: '#cbe7f2', fontSize: 14 }, 
-  markerPulse: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fd6c28', justifyContent: 'center', alignItems: 'center', elevation: 4, borderWidth: 2, borderColor: 'rgba(255, 255, 255, 0.8)' },
+  markerPulse: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', elevation: 4, borderWidth: 2, borderColor: 'rgba(255, 255, 255, 0.8)' },
   bottomSheet: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'rgba(2, 31, 39, 0.95)', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.1)', zIndex: 60 },
   
   // Estilos de Header Condicionais
@@ -710,7 +711,7 @@ const styles = StyleSheet.create({
   cardContainer: { height: 128, backgroundColor: '#1e3841', borderRadius: 12, flexDirection: 'row', overflow: 'hidden' },
   imageWrapper: { width: 128, height: '100%', position: 'relative' },
   cardImage: { width: '100%', height: '100%', backgroundColor: '#05232b' },
-  xpBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#fd6c28', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999 },
+  xpBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999 },
   xpBadgeTertiary: { backgroundColor: '#594138' },
   xpText: { fontSize: 10, fontWeight: '800', color: '#370e00' },
   xpTextTertiary: { color: '#cbe7f2' },

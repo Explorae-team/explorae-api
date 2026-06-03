@@ -72,7 +72,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-[#003646]"
+      className="flex-1 bg-background"
     >
       <StatusBar barStyle="light-content" />
       <ScrollView
@@ -81,7 +81,7 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Círculo decorativo laranja desfocado ao fundo */}
-        <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-[#fd6c28]/10 rounded-full blur-[80px]" />
+        <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-primary/10 rounded-full blur-[80px]" />
         
         <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
           <View className="items-center mb-8">
@@ -89,7 +89,7 @@ export default function LoginScreen() {
           </View>
 
           <View className="mb-8">
-            <Text className="text-[#003646] font-bold text-2xl mb-1">
+            <Text className="text-explora-blue font-bold text-2xl mb-1">
               Bem-vindo de volta!
             </Text>
             <Text className="text-slate-500 text-sm">
@@ -140,7 +140,7 @@ export default function LoginScreen() {
               rightElement={
                 <Link href="/recuperar-senha" asChild>
                   <TouchableOpacity>
-                    <Text className="text-[#fd6c28] text-[10px] font-bold">Esqueceu?</Text>
+                    <Text className="text-primary text-[10px] font-bold">Esqueceu?</Text>
                   </TouchableOpacity>
                 </Link>
               }
@@ -157,12 +157,12 @@ export default function LoginScreen() {
         </View>
 
         <View className="mt-10 flex-row justify-center">
-          <Text className="text-[#bde9fe] font-medium text-sm">
+          <Text className="text-on-background font-medium text-sm">
             Não tem uma conta?
           </Text>
           <Link href="/cadastro" asChild>
             <TouchableOpacity>
-              <Text className="text-[#FFB700] font-bold ml-1 text-sm">
+              <Text className="text-explora-gold font-bold ml-1 text-sm">
                 Cadastre-se
               </Text>
             </TouchableOpacity>

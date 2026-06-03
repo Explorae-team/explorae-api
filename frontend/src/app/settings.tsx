@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import SettingsGroup from '../components/settings/SettingsGroup';
 import SettingsItem from '../components/settings/SettingsItem';
+import { colors } from '../constants/colors';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function SettingsScreen() {
 
   return (
     // Container principal configurado com a cor escura do app
-    <View style={{ flex: 1, backgroundColor: '#001b24' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView style={{ flex: 1 }}>
         {/* Cabeçalho superior fixo */}
         <View
@@ -70,9 +71,9 @@ export default function SettingsScreen() {
           }}
         >
           <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, marginLeft: -8, borderRadius: 99 }}>
-            <MaterialIcons name="arrow-back" size={24} color="#fd6c28" />
+            <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
           </TouchableOpacity>
-          <Text style={{ color: '#fd6c28', fontSize: 18, fontWeight: '700', letterSpacing: -0.3 }}>
+          <Text style={{ color: colors.primary, fontSize: 18, fontWeight: '700', letterSpacing: -0.3 }}>
             Configurações
           </Text>
           <View style={{ width: 40 }} />
@@ -136,7 +137,7 @@ export default function SettingsScreen() {
 
           <SettingsGroup>
             <SettingsItem
-              icon="shield"
+              icon="lock"
               title="Segurança"
               description="Alterar senha e sessões ativas"
               onPress={() => {
@@ -169,7 +170,7 @@ export default function SettingsScreen() {
             style={{
               marginTop: 8,
               width: '100%',
-              backgroundColor: '#002e3c',
+              backgroundColor: colors.surfaceContainerHigh,
               padding: 20,
               borderRadius: 16,
               flexDirection: 'row',
@@ -179,8 +180,8 @@ export default function SettingsScreen() {
             }}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="logout" size={24} color="#ffb4ab" />
-            <Text style={{ color: '#ffb4ab', fontWeight: '700', fontSize: 16 }}>
+            <MaterialIcons name="logout" size={24} color={colors.error} />
+            <Text style={{ color: colors.error, fontWeight: '700', fontSize: 16 }}>
               Sair da Conta
             </Text>
           </TouchableOpacity>

@@ -1,5 +1,6 @@
 import { View, Text, TextInput, TextInputProps, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 interface AuthInputProps extends TextInputProps {
   label: string;
@@ -23,7 +24,7 @@ export default function AuthInput({
   return (
     <View className="mb-4">
       <View className="flex-row justify-between mb-2">
-        <Text className="text-[#003646] text-[10px] font-bold uppercase tracking-widest ml-1">
+        <Text className="text-explora-blue text-[10px] font-bold uppercase tracking-widest ml-1">
           {label}
         </Text>
         {rightElement}
@@ -37,7 +38,7 @@ export default function AuthInput({
         <TextInput
           placeholderTextColor="#94A3B8"
           secureTextEntry={secureTextEntry}
-          className={`bg-slate-50 pl-12 ${rightIconName ? 'pr-12' : 'pr-4'} py-4 rounded-2xl text-[#003646] font-semibold ${
+          className={`bg-slate-50 pl-12 ${rightIconName ? 'pr-12' : 'pr-4'} py-4 rounded-2xl text-explora-blue font-semibold ${
             error ? "border border-red-200" : ""
           }`}
           {...textInputProps}
@@ -51,7 +52,7 @@ export default function AuthInput({
             className="absolute right-4 z-20"
             style={{ padding: 4 }}
           >
-            <Ionicons name={rightIconName} size={22} color="#fd6c28" />
+            <Ionicons name={rightIconName} size={22} color={colors.primary} />
           </TouchableOpacity>
         )}
       </View>

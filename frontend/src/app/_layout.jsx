@@ -9,6 +9,7 @@ import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-ic
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { BadgeCelebrationProvider } from '../contexts/BadgeCelebrationContext';
 import AppFooter from '../components/AppFooter';
+import { colors } from '../constants/colors';
 
 function InitialLayout() {
   const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
@@ -70,7 +71,7 @@ function InitialLayout() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#fd6c28" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -79,11 +80,11 @@ function InitialLayout() {
     <View style={{ flex: 1 }}>
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#007AFF' },
-          headerTintColor: '#fff',
+          headerStyle: { backgroundColor: colors.exploraBlue },
+          headerTintColor: '#ffffff',
           headerTitleStyle: { fontWeight: 'bold' },
           headerBackTitle: 'Voltar',
-          contentStyle: { backgroundColor: '#00161e' },
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -122,8 +123,8 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <SafeAreaProvider style={{ flex: 1, backgroundColor: '#00161e' }}>
-      <View style={{ flex: 1, height: Platform.OS === 'web' ? '100vh' : '100%', backgroundColor: '#00161e', overflow: 'hidden' }}>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, height: Platform.OS === 'web' ? '100vh' : '100%', backgroundColor: colors.background, overflow: 'hidden' }}>
         <AuthProvider>
           <BadgeCelebrationProvider>
             <InitialLayout />

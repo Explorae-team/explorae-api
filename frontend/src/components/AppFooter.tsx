@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
+import { colors } from '../constants/colors';
 
 export interface FooterTab {
   key: 'routes' | 'search' | 'explore' | 'coupons' | 'profile';
@@ -68,9 +69,9 @@ const AppFooter: React.FC<AppFooterProps> = ({
                 className="bg-primary shadow-primary/40 w-14 h-14 rounded-2xl items-center justify-center shadow-lg"
               >
                 <Ionicons 
-                  name={tab.icon.replace('-outline', '') as any} 
-                  size={32} 
-                  color="white" 
+                   name={tab.icon.replace('-outline', '') as any} 
+                   size={32} 
+                   color="white" 
                 />
               </Pressable>
               <Text className={`text-[10px] mt-1 ${isActive ? 'font-bold text-primary' : 'font-medium text-on-surface-variant'}`}>
@@ -90,7 +91,7 @@ const AppFooter: React.FC<AppFooterProps> = ({
               <Ionicons
                 name={isActive ? tab.icon.replace('-outline', '') as any : tab.icon}
                 size={24}
-                color={isActive ? '#fd6c28' : '#8b9296'}
+                color={isActive ? colors.primary : colors.outline}
               />
 
               {tab.badgeCount && tab.badgeCount > 0 ? (

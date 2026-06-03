@@ -9,6 +9,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 import api from '../../services/api';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { ReviewModal } from '../../components/attraction/ReviewModal';
+import { colors } from '../../constants/colors';
 
 // Sub-componentes Especializados
 import AttractionActionHeader from '../../components/attraction/AttractionActionHeader';
@@ -157,8 +158,8 @@ const AttractionDetail = () => {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-[#003646] justify-center items-center">
-        <ActivityIndicator size="large" color="#F2641F" />
+      <View className="flex-1 bg-background justify-center items-center">
+        <ActivityIndicator size="large" color={colors.accent} />
         <Text className="text-white mt-4 font-bold">Carregando detalhes...</Text>
       </View>
     );
@@ -166,8 +167,8 @@ const AttractionDetail = () => {
 
   if (error || !attraction) {
     return (
-      <View className="flex-1 bg-[#003646] justify-center items-center px-6">
-        <MaterialCommunityIcons name="alert-circle-outline" size={64} color="#F2641F" />
+      <View className="flex-1 bg-background justify-center items-center px-6">
+        <MaterialCommunityIcons name="alert-circle-outline" size={64} color={colors.accent} />
         <Text className="text-white text-center mt-4 text-lg font-bold">{error || 'Atração não encontrada'}</Text>
         <PrimaryButton
           title="VOLTAR"
@@ -185,7 +186,7 @@ const AttractionDetail = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#003646]">
+    <View className="flex-1 bg-background">
       {/* Cabeçalho de Ações */}
       <AttractionActionHeader 
         isSaved={attraction?.isSaved}
@@ -207,26 +208,26 @@ const AttractionDetail = () => {
         <View className="px-6 -mt-20">
           {/* Tags e Info de Status */}
           <View className="flex-row items-center gap-2 mb-2">
-            <View className="bg-[#FFB700]/20 px-3 py-1 rounded-full">
-              <Text className="text-[#FFB700] text-[10px] font-bold uppercase">{attraction.category || 'Atração'}</Text>
+            <View className="bg-explora-gold/20 px-3 py-1 rounded-full">
+              <Text className="text-explora-gold text-[10px] font-bold uppercase">{attraction.category || 'Atração'}</Text>
             </View>
-            <View className="flex-row items-center gap-1 bg-[#0d3e4e]/80 px-2 py-1 rounded-lg">
-              <MaterialCommunityIcons name="star" size={14} color="#FFB700" />
+            <View className="flex-row items-center gap-1 bg-surface-bright/80 px-2 py-1 rounded-lg">
+              <MaterialCommunityIcons name="star" size={14} color={colors.exploraGold} />
               <Text className="text-white text-sm font-bold">
                 {attraction.averageRating ? attraction.averageRating.toFixed(1) : '0.0'}
               </Text>
             </View>
             {attraction.isPartner && (
               <View className="bg-green-500/20 px-2 py-1 rounded-lg flex-row items-center gap-1">
-                <MaterialCommunityIcons name="check-decagram" size={12} color="#4ade80" />
-                <Text className="text-[#4ade80] text-[10px] font-bold">PARCEIRO</Text>
+                <MaterialCommunityIcons name="check-decagram" size={12} color={colors.success} />
+                <Text className="text-success text-[10px] font-bold">PARCEIRO</Text>
               </View>
             )}
           </View>
 
           {/* Nome e Descrição */}
-          <Text className="text-4xl font-black text-[#bde9fe] mb-2">{attraction.name}</Text>
-          <Text className="text-[#bde9fe]/90 text-sm leading-6">
+          <Text className="text-4xl font-black text-on-background mb-2">{attraction.name}</Text>
+          <Text className="text-on-background/90 text-sm leading-6">
             {attraction.longDescription || attraction.shortDescription}
           </Text>
 
@@ -252,10 +253,10 @@ const AttractionDetail = () => {
           {/* Botão de Nova Review */}
           <TouchableOpacity 
             onPress={() => setReviewModalVisible(true)}
-            className="mt-6 border border-dashed border-[#F2641F]/40 bg-[#F2641F]/5 p-4 rounded-2xl flex-row justify-center items-center gap-2"
+            className="mt-6 border border-dashed border-accent/40 bg-accent/5 p-4 rounded-2xl flex-row justify-center items-center gap-2"
           >
-            <MaterialCommunityIcons name="plus-circle-outline" size={18} color="#F2641F" />
-            <Text className="text-[#F2641F] font-bold font-sans">Adicionar Nova Dica</Text>
+            <MaterialCommunityIcons name="plus-circle-outline" size={18} color={colors.accent} />
+            <Text className="text-accent font-bold font-sans">Adicionar Nova Dica</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -266,8 +267,8 @@ const AttractionDetail = () => {
           title={isCheckingIn ? "REALIZANDO CHECK-IN..." : "CHECK-IN NO LOCAL"}
           onPress={handleCheckIn}
           disabled={isCheckingIn}
-          className="bg-[#FFB700] shadow-[#FFB700]/30"
-          rightIcon={isCheckingIn ? <ActivityIndicator size="small" color="#00161e" /> : <MaterialCommunityIcons name="checkbox-marked-circle" size={20} color="#00161e" />}
+          className="bg-explora-gold shadow-explora-gold/30"
+          rightIcon={isCheckingIn ? <ActivityIndicator size="small" color={colors.background} /> : <MaterialCommunityIcons name="checkbox-marked-circle" size={20} color={colors.background} />}
         />
       </View>
 
