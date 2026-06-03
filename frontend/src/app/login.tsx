@@ -83,23 +83,23 @@ export default function LoginScreen() {
         {/* Círculo decorativo laranja desfocado ao fundo */}
         <View className="absolute top-[-5%] left-[-10%] w-60 h-60 bg-primary/10 rounded-full blur-[80px]" />
         
-        <View className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-[440px] self-center">
+        <View className="bg-surface-container-high rounded-3xl p-8 border border-white/5 w-full max-w-[440px] self-center">
           <View className="items-center mb-8">
             <Logo size={80} />
           </View>
 
           <View className="mb-8">
-            <Text className="text-explora-blue font-bold text-2xl mb-1">
+            <Text className="text-on-surface font-bold text-2xl mb-1">
               Bem-vindo de volta!
             </Text>
-            <Text className="text-slate-500 text-sm">
+            <Text className="text-on-surface-variant text-sm">
               Continue sua jornada de onde parou.
             </Text>
           </View>
 
           {errors.general && (
-            <View className="bg-red-50 p-4 rounded-xl mb-6">
-              <Text className="text-red-600 text-xs font-semibold">
+            <View className="bg-error/10 p-4 rounded-xl mb-6 border border-error/20">
+              <Text className="text-error text-xs font-semibold">
                 {errors.general}
               </Text>
             </View>

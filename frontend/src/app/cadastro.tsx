@@ -97,15 +97,15 @@ export default function CadastroScreen() {
         
         <Stack.Screen options={{ headerShown: false }} />
 
-        <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
+        <View className="bg-surface-container-high rounded-[24px] p-8 border border-white/5 z-20 mb-8 w-full max-w-[520px] self-center">
           <View className="items-center mb-8">
             <Logo size={80} />
           </View>
           <View className="mb-6 items-center">
-            <Text className="text-explora-blue font-black text-2xl text-center leading-7">
+            <Text className="text-on-surface font-black text-2xl text-center leading-7">
               Crie sua conta para começar a aventura!
             </Text>
-            <Text className="text-outline text-sm font-medium mt-3 text-center">
+            <Text className="text-on-surface-variant text-sm font-medium mt-3 text-center">
               Preencha os dados abaixo para o seu diário de expedição.
             </Text>
           </View>
@@ -195,11 +195,11 @@ export default function CadastroScreen() {
               <View className={`w-6 h-6 border-2 rounded-lg items-center justify-center ${formData.termsAccepted ? 'bg-primary border-primary' : 'border-on-background'}`}>
                 {formData.termsAccepted && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
-              <Text className="text-outline text-xs flex-1">
+              <Text className="text-on-surface-variant text-xs flex-1">
                 Aceito os <Text className="text-primary font-bold">Termos e Condições</Text> de expedição.
               </Text>
             </TouchableOpacity>
-            {errors.termsAccepted && <Text className="text-red-500 text-[10px] ml-1">{errors.termsAccepted}</Text>}
+            {errors.termsAccepted && <Text className="text-error text-[10px] ml-1">{errors.termsAccepted}</Text>}
 
             <PrimaryButton
               onPress={handleRegister}
