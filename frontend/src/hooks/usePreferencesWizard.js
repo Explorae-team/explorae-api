@@ -49,11 +49,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   };
 
   const handleNext = () => {
-    const currentPillar = stepInfo?.pillar;
-    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
-    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
-
-    if (pillarCategories.length > 0 && !hasSelection) {
+    if (isNextDisabled) {
       Alert.alert(
         'Exploração sob Medida',
         'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
@@ -79,11 +75,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   };
 
   const handleFinish = async () => {
-    const currentPillar = stepInfo?.pillar;
-    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
-    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
-
-    if (pillarCategories.length > 0 && !hasSelection) {
+    if (isNextDisabled) {
       Alert.alert(
         'Exploração sob Medida',
         'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
