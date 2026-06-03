@@ -3,6 +3,7 @@ import { View, Text, Pressable, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Logo from '../brand/Logo';
+import { colors } from '../../constants/colors';
 
 import { useRouter } from 'expo-router';
 
@@ -23,7 +24,7 @@ export const ExploreHeader: React.FC<ExploreHeaderProps> = ({
   return (
     <View 
       style={{ paddingTop: insets.top + 16 }}
-      className="bg-[#00161e] border-b border-white/5 px-6 pb-4 flex-row justify-between items-center"
+      className="bg-surface border-b border-white/5 px-6 pb-4 flex-row justify-between items-center"
     >
       <View style={{ width: 130, height: 40, justifyContent: 'center' }}>
         <Logo width={120} height={40} />
@@ -34,14 +35,14 @@ export const ExploreHeader: React.FC<ExploreHeaderProps> = ({
           onPress={() => router.push('/dashboard/favorites')}
           className="p-2 rounded-full active:bg-surface-bright/50 mr-1"
         >
-          <MaterialIcons name="favorite" size={24} color="#fd6c28" />
+          <MaterialIcons name="favorite" size={24} color={colors.primary} />
         </Pressable>
 
         <Pressable 
           onPress={onNotificationsPress}
           className="p-2 rounded-full active:bg-surface-bright/50"
         >
-          <MaterialIcons name="notifications" size={24} color="#fd6c28" />
+          <MaterialIcons name="notifications" size={24} color={colors.primary} />
         </Pressable>
       </View>
     </View>

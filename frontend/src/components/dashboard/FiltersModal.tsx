@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, Pressable, ScrollView, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 interface FiltersModalProps {
   isVisible: boolean;
@@ -61,7 +62,7 @@ export const FiltersModal: React.FC<FiltersModalProps> = ({
           {/* Header */}
           <View className="flex-row justify-between items-center px-8 py-6 border-b border-white/5">
             <Pressable onPress={onClose} className="p-2">
-              <MaterialIcons name="close" size={24} color="#bde9fe" />
+              <MaterialIcons name="close" size={24} color={colors.onSurface} />
             </Pressable>
             <Text className="text-lg font-bold text-on-surface">Filtros</Text>
             <Pressable onPress={handleReset}>
@@ -131,7 +132,7 @@ export const FiltersModal: React.FC<FiltersModalProps> = ({
                           : 'bg-surface-container-high border-outline-variant/10'
                       }`}
                     >
-                      <MaterialIcons name="star" size={16} color={filters.minRating === rating ? "#fd6c28" : "#8b9296"} />
+                      <MaterialIcons name="star" size={16} color={filters.minRating === rating ? colors.primary : colors.outline} />
                       <Text className={`ml-1 font-bold ${filters.minRating === rating ? 'text-primary' : 'text-on-surface-variant'}`}>
                         {rating}+
                       </Text>
@@ -149,8 +150,8 @@ export const FiltersModal: React.FC<FiltersModalProps> = ({
                 <Switch
                   value={filters.openNow}
                   onValueChange={(val) => setFilters(prev => ({ ...prev, openNow: val }))}
-                  trackColor={{ false: '#2c3e50', true: '#fd6c28' }}
-                  thumbColor={filters.openNow ? '#fff' : '#8e9eab'}
+                  trackColor={{ false: colors.surfaceContainerHighest, true: colors.primary }}
+                  thumbColor={filters.openNow ? '#fff' : colors.outline}
                 />
               </View>
 

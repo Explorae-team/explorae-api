@@ -19,6 +19,10 @@ export const colors = {
   brandCompassLight: '#F26732',
   brandCompassDark: '#E05423',
   
+  // Cores de Desafios
+  challengeWeekly: '#00e5ff',
+  challengeSpecial: '#ffea00',
+  
   // Containers e variações de cor do Material Design 3
   surfaceContainerHighest: '#053a4a',
   surfaceContainerHigh: '#002e3c',
