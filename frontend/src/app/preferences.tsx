@@ -21,6 +21,7 @@ export default function PreferencesScreen() {
     selectedIds,
     isSubmitting,
     stepInfo,
+    isNextDisabled,
     handleToggleInterest,
     handleNext,
     handleBack
@@ -89,6 +90,7 @@ export default function PreferencesScreen() {
         onBack={handleBack}
         isSubmitting={isSubmitting}
         isEditMode={isEditMode}
+        isNextDisabled={isNextDisabled}
       />
     </SafeAreaView>
   );

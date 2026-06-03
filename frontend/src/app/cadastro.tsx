@@ -115,7 +115,12 @@ export default function CadastroScreen() {
               iconName="person"
               placeholder="Seu nome de explorador"
               value={formData.fullName}
-              onChangeText={(text) => setFormData({ ...formData, fullName: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, fullName: text });
+                if (errors.fullName) {
+                  setErrors((prev) => ({ ...prev, fullName: undefined }));
+                }
+              }}
               error={errors.fullName}
               autoCapitalize="words"
             />
@@ -125,7 +130,12 @@ export default function CadastroScreen() {
               iconName="mail"
               placeholder="email@exemplo.com"
               value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, email: text });
+                if (errors.email) {
+                  setErrors((prev) => ({ ...prev, email: undefined }));
+                }
+              }}
               error={errors.email}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -139,7 +149,12 @@ export default function CadastroScreen() {
                   placeholder="••••••••"
                   secureTextEntry={!showPassword}
                   value={formData.password}
-                  onChangeText={(text) => setFormData({ ...formData, password: text })}
+                  onChangeText={(text) => {
+                    setFormData({ ...formData, password: text });
+                    if (errors.password) {
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }
+                  }}
                   error={errors.password}
                   rightIconName={showPassword ? "eye-off" : "eye"}
                   onRightIconPress={() => setShowPassword(!showPassword)}
@@ -152,7 +167,12 @@ export default function CadastroScreen() {
                   placeholder="••••••••"
                   secureTextEntry={!showConfirmPassword}
                   value={formData.confirmPassword}
-                  onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+                  onChangeText={(text) => {
+                    setFormData({ ...formData, confirmPassword: text });
+                    if (errors.confirmPassword) {
+                      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                    }
+                  }}
                   error={errors.confirmPassword}
                   rightIconName={showConfirmPassword ? "eye-off" : "eye"}
                   onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -162,7 +182,13 @@ export default function CadastroScreen() {
 
             <TouchableOpacity 
               activeOpacity={0.7}
-              onPress={() => setFormData({ ...formData, termsAccepted: !formData.termsAccepted })}
+              onPress={() => {
+                const nextVal = !formData.termsAccepted;
+                setFormData({ ...formData, termsAccepted: nextVal });
+                if (errors.termsAccepted && nextVal) {
+                  setErrors((prev) => ({ ...prev, termsAccepted: undefined }));
+                }
+              }}
               className="flex-row items-center gap-3 mt-2"
             >
               <View className={`w-6 h-6 border-2 rounded-lg items-center justify-center ${formData.termsAccepted ? 'bg-[#fd6c28] border-[#fd6c28]' : 'border-[#bde9fe]'}`}>

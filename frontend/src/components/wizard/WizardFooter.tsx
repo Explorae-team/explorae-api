@@ -9,6 +9,7 @@ interface WizardFooterProps {
   onBack: () => void;
   isSubmitting?: boolean;
   isEditMode?: boolean;
+  isNextDisabled?: boolean;
 }
 
 export default function WizardFooter({
@@ -18,8 +19,10 @@ export default function WizardFooter({
   onBack,
   isSubmitting = false,
   isEditMode = false,
+  isNextDisabled = false,
 }: WizardFooterProps) {
   const isLastStep = currentStep === totalSteps - 1;
+  const isDisabled = isSubmitting || isNextDisabled;
 
   return (
     <View
@@ -38,9 +41,9 @@ export default function WizardFooter({
 
       <TouchableOpacity
         onPress={onNext}
-        disabled={isSubmitting}
+        disabled={isDisabled}
         className={`px-8 py-4 rounded-2xl flex-row items-center ${
-          isSubmitting ? 'bg-slate-800' : 'bg-[#fd6c28]'
+          isDisabled ? 'bg-[#594138] opacity-50' : 'bg-[#fd6c28] active:opacity-90'
         }`}
       >
         <Text className="text-white font-bold mr-2">

@@ -69,6 +69,7 @@ export default function RoutesScreen() {
   const [attractionsList, setAttractionsList] = useState<Attraction[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [userLocation, setUserLocation] = useState<{coords: {latitude: number, longitude: number}} | null>(null);
+  const [isLocationFallback, setIsLocationFallback] = useState(false);
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -155,12 +156,16 @@ export default function RoutesScreen() {
                 setUserLocation({ 
                   coords: { latitude: position.coords.latitude, longitude: position.coords.longitude } 
                 });
+                setIsLocationFallback(false);
               }
             };
 
             const handleLocationError = (error: any) => {
               console.warn(`Erro GPS Web (${error.code}):`, error.message);
-              if (isActive) setUserLocation(FALLBACK_LOCATION);
+              if (isActive) {
+                setUserLocation(FALLBACK_LOCATION);
+                setIsLocationFallback(true);
+              }
               
               if (error.code === 1) {
                 window.alert("Permissão negada. O mapa será centralizado em João Pessoa por padrão.");
@@ -172,6 +177,7 @@ export default function RoutesScreen() {
             watchId = navigator.geolocation.watchPosition(updateLocation, handleLocationError, geoOptions);
           } else {
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
             window.alert("Geolocalização não suportada. Exibindo João Pessoa.");
           }
         } else {
@@ -179,6 +185,7 @@ export default function RoutesScreen() {
           if (status !== 'granted') {
             Alert.alert('Permissão negada', 'O mapa será centralizado em João Pessoa por padrão.');
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
             mapRef.current?.animateToRegion({
               latitude: FALLBACK_LOCATION.coords.latitude,
               longitude: FALLBACK_LOCATION.coords.longitude,
@@ -194,6 +201,7 @@ export default function RoutesScreen() {
             let initialLoc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
             if (isActive) {
               setUserLocation(initialLoc);
+              setIsLocationFallback(false);
               mapRef.current?.animateToRegion({
                 latitude: initialLoc.coords.latitude,
                 longitude: initialLoc.coords.longitude,
@@ -203,12 +211,16 @@ export default function RoutesScreen() {
             }
           } catch (e) {
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
           }
 
           locationSubscription = await Location.watchPositionAsync(
             { accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 1 },
             (newLocation) => {
-              if (isActive) setUserLocation(newLocation);
+              if (isActive) {
+                setUserLocation(newLocation);
+                setIsLocationFallback(false);
+              }
             }
           );
         }
@@ -478,6 +490,15 @@ export default function RoutesScreen() {
             <MaterialIcon name="mic" size={20} color="#e1bfb3" />
           </View>
         </View>
+
+        {isLocationFallback && (
+          <View style={styles.fallbackBanner}>
+            <MaterialIcon name="gps-off" size={12} color="#ffba26" style={{ marginRight: 6 }} />
+            <Text style={styles.fallbackBannerText}>
+              GPS inativo ou sem sinal. Exibindo João Pessoa.
+            </Text>
+          </View>
+        )}
       </View>
 
       <Animated.View style={[styles.bottomSheet, { height: animatedHeight }]}>
@@ -705,5 +726,31 @@ const styles = StyleSheet.create({
   emptyState: { padding: 24, alignItems: 'center' },
   emptyStateText: { color: '#cbe7f2', fontSize: 16, fontWeight: '600' },
   loadingContainer: { padding: 40, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loadingText: { color: 'rgba(203, 231, 242, 0.6)', fontSize: 14, fontWeight: '600' }
+  loadingText: { color: 'rgba(203, 231, 242, 0.6)', fontSize: 14, fontWeight: '600' },
+  fallbackBanner: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 120 : 100,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(8, 35, 43, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 186, 38, 0.3)',
+    borderRadius: 9999,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    zIndex: 45,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  fallbackBannerText: {
+    color: '#ffba26',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  }
 });

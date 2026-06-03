@@ -12,6 +12,11 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   const [categories, setCategories] = useState([]);
 
   const stepInfo = ONBOARDING_STEPS[currentStep];
+  
+  const currentPillar = stepInfo?.pillar;
+  const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
+  const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
+  const isNextDisabled = pillarCategories.length > 0 && !hasSelection;
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -113,6 +118,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     isSubmitting,
     stepInfo,
     categories,
+    isNextDisabled,
     handleToggleInterest,
     handleNext,
     handleBack
