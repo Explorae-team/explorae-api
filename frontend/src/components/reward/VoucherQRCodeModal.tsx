@@ -18,14 +18,14 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
   voucher,
   onClose
 }) => {
-  if (!voucher) return null;
-
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { formattedTime, isTimeLow, expired } = useCountdown(tokenExpiresAt);
+
+  if (!voucher) return null;
 
   const fetchToken = async () => {
     setLoading(true);
