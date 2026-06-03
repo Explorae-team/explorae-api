@@ -3,6 +3,8 @@ package br.edu.ifpb.explorae.service;
 import br.edu.ifpb.explorae.api.dto.PartnerResponseDTO;
 import br.edu.ifpb.explorae.api.dto.RewardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.VoucherResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherTokenResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherValidationResponseDTO;
 import br.edu.ifpb.explorae.api.exception.BusinessException;
 import br.edu.ifpb.explorae.api.exception.ResourceNotFoundException;
 import br.edu.ifpb.explorae.api.mapper.RewardMapper;
@@ -47,6 +49,9 @@ class RewardServiceTest {
     @Mock
     private RewardMapper rewardMapper;
 
+    @Mock
+    private TokenService tokenService;
+
     @InjectMocks
     private RewardService rewardService;
 
@@ -88,7 +93,7 @@ class RewardServiceTest {
         
         PartnerResponseDTO partnerDTO = new PartnerResponseDTO(partner.getId(), "Parceiro", "Desc", "Contato", "foto");
         RewardResponseDTO rewardDTO = new RewardResponseDTO(rewardId, partnerDTO, "Recompensa", "Desc", RewardType.DISCOUNT, 200, 4, "imagem");
-        VoucherResponseDTO voucherDTO = new VoucherResponseDTO(UUID.randomUUID(), userId, rewardDTO, "EXP-12345678", VoucherStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now().plusDays(30));
+        VoucherResponseDTO voucherDTO = new VoucherResponseDTO(UUID.randomUUID(), userId, rewardDTO, "EXP-12345678", VoucherStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now().plusDays(30), null);
         
         when(rewardMapper.toVoucherDTO(any(Voucher.class))).thenReturn(voucherDTO);
 
@@ -184,7 +189,7 @@ class RewardServiceTest {
         
         PartnerResponseDTO partnerDTO = new PartnerResponseDTO(UUID.randomUUID(), "Parceiro", "Desc", "Contato", "foto");
         RewardResponseDTO rewardDTO = new RewardResponseDTO(UUID.randomUUID(), partnerDTO, "Recompensa", "Desc", RewardType.DISCOUNT, 200, 4, "imagem");
-        VoucherResponseDTO responseDTO = new VoucherResponseDTO(voucher.getId(), userId, rewardDTO, "EXP-123", VoucherStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now().plusDays(30));
+        VoucherResponseDTO responseDTO = new VoucherResponseDTO(voucher.getId(), userId, rewardDTO, "EXP-123", VoucherStatus.ACTIVE, LocalDateTime.now(), LocalDateTime.now().plusDays(30), null);
         
         when(voucherRepository.findByUserIdOrderByRedeemedAtDesc(userId)).thenReturn(vouchers);
         when(rewardMapper.toVoucherDTOList(vouchers)).thenReturn(List.of(responseDTO));
@@ -195,5 +200,120 @@ class RewardServiceTest {
         // Assert
         assertThat(result).hasSize(1);
         assertThat(result.get(0).code()).isEqualTo("EXP-123");
+    }
+
+    @Test
+    @DisplayName("Deve gerar token de voucher com sucesso")
+    void shouldGenerateVoucherTokenSuccessfully() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+        UUID voucherId = UUID.randomUUID();
+
+        User user = User.builder().id(userId).build();
+        Voucher voucher = Voucher.builder()
+                .id(voucherId)
+                .user(user)
+                .status(VoucherStatus.ACTIVE)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .build();
+
+        when(voucherRepository.findById(voucherId)).thenReturn(Optional.of(voucher));
+        when(tokenService.generateVoucherToken(voucherId)).thenReturn("dummy-jwt-token");
+
+        // Act
+        VoucherTokenResponseDTO result = rewardService.generateVoucherToken(userId, voucherId);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.token()).isEqualTo("dummy-jwt-token");
+        assertThat(result.expiresAt()).isAfter(LocalDateTime.now());
+        verify(tokenService).generateVoucherToken(voucherId);
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao gerar token quando o usuário não for proprietário")
+    void shouldFailGenerateVoucherTokenWhenNotOwner() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+        UUID otherUserId = UUID.randomUUID();
+        UUID voucherId = UUID.randomUUID();
+
+        User otherUser = User.builder().id(otherUserId).build();
+        Voucher voucher = Voucher.builder()
+                .id(voucherId)
+                .user(otherUser)
+                .status(VoucherStatus.ACTIVE)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .build();
+
+        when(voucherRepository.findById(voucherId)).thenReturn(Optional.of(voucher));
+
+        // Act & Assert
+        assertThatThrownBy(() -> rewardService.generateVoucherToken(userId, voucherId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Acesso negado. Este voucher não pertence a você.");
+    }
+
+    @Test
+    @DisplayName("Deve validar token de voucher com sucesso")
+    void shouldValidateVoucherTokenSuccessfully() {
+        // Arrange
+        String token = "valid-token";
+        UUID voucherId = UUID.randomUUID();
+
+        User user = User.builder().id(UUID.randomUUID()).name("Explorador").build();
+        Partner partner = Partner.builder().id(UUID.randomUUID()).name("Parceiro").build();
+        Reward reward = Reward.builder().id(UUID.randomUUID()).name("Recompensa").partner(partner).build();
+
+        Voucher voucher = Voucher.builder()
+                .id(voucherId)
+                .code("EXP-ABCD")
+                .user(user)
+                .reward(reward)
+                .status(VoucherStatus.ACTIVE)
+                .expiresAt(LocalDateTime.now().plusDays(30))
+                .build();
+
+        when(tokenService.extractVoucherIdFromToken(token)).thenReturn(voucherId);
+        when(voucherRepository.findById(voucherId)).thenReturn(Optional.of(voucher));
+        when(voucherRepository.save(any(Voucher.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        VoucherValidationResponseDTO result = rewardService.validateVoucherToken(token);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.voucherCode()).isEqualTo("EXP-ABCD");
+        assertThat(result.rewardName()).isEqualTo("Recompensa");
+        assertThat(result.partnerName()).isEqualTo("Parceiro");
+        assertThat(result.userName()).isEqualTo("Explorador");
+        assertThat(voucher.getStatus()).isEqualTo(VoucherStatus.USED);
+        assertThat(voucher.getUsedAt()).isNotNull();
+        verify(voucherRepository).save(voucher);
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao validar token quando o voucher estiver fisicamente expirado")
+    void shouldFailValidateVoucherTokenWhenExpired() {
+        // Arrange
+        String token = "expired-token";
+        UUID voucherId = UUID.randomUUID();
+
+        Voucher voucher = Voucher.builder()
+                .id(voucherId)
+                .status(VoucherStatus.ACTIVE)
+                .expiresAt(LocalDateTime.now().minusDays(1)) // Expired
+                .build();
+
+        when(tokenService.extractVoucherIdFromToken(token)).thenReturn(voucherId);
+        when(voucherRepository.findById(voucherId)).thenReturn(Optional.of(voucher));
+
+        // Act & Assert
+        assertThatThrownBy(() -> rewardService.validateVoucherToken(token))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Este voucher expirou e não pode ser validado.");
+
+        assertThat(voucher.getStatus()).isEqualTo(VoucherStatus.EXPIRED);
+        verify(voucherRepository).save(voucher);
     }
 }

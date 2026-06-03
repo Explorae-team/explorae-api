@@ -3,8 +3,12 @@ package br.edu.ifpb.explorae.api.controller;
 import br.edu.ifpb.explorae.api.dto.RewardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.StandardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.VoucherResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherTokenResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherValidationRequestDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherValidationResponseDTO;
 import br.edu.ifpb.explorae.domain.user.User;
 import br.edu.ifpb.explorae.service.RewardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,5 +45,22 @@ public class RewardController {
         
         List<VoucherResponseDTO> vouchers = rewardService.getUserVouchers(user.getId());
         return ResponseEntity.ok(StandardResponseDTO.success("Seus vouchers foram recuperados com sucesso.", vouchers));
+    }
+
+    @PostMapping("/vouchers/{voucherId}/token")
+    public ResponseEntity<StandardResponseDTO<VoucherTokenResponseDTO>> generateVoucherToken(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID voucherId) {
+        
+        VoucherTokenResponseDTO tokenResponse = rewardService.generateVoucherToken(user.getId(), voucherId);
+        return ResponseEntity.ok(StandardResponseDTO.success("Token de validação dinâmico gerado com sucesso.", tokenResponse));
+    }
+
+    @PostMapping("/vouchers/validate")
+    public ResponseEntity<StandardResponseDTO<VoucherValidationResponseDTO>> validateVoucher(
+            @Valid @RequestBody VoucherValidationRequestDTO request) {
+        
+        VoucherValidationResponseDTO validationResponse = rewardService.validateVoucherToken(request.token());
+        return ResponseEntity.ok(StandardResponseDTO.success("Voucher validado com sucesso pelo estabelecimento parceiro!", validationResponse));
     }
 }

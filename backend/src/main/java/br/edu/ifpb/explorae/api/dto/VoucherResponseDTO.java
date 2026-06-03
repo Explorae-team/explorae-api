@@ -11,5 +11,6 @@ public record VoucherResponseDTO(
     String code,
     VoucherStatus status,
     LocalDateTime redeemedAt,
-    LocalDateTime expiresAt
+    LocalDateTime expiresAt,
+    LocalDateTime usedAt
 ) {}

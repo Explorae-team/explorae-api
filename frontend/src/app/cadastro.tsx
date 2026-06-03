@@ -17,10 +17,7 @@ import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
 import Logo from '../components/brand/LogoWithText';
 
-/**
- * Tela de Cadastro do Exploraê - Design 'Modern Navigator'
- * Implementado com Tailwind CSS (NativeWind v4)
- */
+// Tela de cadastro de novos aventureiros do Exploraê.
 
 export default function CadastroScreen() {
   const router = useRouter();
@@ -61,14 +58,12 @@ export default function CadastroScreen() {
       setErrors({});
       setLoading(true);
 
-      // Enviando dados reais para o Spring Boot via AuthContext
+      // Envia a inscrição para a API via AuthContext
       const registrationData = {
         name: formData.fullName,
         email: formData.email,
         password: formData.password
       };
-
-      // Removido log inseguro de dados de expedição
       
       const response = await register(registrationData);
 
@@ -96,12 +91,11 @@ export default function CadastroScreen() {
         showsVerticalScrollIndicator={false}
       >
         
-        {/* Elementos Atmosféricos (Gradients) */}
+        {/* Efeito de luz laranja de fundo */}
         <View className="absolute top-[-10%] left-[-10%] w-[150%] h-[50%] bg-[#fd6c28] opacity-10 rounded-full blur-[120px]" />
         
         <Stack.Screen options={{ headerShown: false }} />
 
-        {/* Main Card */}
         <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
           <View className="items-center mb-8">
             <Logo size={80} />
@@ -166,7 +160,6 @@ export default function CadastroScreen() {
               </View>
             </View>
 
-            {/* Termos de Aceite */}
             <TouchableOpacity 
               activeOpacity={0.7}
               onPress={() => setFormData({ ...formData, termsAccepted: !formData.termsAccepted })}
@@ -191,7 +184,6 @@ export default function CadastroScreen() {
             />
           </View>
 
-          {/* Footer Card */}
           <View className="items-center mt-6 flex-row justify-center">
             <Text className="text-[#8b9296] font-medium text-xs">
               Já tem uma conta?{' '}
@@ -204,7 +196,7 @@ export default function CadastroScreen() {
           </View>
         </View>
 
-        {/* Footer Gamification */}
+        {/* Mostra um selo social com a contagem de aventureiros */}
         <View className="items-center mb-8 opacity-60">
           <View className="flex-row items-center gap-4 mb-4">
             <View className="w-12 h-1 bg-[#ffba26] rounded-full" />

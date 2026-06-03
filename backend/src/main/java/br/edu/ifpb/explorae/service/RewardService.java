@@ -2,6 +2,8 @@ package br.edu.ifpb.explorae.service;
 
 import br.edu.ifpb.explorae.api.dto.RewardResponseDTO;
 import br.edu.ifpb.explorae.api.dto.VoucherResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherTokenResponseDTO;
+import br.edu.ifpb.explorae.api.dto.VoucherValidationResponseDTO;
 import br.edu.ifpb.explorae.api.exception.BusinessException;
 import br.edu.ifpb.explorae.api.exception.ResourceNotFoundException;
 import br.edu.ifpb.explorae.api.mapper.RewardMapper;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +30,7 @@ public class RewardService {
     private final VoucherRepository voucherRepository;
     private final UserRepository userRepository;
     private final RewardMapper rewardMapper;
+    private final TokenService tokenService;
 
     @Transactional(readOnly = true)
     public List<RewardResponseDTO> getActiveRewards() {
@@ -78,5 +82,66 @@ public class RewardService {
     public List<VoucherResponseDTO> getUserVouchers(UUID userId) {
         List<Voucher> vouchers = voucherRepository.findByUserIdOrderByRedeemedAtDesc(userId);
         return rewardMapper.toVoucherDTOList(vouchers);
+    }
+
+    @Transactional(readOnly = true)
+    public VoucherTokenResponseDTO generateVoucherToken(UUID userId, UUID voucherId) {
+        Voucher voucher = voucherRepository.findById(voucherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Voucher não encontrado."));
+
+        if (!voucher.getUser().getId().equals(userId)) {
+            throw new BusinessException("Acesso negado. Este voucher não pertence a você.");
+        }
+
+        if (voucher.getStatus() != VoucherStatus.ACTIVE) {
+            throw new BusinessException("Apenas vouchers ATIVOS podem ter QR Codes gerados.");
+        }
+
+        if (voucher.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("Este voucher expirou e não pode mais ser utilizado.");
+        }
+
+        String token = tokenService.generateVoucherToken(voucherId);
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(15);
+
+        return new VoucherTokenResponseDTO(token, expiresAt);
+    }
+
+    @Transactional
+    public VoucherValidationResponseDTO validateVoucherToken(String token) {
+        UUID voucherId;
+        try {
+            voucherId = tokenService.extractVoucherIdFromToken(token);
+        } catch (Exception e) {
+            throw new BusinessException("QR Code inválido, corrompido ou expirado.");
+        }
+
+        Voucher voucher = voucherRepository.findById(voucherId)
+                .orElseThrow(() -> new ResourceNotFoundException("Voucher não encontrado no sistema."));
+
+        if (voucher.getStatus() != VoucherStatus.ACTIVE) {
+            if (voucher.getStatus() == VoucherStatus.USED) {
+                throw new BusinessException("Este voucher já foi utilizado.");
+            }
+            throw new BusinessException("Este voucher está inativo ou expirado.");
+        }
+
+        if (voucher.getExpiresAt().isBefore(LocalDateTime.now())) {
+            voucher.setStatus(VoucherStatus.EXPIRED);
+            voucherRepository.save(voucher);
+            throw new BusinessException("Este voucher expirou e não pode ser validado.");
+        }
+
+        voucher.setStatus(VoucherStatus.USED);
+        voucher.setUsedAt(LocalDateTime.now());
+        Voucher savedVoucher = voucherRepository.save(voucher);
+
+        return new VoucherValidationResponseDTO(
+                savedVoucher.getCode(),
+                savedVoucher.getReward().getName(),
+                savedVoucher.getReward().getPartner().getName(),
+                savedVoucher.getUser().getName(),
+                savedVoucher.getUsedAt()
+        );
     }
 }

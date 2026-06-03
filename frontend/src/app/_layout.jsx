@@ -99,6 +99,7 @@ function InitialLayout() {
         <Stack.Screen name="dashboard/badges" options={{ title: 'Medalhas & Desafios', headerShown: false }} />
         <Stack.Screen name="dashboard/favorites" options={{ title: 'Meus Favoritos', headerShown: false }} />
         <Stack.Screen name="dashboard/coupons" options={{ title: 'Meus Cupons', headerShown: false }} />
+        <Stack.Screen name="dashboard/scanner" options={{ title: 'Validar Voucher', headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: 'Configurações', headerShown: false }} />
         <Stack.Screen
           name="attraction/[id]"

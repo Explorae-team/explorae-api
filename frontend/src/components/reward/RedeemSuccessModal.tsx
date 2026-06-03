@@ -50,14 +50,7 @@ export const RedeemSuccessModal: React.FC<RedeemSuccessModalProps> = ({
               </Text>
             </View>
 
-            <View className="bg-[#002e3c] border border-white/5 rounded-2xl p-4 items-center mb-5 mx-2">
-              <Text className="text-white/40 text-[9px] font-black uppercase tracking-wider font-sans">
-                Código do Voucher
-              </Text>
-              <Text className="text-[#fd6c28] text-lg font-black font-sans mt-0.5 tracking-wide">
-                {voucher.code}
-              </Text>
-            </View>
+
 
             <View className="bg-[#002e3c]/50 border border-emerald-500/20 rounded-2xl p-4 mb-6 mx-2 flex-row items-start">
               <Ionicons name="information-circle" size={20} color={colors.success} style={{ marginRight: 10, marginTop: 1 }} />

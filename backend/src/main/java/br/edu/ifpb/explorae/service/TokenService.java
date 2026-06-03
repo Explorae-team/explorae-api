@@ -40,6 +40,32 @@ public class TokenService {
     }
 
     /**
+     * Gera um token dinâmico assinado para o QR Code do Voucher com validade de 15 minutos.
+     */
+    public String generateVoucherToken(java.util.UUID voucherId) {
+        return Jwts.builder()
+                .subject(voucherId.toString())
+                .claim("type", "VOUCHER_VALIDATION")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000)) // 15 minutos
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+    /**
+     * Extrai e valida o UUID do voucher do token assinado.
+     */
+    public java.util.UUID extractVoucherIdFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        String type = claims.get("type", String.class);
+        if (!"VOUCHER_VALIDATION".equals(type)) {
+            throw new io.jsonwebtoken.JwtException("Tipo de token inválido para validação de voucher.");
+        }
+        return java.util.UUID.fromString(claims.getSubject());
+    }
+
+
+    /**
      * extrai o email do usuário do token.
      */
     public String extractUsername(String token) {

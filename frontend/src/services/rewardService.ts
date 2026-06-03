@@ -27,6 +27,20 @@ export interface Voucher {
   status: 'ACTIVE' | 'USED' | 'EXPIRED';
   redeemedAt: string;
   expiresAt: string;
+  usedAt?: string;
+}
+
+export interface VoucherTokenResponse {
+  token: string;
+  expiresAt: string;
+}
+
+export interface VoucherValidationResponse {
+  voucherCode: string;
+  rewardName: string;
+  partnerName: string;
+  userName: string;
+  validatedAt: string;
 }
 
 export const rewardService = {
@@ -72,6 +86,37 @@ export const rewardService = {
       return {
         success: false,
         message: error.response?.data?.message || 'Erro ao carregar seus vouchers'
+      };
+    }
+  },
+
+  getVoucherToken: async (voucherId: string): Promise<{ success: boolean; data?: VoucherTokenResponse; message?: string }> => {
+    try {
+      const response = await api.post(`/api/v1/rewards/vouchers/${voucherId}/token`);
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Erro ao gerar token dinâmico'
+      };
+    }
+  },
+
+  validateVoucher: async (token: string): Promise<{ success: boolean; data?: VoucherValidationResponse; message?: string }> => {
+    try {
+      const response = await api.post('/api/v1/rewards/vouchers/validate', { token });
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Erro ao validar voucher'
       };
     }
   }

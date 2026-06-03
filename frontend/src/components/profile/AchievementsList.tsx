@@ -13,7 +13,6 @@ export default function AchievementsList() {
   const { user } = useAuth() as any;
   const [selectedBadge, setSelectedBadge] = useState<any>(null);
   
-  // Mapeamento de cores para categorias de medalhas
   const categoryColors = {
     'ONBOARDING': '#ffba26',
     'EXPLORACAO': '#fd6c28',
@@ -86,7 +85,6 @@ export default function AchievementsList() {
         ))}
       </ScrollView>
 
-      {/* Modal de Detalhe da Medalha */}
       <BadgeDetailModal
         visible={!!selectedBadge}
         item={selectedBadge ? { type: 'BADGE', data: selectedBadge, isUnlocked: true } : null}

@@ -17,17 +17,17 @@ interface RewardTypeUIConfig {
 const REWARD_UI_THEMES: Record<Reward['type'], RewardTypeUIConfig> = {
   DISCOUNT: {
     label: 'Desconto',
-    badgeClass: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    badgeClass: 'bg-emerald-600 text-white border-emerald-500',
     iconName: 'local-offer',
   },
   EXPERIENCE: {
     label: 'Experiência',
-    badgeClass: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+    badgeClass: 'bg-cyan-600 text-white border-cyan-500',
     iconName: 'directions-bike',
   },
   PRODUCT: {
     label: 'Brinde',
-    badgeClass: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    badgeClass: 'bg-amber-600 text-white border-amber-500',
     iconName: 'card-giftcard',
   },
 };
@@ -47,7 +47,7 @@ const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1590523277543-
 export const RewardCard: React.FC<RewardCardProps> = ({ reward, onPress }) => {
   const theme = REWARD_UI_THEMES[reward.type] || {
     label: 'Recompensa',
-    badgeClass: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    badgeClass: 'bg-blue-600 text-white border-blue-500',
     iconName: 'stars',
   };
 
