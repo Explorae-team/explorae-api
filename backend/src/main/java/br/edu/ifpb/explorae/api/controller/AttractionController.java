@@ -40,14 +40,19 @@ public class AttractionController {
     private final FileStorageService fileStorageService;
 
     @GetMapping
-    public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getAll(
-            @RequestParam(required = false) String category,
-            @PageableDefault(size = 10) Pageable pageable) {
-        Page<AttractionResponseDTO> page = attractionService.findAll(category, pageable);
-        return ResponseEntity.ok(StandardResponseDTO.success(
-                "Atrações recuperadas com sucesso",
-                page));
-    }
+public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getAll(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false, defaultValue = "false") boolean fetchAll,
+        @PageableDefault(size = 10) Pageable pageable) {
+
+    Pageable pageRequest = fetchAll ? Pageable.unpaged() : pageable;
+
+    Page<AttractionResponseDTO> page = attractionService.findAll(category, pageRequest);
+    
+    return ResponseEntity.ok(StandardResponseDTO.success(
+            "Atrações recuperadas com sucesso",
+            page));
+}
 
     @GetMapping("/recommendations")
     public ResponseEntity<StandardResponseDTO<Page<AttractionResponseDTO>>> getRecommendations(

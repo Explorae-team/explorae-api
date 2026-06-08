@@ -63,6 +63,21 @@ const getCategoryStyle = (category: string) => {
   return { icon: 'place', color: '#fd6c28' }; 
 };
 
+const decodePolyline = (t: string) => {
+  let points = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < t.length) {
+    let b, shift = 0, result = 0;
+    do { b = t.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += ((result & 1) ? ~(result >> 1) : (result >> 1));
+    shift = 0; result = 0;
+    do { b = t.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += ((result & 1) ? ~(result >> 1) : (result >> 1));
+    points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+  }
+  return points;
+};
+
 export default function RoutesScreen() {
   const router = useRouter();
 
@@ -72,6 +87,13 @@ export default function RoutesScreen() {
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // ESTADOS DE PESQUISA
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Attraction[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // ESTADOS PARA A SPRINT 4
   const [transportMode, setTransportMode] = useState<TransportMode>('driving');
@@ -90,7 +112,10 @@ export default function RoutesScreen() {
       const fetchAttractions = async () => {
         try {
           setIsLoadingData(true);
-          const response = await api.get('/api/v1/attractions');
+          // Adiciona o fetchAll: true
+          const response = await api.get('/api/v1/attractions', {
+            params: { fetchAll: true }
+          });
           const attractionsArray = response.data.data.content; 
           const mappedData: Attraction[] = attractionsArray.map((item: any) => ({
             id: item.id,
@@ -266,8 +291,97 @@ export default function RoutesScreen() {
     }, [userLocation, attractionsList])
   );
 
+  // Debounce: Aguarda o usuário parar de digitar por 400ms antes de buscar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Dispara a busca no Backend com o termo digitado
+  useEffect(() => {
+    if (!debouncedQuery.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchSearch = async () => {
+      setIsSearching(true);
+      try {
+        // Chamada limpa: trazemos os dados e forçamos o filtro no frontend (fallback seguro)
+        const res = await api.get('/api/v1/attractions', {
+          params: { fetchAll: true }
+        });
+        
+        if (isMounted && res.data?.data?.content) {
+          const term = debouncedQuery.toLowerCase();
+          
+          // Filtra os itens em tempo real verificando se o nome contém o termo buscado
+          const filteredItems = res.data.data.content.filter((item: any) => 
+            (item.name || '').toLowerCase().includes(term)
+          ).slice(0, 5); // Limita aos 5 melhores resultados
+
+          const data = filteredItems.map((item: any) => ({
+            id: item.id,
+            category: item.category || 'Exploração',
+            title: item.name, 
+            imageUrl: item.mainImageUrl || 'https://via.placeholder.com/150',
+            coordinate: {
+              latitude: item.coordinate?.latitude || 0,
+              longitude: item.coordinate?.longitude || 0
+            }
+          }));
+          
+          setSearchResults(data);
+        }
+      } catch (e) {
+        console.error("Erro na busca do mapa:", e);
+      } finally {
+        if (isMounted) setIsSearching(false);
+      }
+    };
+
+    fetchSearch();
+    return () => { isMounted = false; };
+  }, [debouncedQuery]);
+
   const handleSelectAttraction = useCallback((attraction: Attraction) => {
     setSelectedAttraction(attraction);
+    
+    setAttractionsList(prevList => {
+      // Verifica se a atração já existe na lista, se não, adiciona
+      const exists = prevList.some(a => a.id === attraction.id);
+      const listToProcess = exists ? prevList : [...prevList, attraction];
+
+      if (listToProcess.length <= 1) return listToProcess;
+
+      // Algoritmo: Nearest Neighbor para traçar o roteiro ideal
+      const remaining = listToProcess.filter(a => a.id !== attraction.id);
+      const ordered: Attraction[] = [attraction];
+      let current = attraction;
+
+      while (remaining.length > 0) {
+        let nearestIdx = 0;
+        let minDist = Infinity;
+        for (let i = 0; i < remaining.length; i++) {
+          const dist = getDistance(current.coordinate, remaining[i].coordinate);
+          if (dist < minDist) {
+            minDist = dist;
+            nearestIdx = i;
+          }
+        }
+        current = remaining[nearestIdx];
+        ordered.push(current);
+        remaining.splice(nearestIdx, 1);
+      }
+      
+      // Atualiza o estado apenas se a ordem realmente mudou (evita re-renders desnecessários)
+      const orderChanged = listToProcess.length !== ordered.length || listToProcess.some((a, i) => a.id !== ordered[i].id);
+      return orderChanged ? ordered : listToProcess;
+    });
   }, []);
 
   // Efeito para auto-selecionar o primeiro destino ao carregar a lista
@@ -282,30 +396,64 @@ export default function RoutesScreen() {
   // Efeito para "Calcular a Rota", Traçar a Polyline e Enquadrar a Câmara
   useEffect(() => {
     if (selectedAttraction && userLocation) {
-      const mockPolyline = [
-        userLocation.coords,
-        selectedAttraction.coordinate
-      ];
-      setRoutePolyline(mockPolyline);
+      const fetchRouteDirections = async () => {
+        try {
+          const start = userLocation.coords;
+          const end = selectedAttraction.coordinate;
+          
+          // Mapeamento dos modais para a API OSRM (transit e driving usam rotas de carro)
+          const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
+          const mode = modeMap[transportMode];
+          
+          // Requisição para a API open-source de trânsito e roteamento
+          const url = `https://router.project-osrm.org/route/v1/${mode}/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=polyline`;
+          
+          const response = await fetch(url);
+          const json = await response.json();
+          
+          if (json.code === 'Ok' && json.routes.length > 0) {
+            const route = json.routes[0];
+            
+            // Decodifica a geometria da rota em uma linha curva que segue as ruas
+            const points = decodePolyline(route.geometry);
+            setRoutePolyline(points);
+            
+            // Pega a distância e tempo exatos
+            const distMeters = route.distance;
+            const durSeconds = route.duration;
+            
+            const distText = distMeters > 1000 ? `${(distMeters/1000).toFixed(1)} km` : `${Math.round(distMeters)} m`;
+            const timeText = durSeconds > 3600 ? `${Math.floor(durSeconds/3600)}h ${Math.ceil((durSeconds%3600)/60)}m` : `${Math.ceil(durSeconds/60)} min`;
+            
+            setRouteMeta({ distance: distText, time: timeText });
 
-      const distMeters = getDistance(userLocation.coords, selectedAttraction.coordinate);
-      const distText = distMeters > 1000 ? `${(distMeters / 1000).toFixed(1)} km` : `${distMeters} m`;
-      
-      let timeText = '';
-      if (transportMode === 'driving') timeText = `${Math.ceil(distMeters / 400)} min`;
-      if (transportMode === 'transit') timeText = `${Math.ceil(distMeters / 250)} min`;
-      if (transportMode === 'walking') timeText = `${Math.ceil(distMeters / 80)} min`;
-      
-      setRouteMeta({ distance: distText, time: timeText });
-
-      if (Platform.OS !== 'web' && mapRef.current) {
-        setTimeout(() => {
-          mapRef.current?.fitToCoordinates(mockPolyline, {
-            edgePadding: { top: 100, right: 50, bottom: 300, left: 50 },
-            animated: true,
+            if (Platform.OS !== 'web' && mapRef.current) {
+              setTimeout(() => {
+                mapRef.current?.fitToCoordinates(points, {
+                  edgePadding: { top: 100, right: 50, bottom: 300, left: 50 },
+                  animated: true,
+                });
+              }, 300);
+            }
+          } else {
+            throw new Error("Rota não encontrada pelo OSRM");
+          }
+        } catch (err) {
+          console.warn("Falha na API de rotas. Usando linha reta como fallback:", err);
+          
+          // Fallback de segurança: Linha reta caso falte internet ou API caia
+          const fallbackMock = [userLocation.coords, selectedAttraction.coordinate];
+          setRoutePolyline(fallbackMock);
+          
+          const mockDist = getDistance(userLocation.coords, selectedAttraction.coordinate);
+          setRouteMeta({ 
+            distance: mockDist > 1000 ? `${(mockDist / 1000).toFixed(1)} km` : `${mockDist} m`, 
+            time: '--' 
           });
-        }, 300);
-      }
+        }
+      };
+
+      fetchRouteDirections();
     } else {
       setRoutePolyline([]);
     }
@@ -371,14 +519,26 @@ export default function RoutesScreen() {
   const handleConfirmArrival = () => {
     if (selectedAttraction) {
       const filteredList = attractionsList.filter(attr => attr.id !== selectedAttraction.id);
-      const newList = [...filteredList, selectedAttraction];
-      setAttractionsList(newList);
+      setAttractionsList(filteredList);
       
       setSelectedAttraction(null);
       setCanCheckIn(false);
       triggeredAttractionId.current = null;
       setIsModalVisible(false);
+      
+      if (filteredList.length === 0) {
+        if (Platform.OS !== 'web') Alert.alert("Parabéns! 🎉", "Você concluiu com sucesso todos os destinos do seu roteiro!");
+        else window.alert("Parabéns! 🎉 Você concluiu com sucesso todos os destinos do seu roteiro!");
+      }
     }
+  };
+
+  const handleSelectSearchResult = (attr: Attraction) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    
+    // A própria função handleSelectAttraction agora cuida de adicionar (se não existir) e reordenar a fila
+    handleSelectAttraction(attr);
   };
 
   const mapStyleOptions = [
@@ -472,10 +632,51 @@ export default function RoutesScreen() {
             <MaterialIcon name="arrow-back" size={24} color="#cbe7f2" />
           </TouchableOpacity>
 
-          <View style={styles.searchBar}>
-            <MaterialIcon name="search" size={20} color="#e1bfb3" />
-            <TextInput style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]} placeholder="Onde vamos explorar?" placeholderTextColor="#e1bfb3" />
-            <MaterialIcon name="mic" size={20} color="#e1bfb3" />
+          <View style={{ flex: 1, zIndex: 50 }}>
+            <View style={styles.searchBar}>
+              <MaterialIcon name="search" size={20} color="#e1bfb3" />
+              <TextInput 
+                style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]} 
+                placeholder="Onde vamos explorar?" 
+                placeholderTextColor="#e1bfb3" 
+                value={searchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  setShowSearchResults(true);
+                }}
+                onFocus={() => setShowSearchResults(true)}
+              />
+              {searchQuery.length > 0 ? (
+                <TouchableOpacity onPress={() => { setSearchQuery(''); setShowSearchResults(false); }}>
+                  <MaterialIcon name="close" size={20} color="#e1bfb3" />
+                </TouchableOpacity>
+              ) : (
+                <MaterialIcon name="mic" size={20} color="#e1bfb3" />
+              )}
+            </View>
+
+            {showSearchResults && searchQuery.trim().length > 0 && (
+              <View style={styles.searchResultsContainer}>
+                {isSearching ? (
+                  <View style={styles.searchLoading}>
+                    <ActivityIndicator size="small" color="#fd6c28" />
+                  </View>
+                ) : searchResults.length > 0 ? (
+                  <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 200 }}>
+                    {searchResults.map(attr => (
+                      <TouchableOpacity key={attr.id} style={styles.searchResultItem} onPress={() => handleSelectSearchResult(attr)}>
+                        <MaterialIcon name="place" size={16} color="#fd6c28" style={styles.buttonIcon} />
+                        <Text style={styles.searchResultText} numberOfLines={1}>{attr.title}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <View style={styles.searchEmpty}>
+                    <Text style={styles.searchEmptyText}>Nenhum destino encontrado.</Text>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -662,6 +863,12 @@ const styles = StyleSheet.create({
   searchBar: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(6, 35, 43, 0.9)', borderRadius: 9999, height: 48, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.2)' },
   searchInput: { flex: 1, paddingHorizontal: 8, color: '#cbe7f2', fontSize: 14 }, 
   markerPulse: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fd6c28', justifyContent: 'center', alignItems: 'center', elevation: 4, borderWidth: 2, borderColor: 'rgba(255, 255, 255, 0.8)' },
+  searchResultsContainer: { position: 'absolute', top: 54, left: 0, right: 0, backgroundColor: 'rgba(6, 35, 43, 0.98)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.3)', overflow: 'hidden', elevation: 5, zIndex: 100 },
+  searchResultItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255, 255, 255, 0.05)' },
+  searchResultText: { color: '#cbe7f2', fontSize: 14, fontWeight: '600', flex: 1 },
+  searchLoading: { padding: 24, alignItems: 'center' },
+  searchEmpty: { padding: 24, alignItems: 'center' },
+  searchEmptyText: { color: '#e1bfb3', fontSize: 12 },
   bottomSheet: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'rgba(2, 31, 39, 0.95)', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.1)', zIndex: 60 },
   
   // Estilos de Header Condicionais
