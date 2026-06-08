@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  ScrollView,
   View,
   Text,
-  RefreshControl,
   ActivityIndicator,
   Pressable,
   Platform
@@ -18,6 +16,7 @@ import { useRecommendations } from '../../services/useRecommendations';
 import { useFavorites } from '../../services/useFavorites';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import api from '../../services/api';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
 import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
@@ -181,17 +180,11 @@ export default function ExploreScreen() {
         onNotificationsPress={() => console.log('Notifications')}
       />
 
-      <ScrollView
+      <ExploraScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: 24 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary}
-          />
-        }
+        onRefresh={handleRefresh}
+        refreshing={isRefreshing}
       >
         <View style={{ gap: 32 }}>
 
@@ -456,7 +449,7 @@ export default function ExploreScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </ExploraScrollView>
 
       <FiltersModal 
         isVisible={isFilterModalVisible}

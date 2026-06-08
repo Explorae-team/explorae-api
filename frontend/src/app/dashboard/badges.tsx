@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   Image,
   Dimensions,
-  RefreshControl
+  TouchableOpacity
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +17,7 @@ import api from '../../services/api';
 import { BadgeDetailModal } from '../../components/profile/BadgeDetailModal';
 import { ChallengeCard } from '../../components/profile/ChallengeCard';
 import { colors } from '../../constants/colors';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
@@ -119,7 +118,7 @@ export default function BadgesScreen() {
         style={{ paddingTop: insets.top + 16 }}
       >
         <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-white/5">
-          <Ionicons name="arrow-back" size={20} color="white" />
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
         </TouchableOpacity>
         <Text className="text-white text-lg font-bold font-sans">Conquistas & Desafios</Text>
         <View className="w-10 h-10" />
@@ -162,17 +161,11 @@ export default function BadgesScreen() {
           <Text className="text-white/60 mt-4 font-sans">Carregando dados...</Text>
         </View>
       ) : (
-        <ScrollView
+        <ExploraScrollView
           className="flex-1 px-6"
           contentContainerStyle={{ paddingVertical: 24, paddingBottom: 120 }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              tintColor={colors.primary}
-            />
-          }
+          onRefresh={handleRefresh}
+          refreshing={isRefreshing}
         >
           {activeTab === 'MEDALS' ? (
             <View>
@@ -302,7 +295,7 @@ export default function BadgesScreen() {
               )}
             </View>
           )}
-        </ScrollView>
+        </ExploraScrollView>
       )}
 
       {/* Modal de detalhes da conquista selecionada */}

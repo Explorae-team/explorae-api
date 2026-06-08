@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Vibration, Platform } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, Vibration, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
@@ -7,6 +7,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import PhotoGalleryCarousel from '../../components/attraction/PhotoGalleryCarousel';
 import PrimaryButton from '../../components/PrimaryButton';
 import api from '../../services/api';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { ReviewModal } from '../../components/attraction/ReviewModal';
 import { colors } from '../../constants/colors';
@@ -30,25 +31,40 @@ const AttractionDetail = () => {
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isSavingAttraction, setIsSavingAttraction] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchAttraction = async () => {
+    if (!id) return;
+
+    try {
+      setError(null);
+      const response = await api.get(`/api/v1/attractions/${id}`);
+      setAttraction(response.data?.data);
+    } catch (err: any) {
+      console.error('Erro ao buscar detalhes da atração:', err);
+      setError('Não foi possível carregar as informações desta atração.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAttraction = async () => {
-      if (!id) return;
-
-      try {
-        setIsLoading(true);
-        const response = await api.get(`/api/v1/attractions/${id}`);
-        setAttraction(response.data?.data);
-      } catch (err: any) {
-        console.error('Erro ao buscar detalhes da atração:', err);
-        setError('Não foi possível carregar as informações desta atração.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    setIsLoading(true);
     fetchAttraction();
   }, [id]);
+
+  const handleRefresh = async () => {
+    if (!id) return;
+    setRefreshing(true);
+    try {
+      const response = await api.get(`/api/v1/attractions/${id}`);
+      setAttraction(response.data?.data);
+    } catch (err) {
+      console.error('Erro ao recarregar detalhes da atração:', err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleCheckIn = async () => {
     if (isCheckingIn) return;
@@ -200,7 +216,11 @@ const AttractionDetail = () => {
         }} 
       />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 220 }} showsVerticalScrollIndicator={false}>
+      <ExploraScrollView 
+        contentContainerStyle={{ paddingBottom: 220 }} 
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
+      >
         {/* Galeria de Fotos */}
         <PhotoGalleryCarousel images={attraction.imageUrls || []} />
 
@@ -259,7 +279,7 @@ const AttractionDetail = () => {
             <Text className="text-accent font-bold font-sans">Adicionar Nova Dica</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </ExploraScrollView>
 
       {/* Botão de Check-in Flutuante */}
       <View className="absolute bottom-10 left-6 right-6">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Platform, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, Platform, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -9,6 +9,7 @@ import { AttractionCard } from '../../components/dashboard/AttractionCard';
 import { useFavorites } from '../../services/useFavorites';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { colors } from '../../constants/colors';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -68,17 +69,11 @@ export default function FavoritesScreen() {
         </Text>
       </View>
 
-      <ScrollView
+      <ExploraScrollView
         style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 48, paddingTop: 24 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary}
-          />
-        }
+        onRefresh={handleRefresh}
+        refreshing={isRefreshing}
       >
         <View style={{ paddingHorizontal: Platform.OS === 'web' ? 16 : 0 }}>
           {isLoading ? (
@@ -133,7 +128,7 @@ export default function FavoritesScreen() {
             </View>
           )}
         </View>
-      </ScrollView>
+      </ExploraScrollView>
     </View>
   );
 }
