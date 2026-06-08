@@ -4,7 +4,8 @@ import {
   Text,
   ActivityIndicator,
   Pressable,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
