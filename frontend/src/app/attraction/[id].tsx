@@ -11,6 +11,7 @@ import ExploraScrollView from '../../components/common/ExploraScrollView';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import { ReviewModal } from '../../components/attraction/ReviewModal';
 import { colors } from '../../constants/colors';
+import { useRouteStore } from '../../store/useRouteStore';
 
 // Sub-componentes Especializados
 import AttractionActionHeader from '../../components/attraction/AttractionActionHeader';
@@ -22,6 +23,8 @@ const AttractionDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { triggerCelebration } = useCelebration();
+  const addToRoute = useRouteStore((state) => state.addToRoute);
+  const navigateNow = useRouteStore((state) => state.navigateNow);
 
   const [attraction, setAttraction] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -251,12 +254,50 @@ const AttractionDetail = () => {
             {attraction.longDescription || attraction.shortDescription}
           </Text>
 
-          {/* Ação Principal: Rota */}
-          <PrimaryButton
-            title="TRAÇAR ROTA"
-            className="mt-8"
-            rightIcon={<MaterialCommunityIcons name="navigation-variant" size={24} color="white" />}
-          />
+          {/* Ação Principal: Rotas */}
+          <View className="flex-row gap-3 mt-8">
+            <TouchableOpacity
+              onPress={() => {
+                const attrPayload = {
+                  id: attraction.id,
+                  category: attraction.category || 'Exploração',
+                  title: attraction.name,
+                  imageUrl: attraction.mainImageUrl || 'https://via.placeholder.com/150',
+                  coordinate: {
+                    latitude: attraction.coordinate?.latitude || 0,
+                    longitude: attraction.coordinate?.longitude || 0
+                  }
+                };
+                addToRoute(attrPayload);
+                alert('Atração adicionada ao seu roteiro!');
+              }}
+              className="flex-1 border-2 border-primary py-4 rounded-xl flex-row justify-center items-center gap-2"
+            >
+              <MaterialCommunityIcons name="playlist-plus" size={18} color={colors.primary} />
+              <Text className="text-primary font-bold text-xs text-center">ADICIONAR AO ROTEIRO</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                const attrPayload = {
+                  id: attraction.id,
+                  category: attraction.category || 'Exploração',
+                  title: attraction.name,
+                  imageUrl: attraction.mainImageUrl || 'https://via.placeholder.com/150',
+                  coordinate: {
+                    latitude: attraction.coordinate?.latitude || 0,
+                    longitude: attraction.coordinate?.longitude || 0
+                  }
+                };
+                navigateNow(attrPayload);
+                router.push('/dashboard/routes');
+              }}
+              className="flex-1 bg-primary py-4 rounded-xl flex-row justify-center items-center gap-2"
+            >
+              <MaterialCommunityIcons name="navigation-variant" size={18} color="white" />
+              <Text className="text-white font-bold text-xs text-center">NAVEGAR AGORA</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Grid de Informações Bento */}
           <AttractionInfoGrid
@@ -281,16 +322,7 @@ const AttractionDetail = () => {
         </View>
       </ExploraScrollView>
 
-      {/* Botão de Check-in Flutuante */}
-      <View className="absolute bottom-10 left-6 right-6">
-        <PrimaryButton 
-          title={isCheckingIn ? "REALIZANDO CHECK-IN..." : "CHECK-IN NO LOCAL"}
-          onPress={handleCheckIn}
-          disabled={isCheckingIn}
-          className="bg-explora-gold shadow-explora-gold/30"
-          rightIcon={isCheckingIn ? <ActivityIndicator size="small" color={colors.background} /> : <MaterialCommunityIcons name="checkbox-marked-circle" size={20} color={colors.background} />}
-        />
-      </View>
+
 
       {/* Modal de Nova Review Reutilizável */}
       <ReviewModal 

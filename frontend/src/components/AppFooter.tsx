@@ -94,10 +94,10 @@ const AppFooter: React.FC<AppFooterProps> = ({
                 color={isActive ? colors.primary : colors.outline}
               />
 
-              {tab.badgeCount > 0 ? (
+              {(tab.badgeCount ?? 0) > 0 ? (
                 <View className="absolute -top-1 -right-1 bg-error min-w-[16px] h-4 rounded-full items-center justify-center px-1">
                   <Text className="text-[8px] font-bold text-white">
-                    {tab.badgeCount > 9 ? '9+' : tab.badgeCount}
+                    {(tab.badgeCount ?? 0) > 9 ? '9+' : tab.badgeCount}
                   </Text>
                 </View>
               ) : null}

@@ -2,24 +2,31 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   StyleSheet, View, Text, TextInput, TouchableOpacity, Image,
   ScrollView, Dimensions, Animated, PanResponder, StatusBar,
-  Alert, Linking, Platform, ActivityIndicator
+  Alert, Linking, Platform, ActivityIndicator, useWindowDimensions
 } from 'react-native';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
 import { getDistance } from 'geolib';
 import { useRouter, useFocusEffect } from 'expo-router';
 
+// Drag & Drop (usado apenas em mobile)
+import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+// Store
+import { useRouteStore, Attraction } from '../../store/useRouteStore';
+
 // Imports condicionais para evitar crash na web
 let MapView: any;
 let Marker: any;
-let Polyline: any; // NOVO
+let Polyline: any; 
 let PROVIDER_GOOGLE: any;
 
 if (Platform.OS !== 'web') {
   const Maps = require('react-native-maps');
   MapView = Maps.default;
   Marker = Maps.Marker;
-  Polyline = Maps.Polyline; // NOVO
+  Polyline = Maps.Polyline; 
   PROVIDER_GOOGLE = Maps.PROVIDER_GOOGLE;
 }
 
@@ -31,19 +38,17 @@ const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 const SHEET_MAX_HEIGHT = SCREEN_HEIGHT * 0.45;
 const SHEET_MIN_HEIGHT = 100;
 
-interface Attraction {
-  id: string;
-  category: string;
-  title: string;
-  imageUrl: string;
-  coordinate: { latitude: number; longitude: number };
-}
-
 interface PointCardProps extends Attraction {
   distanceText: string;
   onPress: () => void;
   canCheckIn: boolean;
   onCheckIn: () => void;
+  onLongPress?: () => void;
+  isActive?: boolean;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 type TransportMode = 'driving' | 'transit' | 'walking';
@@ -81,14 +86,22 @@ const decodePolyline = (t: string) => {
 
 export default function RoutesScreen() {
   const router = useRouter();
+  const { width: windowWidth } = useWindowDimensions();
+  const isDesktopWeb = Platform.OS === 'web' && windowWidth >= 768;
 
-  const [attractionsList, setAttractionsList] = useState<Attraction[]>([]);
+  // Zustand Global Store
+  const routeQueue = useRouteStore((state) => state.routeQueue);
+  const setRouteQueue = useRouteStore((state) => state.setRouteQueue);
+
+  const [allAttractions, setAllAttractions] = useState<Attraction[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [userLocation, setUserLocation] = useState<{coords: {latitude: number, longitude: number}} | null>(null);
   const [isLocationFallback, setIsLocationFallback] = useState(false);
-  const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // O primeiro da fila é sempre o alvo atual principal
+  const selectedAttraction = routeQueue.length > 0 ? routeQueue[0] : null;
 
   // ESTADOS DE PESQUISA
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,7 +127,6 @@ export default function RoutesScreen() {
       const fetchAttractions = async () => {
         try {
           setIsLoadingData(true);
-          // Adiciona o fetchAll: true
           const response = await api.get('/api/v1/attractions', {
             params: { fetchAll: true }
           });
@@ -130,7 +142,7 @@ export default function RoutesScreen() {
             }
           }));
 
-          if (isMounted) setAttractionsList(mappedData);
+          if (isMounted) setAllAttractions(mappedData);
         } catch (error) {
           console.error('Erro ao buscar atrações:', error);
           if(Platform.OS !== 'web') Alert.alert('Erro de Conexão', 'Não foi possível carregar os pontos de exploração.');
@@ -144,10 +156,10 @@ export default function RoutesScreen() {
     }, [])
   );
 
-  // Pan Responder Condicional (Mais sensível na Web)
+  // Pan Responder Condicional (Mais sensível na Web se for usar)
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (_, gestureState) => Math.abs(gestureState.dy) > (Platform.OS === 'web' ? 5 : 10),
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => Math.abs(gestureState.dy) > 10,
       onPanResponderGrant: () => {
         animatedHeight.setOffset(lastDrivenHeight.current);
         animatedHeight.setValue(0);
@@ -192,13 +204,11 @@ export default function RoutesScreen() {
                 setUserLocation(FALLBACK_LOCATION);
                 setIsLocationFallback(true);
               }
-              
-              if (error.code === 1) {
-                window.alert("Permissão negada. O mapa será centralizado em João Pessoa por padrão.");
-              }
+              if (error.code === 1) window.alert("Permissão negada. O mapa será centralizado em João Pessoa por padrão.");
             };
 
-            const geoOptions = { enableHighAccuracy: true, maximumAge: 10000 };
+            // Timeout ajustado para 8 segundos para falhar rapidamente em desktops sem GPS
+            const geoOptions = { enableHighAccuracy: true, maximumAge: 10000, timeout: 8000 };
             navigator.geolocation.getCurrentPosition(updateLocation, handleLocationError, geoOptions);
             watchId = navigator.geolocation.watchPosition(updateLocation, handleLocationError, geoOptions);
           } else {
@@ -265,12 +275,13 @@ export default function RoutesScreen() {
   // Radar
   useFocusEffect(
     useCallback(() => {
-      if (!userLocation || attractionsList.length === 0) return;
+      if (!userLocation || routeQueue.length === 0) return;
 
       let nearestAttraction: Attraction | null = null;
       let shortestDistance = Infinity;
 
-      for (const attr of attractionsList) {
+      // Simplificado: checa se chegou no target atual (primeiro da fila) ou se passou por qualquer outro da fila
+      for (const attr of routeQueue) {
         const dist = getDistance(userLocation.coords, attr.coordinate);
         if (dist <= 50 && dist < shortestDistance) {
           shortestDistance = dist;
@@ -281,7 +292,13 @@ export default function RoutesScreen() {
       if (nearestAttraction) {
         if (triggeredAttractionId.current !== nearestAttraction.id) {
           triggeredAttractionId.current = nearestAttraction.id;
-          setSelectedAttraction(nearestAttraction);
+          
+          // Traz a atração alcançada para o topo caso não seja o alvo atual
+          if (routeQueue[0].id !== nearestAttraction.id) {
+             const filtered = routeQueue.filter(a => a.id !== nearestAttraction?.id);
+             setRouteQueue([nearestAttraction, ...filtered]);
+          }
+
           setCanCheckIn(true);
           
           if(Platform.OS !== 'web') {
@@ -301,18 +318,16 @@ export default function RoutesScreen() {
         triggeredAttractionId.current = null;
         setCanCheckIn(false);
       }
-    }, [userLocation, attractionsList])
+    }, [userLocation, routeQueue])
   );
 
-  // Debounce: Aguarda o usuário parar de digitar por 400ms antes de buscar
+  // Debounce Pesquisa
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 400);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Dispara a busca no Backend com o termo digitado
+  // Busca Local
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setSearchResults([]);
@@ -324,18 +339,12 @@ export default function RoutesScreen() {
     const fetchSearch = async () => {
       setIsSearching(true);
       try {
-        // Chamada limpa: trazemos os dados e forçamos o filtro no frontend (fallback seguro)
-        const res = await api.get('/api/v1/attractions', {
-          params: { fetchAll: true }
-        });
-        
+        const res = await api.get('/api/v1/attractions', { params: { fetchAll: true } });
         if (isMounted && res.data?.data?.content) {
           const term = debouncedQuery.toLowerCase();
-          
-          // Filtra os itens em tempo real verificando se o nome contém o termo buscado
           const filteredItems = res.data.data.content.filter((item: any) => 
             (item.name || '').toLowerCase().includes(term)
-          ).slice(0, 5); // Limita aos 5 melhores resultados
+          ).slice(0, 5); 
 
           const data = filteredItems.map((item: any) => ({
             id: item.id,
@@ -347,7 +356,6 @@ export default function RoutesScreen() {
               longitude: item.coordinate?.longitude || 0
             }
           }));
-          
           setSearchResults(data);
         }
       } catch (e) {
@@ -361,77 +369,53 @@ export default function RoutesScreen() {
     return () => { isMounted = false; };
   }, [debouncedQuery]);
 
-  const handleSelectAttraction = useCallback((attraction: Attraction) => {
-    setSelectedAttraction(attraction);
+  const handleSelectSearchResult = (attr: Attraction) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
     
-    setAttractionsList(prevList => {
-      // Verifica se a atração já existe na lista, se não, adiciona
-      const exists = prevList.some(a => a.id === attraction.id);
-      const listToProcess = exists ? prevList : [...prevList, attraction];
-
-      if (listToProcess.length <= 1) return listToProcess;
-
-      // Algoritmo: Nearest Neighbor para traçar o roteiro ideal
-      const remaining = listToProcess.filter(a => a.id !== attraction.id);
-      const ordered: Attraction[] = [attraction];
-      let current = attraction;
-
-      while (remaining.length > 0) {
-        let nearestIdx = 0;
-        let minDist = Infinity;
-        for (let i = 0; i < remaining.length; i++) {
-          const dist = getDistance(current.coordinate, remaining[i].coordinate);
-          if (dist < minDist) {
-            minDist = dist;
-            nearestIdx = i;
-          }
-        }
-        current = remaining[nearestIdx];
-        ordered.push(current);
-        remaining.splice(nearestIdx, 1);
-      }
-      
-      // Atualiza o estado apenas se a ordem realmente mudou (evita re-renders desnecessários)
-      const orderChanged = listToProcess.length !== ordered.length || listToProcess.some((a, i) => a.id !== ordered[i].id);
-      return orderChanged ? ordered : listToProcess;
-    });
-  }, []);
-
-  // Efeito para auto-selecionar o primeiro destino ao carregar a lista
-  useEffect(() => {
-    if (attractionsList.length > 0 && selectedAttraction === null) {
-      setTimeout(() => {
-        handleSelectAttraction(attractionsList[0]);
-      }, 500);
+    const exists = routeQueue.some(a => a.id === attr.id);
+    if (!exists) {
+      setRouteQueue([...routeQueue, attr]);
     }
-  }, [attractionsList, selectedAttraction, handleSelectAttraction]);
+  };
 
-  // Efeito para "Calcular a Rota", Traçar a Polyline e Enquadrar a Câmara
+  const moveQueueItem = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index > 0) {
+      const newQueue = [...routeQueue];
+      [newQueue[index - 1], newQueue[index]] = [newQueue[index], newQueue[index - 1]];
+      setRouteQueue(newQueue);
+    } else if (direction === 'down' && index < routeQueue.length - 1) {
+      const newQueue = [...routeQueue];
+      [newQueue[index + 1], newQueue[index]] = [newQueue[index], newQueue[index + 1]];
+      setRouteQueue(newQueue);
+    }
+  };
+
+  // Traçar a Polyline com MÚLTIPLOS Waypoints
   useEffect(() => {
-    if (selectedAttraction && userLocation) {
+    if (routeQueue.length > 0 && userLocation) {
       const fetchRouteDirections = async () => {
         try {
-          const start = userLocation.coords;
-          const end = selectedAttraction.coordinate;
-          
-          // Mapeamento dos modais para a API OSRM (transit e driving usam rotas de carro)
           const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
           const mode = modeMap[transportMode];
           
-          // Requisição para a API open-source de trânsito e roteamento
-          const url = `https://router.project-osrm.org/route/v1/${mode}/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=polyline`;
+          // Constroi a URL passando pelo userLocation e iterando toda a fila do roteiro, removendo coords invalidas
+          const waypoints = [userLocation.coords, ...routeQueue.map(a => a.coordinate)].filter(c => c && c.latitude !== 0 && c.longitude !== 0);
+          
+          if (waypoints.length < 2) throw new Error("Pontos insuficientes para traçar rota");
+
+          const coordsString = waypoints.map(c => `${c.longitude},${c.latitude}`).join(';');
+          
+          const url = `https://router.project-osrm.org/route/v1/${mode}/${coordsString}?overview=full&geometries=polyline`;
           
           const response = await fetch(url);
           const json = await response.json();
           
           if (json.code === 'Ok' && json.routes.length > 0) {
             const route = json.routes[0];
-            
-            // Decodifica a geometria da rota em uma linha curva que segue as ruas
             const points = decodePolyline(route.geometry);
             setRoutePolyline(points);
             
-            // Pega a distância e tempo exatos
             const distMeters = route.distance;
             const durSeconds = route.duration;
             
@@ -452,17 +436,11 @@ export default function RoutesScreen() {
             throw new Error("Rota não encontrada pelo OSRM");
           }
         } catch (err) {
-          console.warn("Falha na API de rotas. Usando linha reta como fallback:", err);
+          console.warn("Falha na API de rotas. Usando fallback de linhas retas.", err);
           
-          // Fallback de segurança: Linha reta caso falte internet ou API caia
-          const fallbackMock = [userLocation.coords, selectedAttraction.coordinate];
+          const fallbackMock = [userLocation.coords, ...routeQueue.map(a => a.coordinate)];
           setRoutePolyline(fallbackMock);
-          
-          const mockDist = getDistance(userLocation.coords, selectedAttraction.coordinate);
-          setRouteMeta({ 
-            distance: mockDist > 1000 ? `${(mockDist / 1000).toFixed(1)} km` : `${mockDist} m`, 
-            time: '--' 
-          });
+          setRouteMeta({ distance: '--', time: '--' });
         }
       };
 
@@ -470,19 +448,14 @@ export default function RoutesScreen() {
     } else {
       setRoutePolyline([]);
     }
-  }, [selectedAttraction, userLocation, transportMode]);
+  }, [routeQueue, userLocation, transportMode]);
 
   const handleNextDestination = () => {
-    if (attractionsList.length === 0) return;
-    let nextIndex = 0;
-    if (selectedAttraction) {
-      const currentIndex = attractionsList.findIndex(a => a.id === selectedAttraction.id);
-      if (currentIndex !== -1) {
-        nextIndex = (currentIndex + 1) % attractionsList.length;
-      }
+    if (routeQueue.length > 1) {
+       const nextQueue = [...routeQueue];
+       nextQueue.shift();
+       setRouteQueue(nextQueue);
     }
-    const nextAttr = attractionsList[nextIndex];
-    handleSelectAttraction(nextAttr);
   };
 
   const handleOpenNativeMaps = () => {
@@ -515,11 +488,11 @@ export default function RoutesScreen() {
     if (Platform.OS !== 'web') {
       Alert.alert(
         "Rota Iniciada! 🚀", 
-        `A sua jornada para ${selectedAttraction.title} começou.\n\nCompletar esta rota de ${transportMode === 'walking' ? 'caminhada' : 'carro'} renderá +150 XP!`,
+        `A sua jornada pelo roteiro planejado começou.\n\nCompletar esta etapa renderá +150 XP!`,
         [{ text: "Bora explorar!" }]
       );
     } else {
-      window.alert(`Rota Iniciada para ${selectedAttraction.title}! Completar renderá +150 XP.`);
+      window.alert(`Rota Iniciada! Completar a etapa renderá +150 XP.`);
     }
   };
 
@@ -531,10 +504,9 @@ export default function RoutesScreen() {
 
   const handleConfirmArrival = () => {
     if (selectedAttraction) {
-      const filteredList = attractionsList.filter(attr => attr.id !== selectedAttraction.id);
-      setAttractionsList(filteredList);
+      const filteredList = routeQueue.filter(attr => attr.id !== selectedAttraction.id);
+      setRouteQueue(filteredList);
       
-      setSelectedAttraction(null);
       setCanCheckIn(false);
       triggeredAttractionId.current = null;
       setIsModalVisible(false);
@@ -546,14 +518,6 @@ export default function RoutesScreen() {
     }
   };
 
-  const handleSelectSearchResult = (attr: Attraction) => {
-    setShowSearchResults(false);
-    setSearchQuery('');
-    
-    // A própria função handleSelectAttraction agora cuida de adicionar (se não existir) e reordenar a fila
-    handleSelectAttraction(attr);
-  };
-
   const mapStyleOptions = [
     { "elementType": "geometry", "stylers": [{ "color": "#05232b" }] },
     { "elementType": "labels.text.fill", "stylers": [{ "color": "#ffffff" }, { "weight": 2 }] },
@@ -561,264 +525,309 @@ export default function RoutesScreen() {
     { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#00161d" }] }
   ];
 
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.mapCanvas}>
-        
-        {Platform.OS === 'web' ? (
-           <View style={{ flex: 1, backgroundColor: '#05232b' }}>
-             {(() => {
-               if (selectedAttraction && userLocation) {
-                 const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-                 return (
-                   <iframe 
-                     width="100%" height="100%" frameBorder="0" style={{ border: 0 }}
-                     src={`https://maps.google.com/maps?saddr=${userLocation.coords.latitude},${userLocation.coords.longitude}&daddr=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&dirflg=${dirFlag}&output=embed`}
-                   />
-                 );
-               } else if (selectedAttraction) {
-                 return (
-                   <iframe 
-                     width="100%" height="100%" frameBorder="0" style={{ border: 0 }}
-                     src={`https://maps.google.com/maps?q=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&z=15&output=embed`}
-                   />
-                 );
-               } else if (userLocation) {
-                 return (
-                   <iframe 
-                     width="100%" height="100%" frameBorder="0" style={{ border: 0 }}
-                     src={`https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=16&output=embed`}
-                   />
-                 );
-               } else {
-                 return (
-                   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
-                     <MaterialIcon name="explore" size={64} color="#bde9fe" />
-                     <Text style={{ color: '#bde9fe', marginTop: 16 }}>Buscando sua localização atual...</Text>
-                   </View>
-                 );
-               }
-             })()}
-           </View>
-        ) : (
-          <MapView
-            ref={mapRef}
-            style={StyleSheet.absoluteFill}
-            provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-            showsUserLocation={true} 
-            showsMyLocationButton={false} 
-            customMapStyle={mapStyleOptions}
-          >
-            {routePolyline.length > 0 && (
-              <Polyline 
-                key={`route-line-${transportMode}`} // A MÁGICA ESTÁ AQUI!
-                coordinates={routePolyline}
-                strokeColor={colors.primary}
-                strokeWidth={4}
-                lineDashPattern={transportMode === 'walking' ? [10, 10] : undefined}
-              />
-            )}
-
-            {attractionsList.map((attr) => {
-              const { icon, color } = getCategoryStyle(attr.category);
-              return (
-                <Marker 
-                  key={attr.id} 
-                  coordinate={attr.coordinate} 
-                  onPress={() => handleSelectAttraction(attr)}
-                >
-                  <View style={[styles.markerPulse, { backgroundColor: color, borderColor: 'rgba(255,255,255,0.9)' }]}>
-                     <MaterialIcon name={icon as any} size={16} color="#fff" />
-                  </View>
-                </Marker>
-              );
-            })}
-          </MapView>
-        )}
-
-        <View style={styles.topBarContainer}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => router.replace('/dashboard')}
-          >
-            <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
-          </TouchableOpacity>
-
-          <View style={{ flex: 1, zIndex: 50 }}>
-            <View style={styles.searchBar}>
-              <MaterialIcon name="search" size={20} color="#e1bfb3" />
-              <TextInput 
-                style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]} 
-                placeholder="Onde vamos explorar?" 
-                placeholderTextColor="#e1bfb3" 
-                value={searchQuery}
-                onChangeText={(text) => {
-                  setSearchQuery(text);
-                  setShowSearchResults(true);
-                }}
-                onFocus={() => setShowSearchResults(true)}
-              />
-              {searchQuery.length > 0 ? (
-                <TouchableOpacity onPress={() => { setSearchQuery(''); setShowSearchResults(false); }}>
-                  <MaterialIcon name="close" size={20} color="#e1bfb3" />
-                </TouchableOpacity>
-              ) : (
-                <MaterialIcon name="mic" size={20} color="#e1bfb3" />
-              )}
-            </View>
-
-            {showSearchResults && searchQuery.trim().length > 0 && (
-              <View style={styles.searchResultsContainer}>
-                {isSearching ? (
-                  <View style={styles.searchLoading}>
-                    <ActivityIndicator size="small" color="#fd6c28" />
-                  </View>
-                ) : searchResults.length > 0 ? (
-                  <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 200 }}>
-                    {searchResults.map(attr => (
-                      <TouchableOpacity key={attr.id} style={styles.searchResultItem} onPress={() => handleSelectSearchResult(attr)}>
-                        <MaterialIcon name="place" size={16} color="#fd6c28" style={styles.buttonIcon} />
-                        <Text style={styles.searchResultText} numberOfLines={1}>{attr.title}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                ) : (
-                  <View style={styles.searchEmpty}>
-                    <Text style={styles.searchEmptyText}>Nenhum destino encontrado.</Text>
-                  </View>
-                )}
-              </View>
-            )}
-          </View>
-        </View>
-
-        {isLocationFallback && (
-          <View style={styles.fallbackBanner}>
-            <MaterialIcon name="gps-off" size={12} color="#ffba26" style={{ marginRight: 6 }} />
-            <Text style={styles.fallbackBannerText}>
-              GPS inativo ou sem sinal. Exibindo João Pessoa.
-            </Text>
-          </View>
-        )}
+  // Componente de Cabeçalho da Lista
+  const ListHeader = () => (
+    <>
+      <View style={[styles.sheetHeader, Platform.OS === 'web' && { marginTop: 20 }]}>
+        <Text style={styles.sheetTitle}>Seu roteiro personalizado</Text>
       </View>
 
-      <Animated.View style={[styles.bottomSheet, { height: animatedHeight }]}>
-        
-        {/* LÓGICA CONDICIONAL: WEB VS MOBILE */}
-        {Platform.OS === 'web' ? (
-          <View 
-            {...panResponder.panHandlers} 
-            style={[styles.draggableHeaderWeb, { cursor: 'grab' } as any]}
+      {selectedAttraction && (
+        <View style={styles.transportSelectorContainer}>
+          <TouchableOpacity 
+            style={[styles.transportBtn, transportMode === 'driving' && styles.transportBtnActive]} 
+            onPress={() => setTransportMode('driving')}
           >
-            <View style={styles.dragHandler}>
+            <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? colors.primary : '#e1bfb3'} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.transportBtn, transportMode === 'transit' && styles.transportBtnActive]} 
+            onPress={() => setTransportMode('transit')}
+          >
+            <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? colors.primary : '#e1bfb3'} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.transportBtn, transportMode === 'walking' && styles.transportBtnActive]} 
+            onPress={() => setTransportMode('walking')}
+          >
+            <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? colors.primary : '#e1bfb3'} />
+          </TouchableOpacity>
+          
+          <View style={styles.routeMetaInfo}>
+            <Text style={styles.routeMetaTime}>{routeMeta.time || '--'}</Text>
+            <Text style={styles.routeMetaDist}>{routeMeta.distance || '--'}</Text>
+          </View>
+        </View>
+      )}
+
+      <View style={styles.actionButtonGroup}>
+        <TouchableOpacity style={styles.primaryActionButton} onPress={handleStartRoute}>
+          <MaterialIcon name="play-arrow" size={24} color="#370e00" style={styles.buttonIcon} />
+          <Text style={styles.primaryActionText}>Iniciar Rota</Text>
+        </TouchableOpacity>
+        
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <TouchableOpacity style={[styles.secondaryActionButton, { flex: 1 }]} onPress={handleNextDestination}>
+            <MaterialIcon name="skip-next" size={20} color="#cbe7f2" style={styles.buttonIcon} />
+            <Text style={styles.secondaryActionText}>Próximo</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.secondaryActionButton, { flex: 1 }]} onPress={handleOpenNativeMaps}>
+            <MaterialIcon name="map" size={20} color="#cbe7f2" style={styles.buttonIcon} />
+            <Text style={styles.secondaryActionText}>Externo</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {isLoadingData && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.primary} />
+          <Text style={styles.loadingText}>Carregando pontos turísticos...</Text>
+        </View>
+      )}
+
+      {!isLoadingData && routeQueue.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>Seu roteiro está vazio. Selecione locais no mapa ou busque para começar! 🗺️</Text>
+        </View>
+      )}
+    </>
+  );
+
+  const renderCardItem = (item: Attraction, index: number, drag?: () => void, isActive?: boolean) => {
+    let dynamicDistanceText = "Calculando...";
+    if (userLocation) {
+      const d = getDistance(userLocation.coords, item.coordinate);
+      dynamicDistanceText = d > 1000 ? `${(d / 1000).toFixed(1)} km` : `${d} m`;
+    }
+    if (selectedAttraction?.id === item.id) {
+      dynamicDistanceText = `🎯 Alvo Atual`;
+    }
+
+    return (
+      <PointCard
+        key={item.id}
+        {...item}
+        distanceText={dynamicDistanceText}
+        isActive={isActive || false}
+        onPress={() => {
+          if (item.id !== selectedAttraction?.id) {
+            const filtered = routeQueue.filter(a => a.id !== item.id);
+            setRouteQueue([item, ...filtered]);
+          }
+        }}
+        onLongPress={drag}
+        canCheckIn={selectedAttraction?.id === item.id && canCheckIn}
+        onCheckIn={handleCheckInClick}
+        // Para Web:
+        onMoveUp={() => moveQueueItem(index, 'up')}
+        onMoveDown={() => moveQueueItem(index, 'down')}
+        isFirst={index === 0}
+        isLast={index === routeQueue.length - 1}
+      />
+    );
+  };
+
+  const renderMapCanvas = () => (
+    <View style={styles.mapCanvas}>
+      {Platform.OS === 'web' ? (
+         <View style={{ flex: 1, backgroundColor: '#05232b' }}>
+           {(() => {
+             let iframeUrl = '';
+             if (selectedAttraction && userLocation) {
+               const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
+               iframeUrl = `https://maps.google.com/maps?saddr=${userLocation.coords.latitude},${userLocation.coords.longitude}&daddr=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&dirflg=${dirFlag}&output=embed`;
+             } else if (selectedAttraction) {
+               iframeUrl = `https://maps.google.com/maps?q=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&z=15&output=embed`;
+             } else if (userLocation) {
+               iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=16&output=embed`;
+             }
+             
+             if (iframeUrl) {
+               return (
+                 <iframe 
+                   key="google-maps-iframe-constant"
+                   width="100%" height="100%" frameBorder="0" style={{ border: 0 }}
+                   src={iframeUrl}
+                 />
+               );
+             } else {
+               return (
+                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                   <MaterialIcon name="explore" size={64} color="#bde9fe" />
+                   <Text style={{ color: '#bde9fe', marginTop: 16 }}>Buscando sua localização atual...</Text>
+                 </View>
+               );
+             }
+           })()}
+         </View>
+      ) : (
+        <MapView
+          ref={mapRef}
+          style={StyleSheet.absoluteFill}
+          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+          showsUserLocation={true} 
+          showsMyLocationButton={false} 
+          customMapStyle={mapStyleOptions}
+        >
+          {routePolyline.length > 0 && (
+            <Polyline 
+              key={`route-line-${transportMode}`}
+              coordinates={routePolyline}
+              strokeColor={colors.primary}
+              strokeWidth={4}
+              lineDashPattern={transportMode === 'walking' ? [10, 10] : undefined}
+            />
+          )}
+
+          {allAttractions.map((attr) => {
+            const { icon, color } = getCategoryStyle(attr.category);
+            return (
+              <Marker 
+                key={attr.id} 
+                coordinate={attr.coordinate} 
+                onPress={() => {
+                  const exists = routeQueue.some(a => a.id === attr.id);
+                  if (!exists) setRouteQueue([...routeQueue, attr]);
+                }}
+              >
+                <View style={[styles.markerPulse, { backgroundColor: color, borderColor: 'rgba(255,255,255,0.9)' }]}>
+                   <MaterialIcon name={icon as any} size={16} color="#fff" />
+                </View>
+              </Marker>
+            );
+          })}
+        </MapView>
+      )}
+
+      <View style={[styles.topBarContainer, isDesktopWeb && { width: '100%' }]}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.replace('/dashboard')}
+        >
+          <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
+        </TouchableOpacity>
+
+        <View style={{ flex: 1, zIndex: 50 }}>
+          <View style={styles.searchBar}>
+            <MaterialIcon name="search" size={20} color="#e1bfb3" />
+            <TextInput 
+              style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]} 
+              placeholder="Onde vamos explorar?" 
+              placeholderTextColor="#e1bfb3" 
+              value={searchQuery}
+              onChangeText={(text) => {
+                setSearchQuery(text);
+                setShowSearchResults(true);
+              }}
+              onFocus={() => setShowSearchResults(true)}
+            />
+            {searchQuery.length > 0 ? (
+              <TouchableOpacity onPress={() => { setSearchQuery(''); setShowSearchResults(false); }}>
+                <MaterialIcon name="close" size={20} color="#e1bfb3" />
+              </TouchableOpacity>
+            ) : (
+              <MaterialIcon name="mic" size={20} color="#e1bfb3" />
+            )}
+          </View>
+
+          {showSearchResults && searchQuery.trim().length > 0 && (
+            <View style={styles.searchResultsContainer}>
+              {isSearching ? (
+                <View style={styles.searchLoading}>
+                  <ActivityIndicator size="small" color="#fd6c28" />
+                </View>
+              ) : searchResults.length > 0 ? (
+                <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 200 }}>
+                  {searchResults.map(attr => (
+                    <TouchableOpacity key={attr.id} style={styles.searchResultItem} onPress={() => handleSelectSearchResult(attr)}>
+                      <MaterialIcon name="place" size={16} color="#fd6c28" style={styles.buttonIcon} />
+                      <Text style={styles.searchResultText} numberOfLines={1}>{attr.title}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              ) : (
+                <View style={styles.searchEmpty}>
+                  <Text style={styles.searchEmptyText}>Nenhum destino encontrado.</Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+
+      {isLocationFallback && (
+        <View style={[styles.fallbackBanner, isDesktopWeb && { top: 80 }]}>
+          <MaterialIcon name="gps-off" size={12} color="#ffba26" style={{ marginRight: 6 }} />
+          <Text style={styles.fallbackBannerText}>
+            GPS inativo. Exibindo João Pessoa.
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      
+      {isDesktopWeb ? (
+        // LAYOUT DESKTOP WEB (SPLIT SCREEN)
+        <View style={styles.splitScreenContainer}>
+          <View style={styles.sidePanel}>
+            <ScrollView contentContainerStyle={styles.sidePanelContent} showsVerticalScrollIndicator={false}>
+              <ListHeader />
+              <View style={{ marginTop: 16 }}>
+                {routeQueue.map((item, index) => renderCardItem(item, index))}
+              </View>
+            </ScrollView>
+          </View>
+          <View style={styles.mainMapArea}>
+            {renderMapCanvas()}
+          </View>
+        </View>
+      ) : (
+        // LAYOUT MOBILE (BOTTOM SHEET)
+        <>
+          {renderMapCanvas()}
+
+          <Animated.View style={[styles.bottomSheet, { height: animatedHeight }]}>
+            <View style={styles.dragHandler} {...panResponder.panHandlers}>
               <View style={styles.dragBar} />
             </View>
-            <View style={styles.sheetHeaderWeb}>
-              <Text style={styles.sheetTitle}>Seu roteiro personalizado</Text>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.dragHandler} {...panResponder.panHandlers}>
-            <View style={styles.dragBar} />
-          </View>
-        )}
 
-        <ScrollView contentContainerStyle={styles.sheetContent} showsVerticalScrollIndicator={false}>
-          
-          {/* TÍTULO NO MOBILE FICA DENTRO DO SCROLLVIEW */}
-          {Platform.OS !== 'web' && (
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>Seu roteiro personalizado</Text>
-            </View>
-          )}
-
-          {selectedAttraction && (
-            <View style={styles.transportSelectorContainer}>
-              <TouchableOpacity 
-                style={[styles.transportBtn, transportMode === 'driving' && styles.transportBtnActive]} 
-                onPress={() => setTransportMode('driving')}
+            {Platform.OS === 'web' ? (
+              // Na Web Mobile, usamos ScrollView simples para evitar problemas de Drag
+              <ScrollView 
+                contentContainerStyle={styles.sheetContent}
+                showsVerticalScrollIndicator={false}
               >
-                <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? colors.primary : '#e1bfb3'} />
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.transportBtn, transportMode === 'transit' && styles.transportBtnActive]} 
-                onPress={() => setTransportMode('transit')}
-              >
-                <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? colors.primary : '#e1bfb3'} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={[styles.transportBtn, transportMode === 'walking' && styles.transportBtnActive]} 
-                onPress={() => setTransportMode('walking')}
-              >
-                <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? colors.primary : '#e1bfb3'} />
-              </TouchableOpacity>
-              
-              <View style={styles.routeMetaInfo}>
-                <Text style={styles.routeMetaTime}>{routeMeta.time || '--'}</Text>
-                <Text style={styles.routeMetaDist}>{routeMeta.distance || '--'}</Text>
-              </View>
-            </View>
-          )}
-
-          <View style={styles.actionButtonGroup}>
-            <TouchableOpacity style={styles.primaryActionButton} onPress={handleStartRoute}>
-              <MaterialIcon name="play-arrow" size={24} color="#370e00" style={styles.buttonIcon} />
-              <Text style={styles.primaryActionText}>Iniciar Rota</Text>
-            </TouchableOpacity>
-            
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity style={[styles.secondaryActionButton, { flex: 1 }]} onPress={handleNextDestination}>
-                <MaterialIcon name="skip-next" size={20} color="#cbe7f2" style={styles.buttonIcon} />
-                <Text style={styles.secondaryActionText}>Próximo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.secondaryActionButton, { flex: 1 }]} onPress={handleOpenNativeMaps}>
-                <MaterialIcon name="map" size={20} color="#cbe7f2" style={styles.buttonIcon} />
-                <Text style={styles.secondaryActionText}>Externo</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.cardsContainer}>
-            {isLoadingData ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={styles.loadingText}>Carregando pontos turísticos...</Text>
-              </View>
+                <ListHeader />
+                {routeQueue.map((item, index) => renderCardItem(item, index))}
+              </ScrollView>
             ) : (
-              attractionsList.map((item) => {
-                let dynamicDistanceText = "Calculando...";
-                if (userLocation) {
-                  const d = getDistance(userLocation.coords, item.coordinate);
-                  dynamicDistanceText = d > 1000 ? `${(d / 1000).toFixed(1)} km` : `${d} m`;
-                }
-                if (selectedAttraction?.id === item.id) {
-                  dynamicDistanceText = `🎯 Alvo: ${dynamicDistanceText}`;
-                }
-
-                return (
-                  <PointCard
-                    key={item.id}
-                    {...item}
-                    distanceText={dynamicDistanceText} 
-                    onPress={() => handleSelectAttraction(item)}
-                    canCheckIn={selectedAttraction?.id === item.id && canCheckIn}
-                    onCheckIn={handleCheckInClick}
-                  />
-                );
-              })
+              // No App Nativo, usamos o DraggableFlatList com animações
+              <DraggableFlatList
+                data={routeQueue}
+                onDragEnd={({ data }) => setRouteQueue(data)}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.sheetContent}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={<ListHeader />}
+                renderItem={({ item, drag, isActive, getIndex }) => {
+                  const index = getIndex() || 0;
+                  return (
+                    <ScaleDecorator>
+                      {renderCardItem(item, index, drag, isActive)}
+                    </ScaleDecorator>
+                  );
+                }}
+              />
             )}
-            
-            {!isLoadingData && attractionsList.length === 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>Nenhum local disponível na rota. 🎉</Text>
-              </View>
-            )}
-          </View>
-        </ScrollView>
-      </Animated.View>
+          </Animated.View>
+        </>
+      )}
 
       <DestinationReachedModal
         visible={isModalVisible}
@@ -826,52 +835,90 @@ export default function RoutesScreen() {
         onClose={() => setIsModalVisible(false)}
         onConfirm={handleConfirmArrival}
       />
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
-function PointCard({ category, distanceText, title, imageUrl, onPress, canCheckIn, onCheckIn }: PointCardProps) {
+function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPress, isActive, canCheckIn, onCheckIn, onMoveUp, onMoveDown, isFirst, isLast }: PointCardProps) {
+  const isWeb = Platform.OS === 'web';
+
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={styles.cardContainer}>
-      <View style={styles.imageWrapper}>
-        <Image source={{ uri: imageUrl }} style={styles.cardImage} />
-        <View style={[styles.xpBadge, category === 'Longe' && styles.xpBadgeTertiary]}>
-          <Text style={[styles.xpText, category === 'Longe' && styles.xpTextTertiary]}>+100 XP</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+      {/* Botões de Ordenação na Web */}
+      {isWeb && (
+        <View style={styles.webSortControls}>
+          <TouchableOpacity 
+            style={[styles.sortButton, isFirst && { opacity: 0.2 }]} 
+            onPress={onMoveUp} 
+            disabled={isFirst}
+          >
+            <MaterialIcon name="keyboard-arrow-up" size={24} color="#e1bfb3" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.sortButton, isLast && { opacity: 0.2 }]} 
+            onPress={onMoveDown} 
+            disabled={isLast}
+          >
+            <MaterialIcon name="keyboard-arrow-down" size={24} color="#e1bfb3" />
+          </TouchableOpacity>
         </View>
-      </View>
-      
-      <View style={styles.cardDetails}>
-        <View style={styles.cardRowTop}>
-          <Text style={styles.categoryText}>{category}</Text>
-          <View style={styles.distanceWrapper}>
-            <MaterialIcon name="navigation" size={10} color="#e1bfb3" style={styles.distanceIcon} />
-            <Text style={styles.distanceText}>{distanceText}</Text>
+      )}
+
+      <TouchableOpacity 
+        activeOpacity={0.8} 
+        onPress={onPress} 
+        onLongPress={onLongPress}
+        style={[
+          styles.cardContainer,
+          isActive && { backgroundColor: 'rgba(55, 14, 0, 0.4)', borderColor: colors.primary, borderWidth: 1, elevation: 8, boxShadow: '0px 4px 8px rgba(0,0,0,0.5)' }
+        ]}
+      >
+        <View style={styles.imageWrapper}>
+          <Image source={{ uri: imageUrl }} style={styles.cardImage} />
+          <View style={[styles.xpBadge, category === 'Longe' && styles.xpBadgeTertiary]}>
+            <Text style={[styles.xpText, category === 'Longe' && styles.xpTextTertiary]}>+100 XP</Text>
           </View>
         </View>
-        <Text style={styles.cardTitle} numberOfLines={1}>{title}</Text>
         
-        <TouchableOpacity 
-          style={[styles.checkInButton, !canCheckIn && { opacity: 0.5, backgroundColor: '#594138' }]} 
-          disabled={!canCheckIn}
-          onPress={onCheckIn}
-        >
-          <MaterialIcon name="location-on" size={14} color={canCheckIn ? "#370e00" : "#cbe7f2"} style={styles.buttonIcon} />
-          <Text style={[styles.checkInText, !canCheckIn && { color: '#cbe7f2' }]}>
-            {canCheckIn ? "Fazer Check-in!" : "Muito longe"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+        <View style={styles.cardDetails}>
+          <View style={styles.cardRowTop}>
+            <Text style={styles.categoryText}>{category}</Text>
+            <View style={styles.distanceWrapper}>
+              {!isWeb && <MaterialIcon name="drag-indicator" size={14} color="#e1bfb3" style={{ marginRight: 4, opacity: 0.5 }} />}
+              <Text style={styles.distanceText}>{distanceText}</Text>
+            </View>
+          </View>
+          <Text style={styles.cardTitle} numberOfLines={1}>{title}</Text>
+          
+          <TouchableOpacity 
+            style={[styles.checkInButton, !canCheckIn && { opacity: 0.5, backgroundColor: '#594138' }]} 
+            disabled={!canCheckIn}
+            onPress={onCheckIn}
+          >
+            <MaterialIcon name="location-on" size={14} color={canCheckIn ? "#370e00" : "#cbe7f2"} style={styles.buttonIcon} />
+            <Text style={[styles.checkInText, !canCheckIn && { color: '#cbe7f2' }]}>
+              {canCheckIn ? "Fazer Check-in!" : "Muito longe"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#00161d' },
+  splitScreenContainer: { flex: 1, flexDirection: 'row' },
+  sidePanel: { width: 380, backgroundColor: 'rgba(2, 31, 39, 1)', borderRightWidth: 1, borderRightColor: 'rgba(89, 65, 56, 0.2)', zIndex: 10 },
+  sidePanelContent: { paddingHorizontal: 20, paddingBottom: 40 },
+  mainMapArea: { flex: 1, position: 'relative' },
   mapCanvas: { flex: 1, backgroundColor: '#05232b' },
+  
   topBarContainer: { 
     position: 'absolute', 
     top: Platform.OS === 'ios' ? 60 : 40, 
-    width: SCREEN_WIDTH, 
+    left: 0,
+    right: 0,
     paddingHorizontal: 16, 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -891,12 +938,8 @@ const styles = StyleSheet.create({
   searchLoading: { padding: 24, alignItems: 'center' },
   searchEmpty: { padding: 24, alignItems: 'center' },
   searchEmptyText: { color: '#e1bfb3', fontSize: 12 },
+  
   bottomSheet: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'rgba(2, 31, 39, 0.95)', borderTopLeftRadius: 16, borderTopRightRadius: 16, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.1)', zIndex: 60 },
-  
-  // Estilos de Header Condicionais
-  draggableHeaderWeb: { width: '100%', paddingBottom: 16, backgroundColor: 'transparent' },
-  sheetHeaderWeb: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 },
-  
   dragHandler: { width: '100%', paddingVertical: 16, alignItems: 'center', justifyContent: 'center' }, 
   dragBar: { width: 48, height: 6, backgroundColor: 'rgba(89, 65, 56, 0.5)', borderRadius: 3 },
   sheetContent: { paddingHorizontal: 24, paddingBottom: 120 },
@@ -914,8 +957,11 @@ const styles = StyleSheet.create({
   secondaryActionButton: { backgroundColor: '#1e3841', height: 48, borderRadius: 8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.3)' },
   secondaryActionText: { color: '#cbe7f2', fontSize: 12, fontWeight: '800' },
   buttonIcon: { marginRight: 6 },
-  cardsContainer: { gap: 12 },
-  cardContainer: { height: 128, backgroundColor: '#1e3841', borderRadius: 12, flexDirection: 'row', overflow: 'hidden' },
+  
+  webSortControls: { width: 36, alignItems: 'center', justifyContent: 'center', gap: 4, marginRight: 8 },
+  sortButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(30, 56, 65, 0.5)', borderRadius: 8 },
+  
+  cardContainer: { flex: 1, height: 128, backgroundColor: '#1e3841', borderRadius: 12, flexDirection: 'row', overflow: 'hidden' },
   imageWrapper: { width: 128, height: '100%', position: 'relative' },
   cardImage: { width: '100%', height: '100%', backgroundColor: '#05232b' },
   xpBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999 },
@@ -926,15 +972,16 @@ const styles = StyleSheet.create({
   cardRowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   categoryText: { fontSize: 10, fontWeight: '700', color: '#ffb598', textTransform: 'uppercase', letterSpacing: 1 },
   distanceWrapper: { flexDirection: 'row', alignItems: 'center' },
-  distanceIcon: { transform: [{ rotate: '45deg' }], marginRight: 2 },
   distanceText: { fontSize: 12, color: '#e1bfb3' },
   cardTitle: { fontSize: 18, fontWeight: '700', color: '#cbe7f2', marginTop: 4 },
   checkInButton: { backgroundColor: '#ffb598', height: 36, borderRadius: 8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   checkInText: { color: '#370e00', fontSize: 12, fontWeight: '700' },
-  emptyState: { padding: 24, alignItems: 'center' },
-  emptyStateText: { color: '#cbe7f2', fontSize: 16, fontWeight: '600' },
+  
+  emptyState: { padding: 24, alignItems: 'center', backgroundColor: 'rgba(30, 56, 65, 0.3)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.2)' },
+  emptyStateText: { color: '#cbe7f2', fontSize: 14, fontWeight: '600', textAlign: 'center', lineHeight: 20 },
   loadingContainer: { padding: 40, alignItems: 'center', justifyContent: 'center', gap: 12 },
   loadingText: { color: 'rgba(203, 231, 242, 0.6)', fontSize: 14, fontWeight: '600' },
+  
   fallbackBanner: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 120 : 100,
@@ -948,10 +995,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     zIndex: 45,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0,0,0,0.3)',
     elevation: 4,
   },
   fallbackBannerText: {
