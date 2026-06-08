@@ -11,7 +11,7 @@ import { ProgressBar, calculateLevelProgress } from '../common/ProgressBar';
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function UserStats() {
-  const { user, updateProfile } = useAuth() as any;
+  const { user, updateProfile, updateUserPreferences } = useAuth() as any;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [tempName, setTempName] = useState(user?.name || '');
@@ -99,6 +99,8 @@ export default function UserStats() {
       });
 
       if (!response.ok) throw new Error('Falha no upload');
+
+      await updateUserPreferences();
 
       Alert.alert('Sucesso', 'Foto atualizada!');
     } catch (error: any) {
