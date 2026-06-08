@@ -24,16 +24,6 @@ public class SupabaseFileStorageService implements FileStorageService {
             @Value("${SUPABASE_KEY}") String supabaseKey) {
         this.supabaseUrl = supabaseUrl;
         this.supabaseKey = supabaseKey;
-        
-        if (supabaseKey == null) {
-            System.out.println("[SUPABASE_DEBUG] Chave SUPABASE_KEY é NULA!");
-        } else {
-            System.out.println("[SUPABASE_DEBUG] Chave SUPABASE_KEY carregada com sucesso.");
-            System.out.println("[SUPABASE_DEBUG] Comprimento: " + supabaseKey.length());
-            System.out.println("[SUPABASE_DEBUG] Começa com: '" + (supabaseKey.length() >= 5 ? supabaseKey.substring(0, 5) : "N/A") + "'");
-            System.out.println("[SUPABASE_DEBUG] Termina com: '" + (supabaseKey.length() >= 5 ? supabaseKey.substring(supabaseKey.length() - 5) : "N/A") + "'");
-        }
-
         this.restClient = RestClient.builder()
                 .baseUrl(supabaseUrl + "/storage/v1/object")
                 .defaultHeader("apikey", supabaseKey)
