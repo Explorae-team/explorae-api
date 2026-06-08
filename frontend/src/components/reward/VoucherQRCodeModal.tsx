@@ -5,6 +5,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { Voucher, rewardService } from '../../services/rewardService';
 import { getVoucherExpirationText } from '../../utils/dateUtils';
 import { useCountdown } from '../../hooks/useCountdown';
+import { colors } from '../../constants/colors';
 
 interface VoucherQRCodeModalProps {
   visible: boolean;
@@ -12,22 +13,11 @@ interface VoucherQRCodeModalProps {
   onClose: () => void;
 }
 
-const colors = {
-  primary: '#fd6c28',
-  secondary: '#ffba26',
-  error: '#ffb4ab',
-  surfaceDark: '#00232f',
-  surfaceLight: '#002e3c',
-  textSecondary: '#c1c7cc',
-};
-
 export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
   visible,
   voucher,
   onClose
 }) => {
-  if (!voucher) return null;
-
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null);
@@ -41,12 +31,14 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
     setToken(null);
     setTokenExpiresAt(null);
 
-    const res = await rewardService.getVoucherToken(voucher.id);
-    if (res.success && res.data) {
-      setToken(res.data.token);
-      setTokenExpiresAt(res.data.expiresAt);
-    } else {
-      setError(res.message || 'Erro ao gerar QR Code dinâmico.');
+    if (voucher) {
+      const res = await rewardService.getVoucherToken(voucher.id);
+      if (res.success && res.data) {
+        setToken(res.data.token);
+        setTokenExpiresAt(res.data.expiresAt);
+      } else {
+        setError(res.message || 'Erro ao gerar QR Code dinâmico.');
+      }
     }
     setLoading(false);
   };
@@ -59,6 +51,8 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
       setTokenExpiresAt(null);
     }
   }, [visible, voucher?.id]);
+
+  if (!voucher) return null;
 
   const expirationText = getVoucherExpirationText(voucher);
 
@@ -86,7 +80,7 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
             <Text className="text-white text-base font-bold text-center mb-1 font-sans px-2" numberOfLines={1}>
               {voucher.reward.name}
             </Text>
-            <Text style={{ color: colors.textSecondary }} className="text-xs font-sans mb-6">
+            <Text style={{ color: colors.onSurfaceVariant }} className="text-xs font-sans mb-6">
               {voucher.reward.partner.name}
             </Text>
 
@@ -122,7 +116,7 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
               ) : expired ? (
                 <View className="items-center justify-center px-4">
                   <View className="w-16 h-16 rounded-full bg-[#ffba26]/10 border border-[#ffba26]/20 items-center justify-center mb-4">
-                    <MaterialCommunityIcons name="lock-clock" size={32} color={colors.secondary} />
+                    <MaterialCommunityIcons name="lock-clock" size={32} color={colors.tertiary} />
                   </View>
                   <Text className="text-white font-bold text-base text-center font-sans">
                     Código Expirado
@@ -161,10 +155,10 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
                   <Ionicons 
                     name="time-outline" 
                     size={13} 
-                    color={isTimeLow ? colors.error : colors.secondary} 
+                    color={isTimeLow ? colors.error : colors.tertiary} 
                   />
                   <Text 
-                    style={{ color: isTimeLow ? colors.error : colors.secondary }}
+                    style={{ color: isTimeLow ? colors.error : colors.tertiary }}
                     className="text-xs font-black font-sans tracking-wider"
                   >
                     EXPIRA EM: {formattedTime}
@@ -180,7 +174,7 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
                   ⏱️ VALIDADE FÍSICA: {expirationText.toUpperCase()}
                 </Text>
               )}
-              <Text style={{ color: colors.textSecondary }} className="text-[11px] text-center font-sans leading-relaxed">
+              <Text style={{ color: colors.onSurfaceVariant }} className="text-[11px] text-center font-sans leading-relaxed">
                 {expired 
                   ? "Este voucher permanece ativo em sua carteira. Basta gerar um novo QR Code acima para validá-lo no estabelecimento."
                   : "Apresente esta tela ao estabelecimento parceiro. O QR Code dinâmico será escaneado e validado em tempo real."}

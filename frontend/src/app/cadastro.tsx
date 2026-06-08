@@ -16,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext';
 import AuthInput from '../components/auth/AuthInput';
 import PrimaryButton from '../components/PrimaryButton';
 import Logo from '../components/brand/LogoWithText';
+import { colors } from '../constants/colors';
 
 // Tela de cadastro de novos aventureiros do Exploraê.
 
@@ -83,7 +84,7 @@ export default function CadastroScreen() {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-[#003646]"
+      className="flex-1 bg-background"
     >
       <ScrollView 
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
@@ -92,19 +93,19 @@ export default function CadastroScreen() {
       >
         
         {/* Efeito de luz laranja de fundo */}
-        <View className="absolute top-[-10%] left-[-10%] w-[150%] h-[50%] bg-[#fd6c28] opacity-10 rounded-full blur-[120px]" />
+        <View className="absolute top-[-10%] left-[-10%] w-[150%] h-[50%] bg-primary opacity-10 rounded-full blur-[120px]" />
         
         <Stack.Screen options={{ headerShown: false }} />
 
-        <View className="bg-white rounded-[24px] p-8 shadow-2xl z-20 mb-8 border border-white/20 w-full max-w-[520px] self-center">
+        <View className="bg-surface-container-high rounded-[24px] p-8 border border-white/5 z-20 mb-8 w-full max-w-[520px] self-center">
           <View className="items-center mb-8">
             <Logo size={80} />
           </View>
           <View className="mb-6 items-center">
-            <Text className="text-[#003646] font-black text-2xl text-center leading-7">
+            <Text className="text-on-surface font-black text-2xl text-center leading-7">
               Crie sua conta para começar a aventura!
             </Text>
-            <Text className="text-[#8b9296] text-sm font-medium mt-3 text-center">
+            <Text className="text-on-surface-variant text-sm font-medium mt-3 text-center">
               Preencha os dados abaixo para o seu diário de expedição.
             </Text>
           </View>
@@ -115,7 +116,12 @@ export default function CadastroScreen() {
               iconName="person"
               placeholder="Seu nome de explorador"
               value={formData.fullName}
-              onChangeText={(text) => setFormData({ ...formData, fullName: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, fullName: text });
+                if (errors.fullName) {
+                  setErrors((prev) => ({ ...prev, fullName: undefined }));
+                }
+              }}
               error={errors.fullName}
               autoCapitalize="words"
             />
@@ -125,7 +131,12 @@ export default function CadastroScreen() {
               iconName="mail"
               placeholder="email@exemplo.com"
               value={formData.email}
-              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              onChangeText={(text) => {
+                setFormData({ ...formData, email: text });
+                if (errors.email) {
+                  setErrors((prev) => ({ ...prev, email: undefined }));
+                }
+              }}
               error={errors.email}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -139,7 +150,12 @@ export default function CadastroScreen() {
                   placeholder="••••••••"
                   secureTextEntry={!showPassword}
                   value={formData.password}
-                  onChangeText={(text) => setFormData({ ...formData, password: text })}
+                  onChangeText={(text) => {
+                    setFormData({ ...formData, password: text });
+                    if (errors.password) {
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }
+                  }}
                   error={errors.password}
                   rightIconName={showPassword ? "eye-off" : "eye"}
                   onRightIconPress={() => setShowPassword(!showPassword)}
@@ -152,7 +168,12 @@ export default function CadastroScreen() {
                   placeholder="••••••••"
                   secureTextEntry={!showConfirmPassword}
                   value={formData.confirmPassword}
-                  onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+                  onChangeText={(text) => {
+                    setFormData({ ...formData, confirmPassword: text });
+                    if (errors.confirmPassword) {
+                      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                    }
+                  }}
                   error={errors.confirmPassword}
                   rightIconName={showConfirmPassword ? "eye-off" : "eye"}
                   onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -162,17 +183,23 @@ export default function CadastroScreen() {
 
             <TouchableOpacity 
               activeOpacity={0.7}
-              onPress={() => setFormData({ ...formData, termsAccepted: !formData.termsAccepted })}
+              onPress={() => {
+                const nextVal = !formData.termsAccepted;
+                setFormData({ ...formData, termsAccepted: nextVal });
+                if (errors.termsAccepted && nextVal) {
+                  setErrors((prev) => ({ ...prev, termsAccepted: undefined }));
+                }
+              }}
               className="flex-row items-center gap-3 mt-2"
             >
-              <View className={`w-6 h-6 border-2 rounded-lg items-center justify-center ${formData.termsAccepted ? 'bg-[#fd6c28] border-[#fd6c28]' : 'border-[#bde9fe]'}`}>
+              <View className={`w-6 h-6 border-2 rounded-lg items-center justify-center ${formData.termsAccepted ? 'bg-primary border-primary' : 'border-on-background'}`}>
                 {formData.termsAccepted && <Ionicons name="checkmark" size={18} color="white" />}
               </View>
-              <Text className="text-[#8b9296] text-xs flex-1">
-                Aceito os <Text className="text-[#fd6c28] font-bold">Termos e Condições</Text> de expedição.
+              <Text className="text-on-surface-variant text-xs flex-1">
+                Aceito os <Text className="text-primary font-bold">Termos e Condições</Text> de expedição.
               </Text>
             </TouchableOpacity>
-            {errors.termsAccepted && <Text className="text-red-500 text-[10px] ml-1">{errors.termsAccepted}</Text>}
+            {errors.termsAccepted && <Text className="text-error text-[10px] ml-1">{errors.termsAccepted}</Text>}
 
             <PrimaryButton
               onPress={handleRegister}
@@ -185,12 +212,12 @@ export default function CadastroScreen() {
           </View>
 
           <View className="items-center mt-6 flex-row justify-center">
-            <Text className="text-[#8b9296] font-medium text-xs">
+            <Text className="text-outline font-medium text-xs">
               Já tem uma conta?{' '}
             </Text>
             <Link href="/login" asChild>
               <TouchableOpacity>
-                <Text className="text-[#fd6c28] font-black text-xs">Entrar</Text>
+                <Text className="text-primary font-black text-xs">Entrar</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -199,11 +226,11 @@ export default function CadastroScreen() {
         {/* Mostra um selo social com a contagem de aventureiros */}
         <View className="items-center mb-8 opacity-60">
           <View className="flex-row items-center gap-4 mb-4">
-            <View className="w-12 h-1 bg-[#ffba26] rounded-full" />
-            <Ionicons name="medal" size={24} color="#ffba26" />
-            <View className="w-12 h-1 bg-[#bde9fe]/20 rounded-full" />
+            <View className="w-12 h-1 bg-tertiary rounded-full" />
+            <Ionicons name="medal" size={24} color={colors.tertiary} />
+            <View className="w-12 h-1 bg-on-background/20 rounded-full" />
           </View>
-          <Text className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#bde9fe] text-center px-10">
+          <Text className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-background text-center px-10">
             Junte-se a +50.000 exploradores em todo o mundo
           </Text>
         </View>

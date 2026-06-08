@@ -3,6 +3,7 @@ import { View, Text, Image, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Voucher } from '../../services/rewardService';
 import { getVoucherExpirationText } from '../../utils/dateUtils';
+import { colors } from '../../constants/colors';
 
 interface VoucherCardProps {
   voucher: Voucher;
@@ -39,16 +40,6 @@ const VOUCHER_STATUS_THEMES: Record<Voucher['status'], VoucherStatusUIConfig> = 
     borderColor: 'border-rose-500/20',
     iconName: 'cancel',
   },
-};
-
-const colors = {
-  surfaceContainerHigh: '#002e3c',
-  surfaceBright: '#0d3e4e',
-  surfaceContainer: '#00232f',
-  onSurface: '#bde9fe',
-  onSurfaceVariant: '#c1c7cc',
-  onPrimaryContainer: '#fd6c28',
-  tertiary: '#ffba26',
 };
 
 const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';

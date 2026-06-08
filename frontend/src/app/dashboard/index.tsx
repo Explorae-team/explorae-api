@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  ScrollView,
   View,
   Text,
-  RefreshControl,
   ActivityIndicator,
   Pressable,
   Platform
@@ -18,6 +16,7 @@ import { useRecommendations } from '../../services/useRecommendations';
 import { useFavorites } from '../../services/useFavorites';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
 import api from '../../services/api';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 
 import { ExploreHeader } from '../../components/dashboard/ExploreHeader';
 import { UserProgressHero } from '../../components/dashboard/UserProgressHero';
@@ -28,12 +27,7 @@ import AttractionSkeleton from '../../components/dashboard/AttractionSkeleton';
 import { TopVisitedList } from '../../components/dashboard/TopVisitedList';
 import { MapQuickAccess } from '../../components/dashboard/MapQuickAccess';
 import { FiltersModal, FilterState } from '../../components/dashboard/FiltersModal';
-
-const colors = {
-  onSurface: '#bde9fe',
-  onSurfaceVariant: '#c1c7cc',
-  primary: '#fd6c28',
-};
+import { colors } from '../../constants/colors';
 
 interface LocationCoords {
   latitude: number;
@@ -186,17 +180,11 @@ export default function ExploreScreen() {
         onNotificationsPress={() => console.log('Notifications')}
       />
 
-      <ScrollView
+      <ExploraScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 100, paddingTop: 24 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor="#fd6c28"
-          />
-        }
+        onRefresh={handleRefresh}
+        refreshing={isRefreshing}
       >
         <View style={{ gap: 32 }}>
 
@@ -215,8 +203,8 @@ export default function ExploreScreen() {
             </View>
 
             {isLoadingChallenges ? (
-              <View className="mx-6 p-6 rounded-2xl bg-[#002532] border border-white/10 items-center justify-center">
-                <ActivityIndicator size="small" color="#fd6c28" />
+              <View className="mx-6 p-6 rounded-2xl bg-surface-container border border-white/10 items-center justify-center">
+                <ActivityIndicator size="small" color={colors.primary} />
               </View>
             ) : challenges.length > 0 ? (
               <ScrollView
@@ -246,7 +234,7 @@ export default function ExploreScreen() {
                 ))}
               </ScrollView>
             ) : (
-              <View className="mx-6 p-6 rounded-2xl bg-[#002532] border border-white/10 items-center">
+              <View className="mx-6 p-6 rounded-2xl bg-surface-container border border-white/10 items-center">
                 <Text className="text-white/60 text-sm italic">
                   Todos os desafios completados! Volte amanhã.
                 </Text>
@@ -324,7 +312,7 @@ export default function ExploreScreen() {
                 className="flex-row items-center space-x-1 bg-surface-container-high px-3 py-1.5 rounded-full active:bg-surface-bright"
               >
                 <Text className="text-sm font-bold text-primary">Filtros</Text>
-                <MaterialIcons name="tune" size={16} color="#fd6c28" />
+                <MaterialIcons name="tune" size={16} color={colors.primary} />
               </Pressable>
             </View>
 
@@ -402,7 +390,7 @@ export default function ExploreScreen() {
                     className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                   >
                     {isLoadingMore ? (
-                      <ActivityIndicator color="#fd6c28" />
+                      <ActivityIndicator color={colors.primary} />
                     ) : (
                       <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
                     )}
@@ -410,7 +398,7 @@ export default function ExploreScreen() {
                 ) : attractions.length > 0 ? (
                   <View className="items-center justify-center py-10">
                     <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
-                      <MaterialIcons name="route" size={32} color="#8b9296" />
+                      <MaterialIcons name="route" size={32} color={colors.outline} />
                     </View>
                     <Text className="text-lg font-bold text-on-surface text-center mb-2">
                       Você chegou ao fim por agora
@@ -433,7 +421,7 @@ export default function ExploreScreen() {
                     className="py-4 items-center justify-center rounded-2xl bg-surface-container-high border border-outline-variant/20"
                   >
                     {isLoadingMoreRecsVert ? (
-                      <ActivityIndicator color="#fd6c28" />
+                      <ActivityIndicator color={colors.primary} />
                     ) : (
                       <Text className="text-sm font-bold text-primary uppercase tracking-widest">Mostrar mais atrações</Text>
                     )}
@@ -441,7 +429,7 @@ export default function ExploreScreen() {
                 ) : recsVertical.length > 0 ? (
                   <View className="items-center justify-center py-10">
                     <View className="w-16 h-16 bg-surface-container-high rounded-full items-center justify-center mb-4">
-                      <MaterialIcons name="route" size={32} color="#8b9296" />
+                      <MaterialIcons name="route" size={32} color={colors.outline} />
                     </View>
                     <Text className="text-lg font-bold text-on-surface text-center mb-2">
                       Você chegou ao fim por agora
@@ -461,7 +449,7 @@ export default function ExploreScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </ExploraScrollView>
 
       <FiltersModal 
         isVisible={isFilterModalVisible}

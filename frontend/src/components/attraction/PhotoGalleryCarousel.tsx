@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, Dimensions, TouchableOpacity, FlatList, Modal, SafeAreaView, Pressable, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 const StatefulImage = ({ uri, style, resizeMode }: any) => {
   const defaultFallback = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';
@@ -47,7 +48,7 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
   };
 
   return (
-    <View className="relative h-[530px] w-full bg-[#003646] overflow-hidden">
+    <View className="relative h-[530px] w-full bg-explora-blue overflow-hidden">
       <FlatList
         data={safeImages}
         keyExtractor={(_, index) => index.toString()}
@@ -74,7 +75,7 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
       />
 
       <LinearGradient
-        colors={['transparent', '#003646']}
+        colors={['transparent', colors.exploraBlue]}
         className="absolute bottom-0 left-0 right-0 h-32"
         style={{ pointerEvents: 'none' }}
       />
@@ -89,7 +90,7 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
                 height: 6,
                 borderRadius: 3,
                 width: index === currentIndex ? 15 : 8,
-                backgroundColor: index === currentIndex ? '#F2641F' : 'rgba(255,255,255,0.3)'
+                backgroundColor: index === currentIndex ? colors.accent : 'rgba(255,255,255,0.3)'
               }}
             />
           ))}
@@ -110,7 +111,7 @@ export default function PhotoGalleryCarousel({ images }: PhotoGalleryCarouselPro
                 style={{ position: 'absolute', top: 30, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
                 onPress={() => setIsModalVisible(false)}
               >
-                <MaterialCommunityIcons name="close" size={30} color="#F2641F" />
+                <MaterialCommunityIcons name="close" size={30} color={colors.primary} />
               </Pressable>
 
               <Pressable

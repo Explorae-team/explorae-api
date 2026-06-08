@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,10 +10,14 @@ import UserStats from '../../components/profile/UserStats';
 import StatsGrid from '../../components/profile/StatsGrid';
 import AchievementsList from '../../components/profile/AchievementsList';
 import RecentActivity from '../../components/profile/RecentActivity';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
+
+import { colors } from '../../constants/colors';
 
 export default function ExplorerProfile() {
   const { updateUserPreferences } = useAuth() as any;
   const [isRefreshing, setIsRefreshing] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -27,10 +31,19 @@ export default function ExplorerProfile() {
     fetchProfile();
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await updateUserPreferences();
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (isRefreshing) {
     return (
       <View className="flex-1 bg-surface justify-center items-center">
-        <ActivityIndicator size="large" color="#fd6c28" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text className="mt-4 text-primary font-sans">Carregando explorador...</Text>
       </View>
     );
@@ -39,7 +52,7 @@ export default function ExplorerProfile() {
     <View className="flex-1 bg-surface">
       <ExplorerHeader />
 
-      <ScrollView 
+      <ExploraScrollView 
         className="flex-1" 
         contentContainerStyle={{ 
           paddingTop: insets.top + 80, 
@@ -47,14 +60,15 @@ export default function ExplorerProfile() {
           paddingHorizontal: 24,
           flexGrow: 1
         }} 
-        showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
       >
         <UserStats />
         <StatsGrid />
         <AchievementsList />
         <RecentActivity />
-      </ScrollView>
+      </ExploraScrollView>
 
     </View>
   );

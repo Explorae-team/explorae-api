@@ -4,16 +4,11 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { rewardService, VoucherValidationResponse } from '../../services/rewardService';
+import { colors } from '../../constants/colors';
 
 // Sub-componentes modulares e reutilizáveis
 import { ScannerViewfinder } from '../../components/scanner/ScannerViewfinder';
 import { ValidationResultModal } from '../../components/scanner/ValidationResultModal';
-
-const colors = {
-  primary: '#fd6c28',
-  background: '#001b24',
-  surface: '#00232f',
-};
 
 export default function PartnerScannerScreen() {
   const router = useRouter();

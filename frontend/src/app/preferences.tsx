@@ -3,6 +3,7 @@ import { SafeAreaView, ScrollView, View, TouchableOpacity } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { colors } from '../constants/colors';
 import InterestsGrid from '../components/preferences/InterestsGrid';
 import preferenceService from '../services/preferenceService';
 import WizardProgressBar from '../components/wizard/WizardProgressBar';
@@ -21,6 +22,7 @@ export default function PreferencesScreen() {
     selectedIds,
     isSubmitting,
     stepInfo,
+    isNextDisabled,
     handleToggleInterest,
     handleNext,
     handleBack
@@ -35,14 +37,14 @@ export default function PreferencesScreen() {
         options={{
           headerShown: true,
           headerTitle: isEditMode ? 'Editar Interesses' : 'Selecionar Interesses',
-          headerStyle: { backgroundColor: '#00161e' },
-          headerTintColor: '#fd6c28',
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.primary,
           headerLeft: () => (
             <TouchableOpacity onPress={handleBack} className="ml-2">
               <MaterialIcons 
                 name={isEditMode || currentStep > 0 ? "arrow-back" : "logout"} 
                 size={24} 
-                color="#fd6c28" 
+                color={colors.primary} 
               />
             </TouchableOpacity>
           )
@@ -89,6 +91,7 @@ export default function PreferencesScreen() {
         onBack={handleBack}
         isSubmitting={isSubmitting}
         isEditMode={isEditMode}
+        isNextDisabled={isNextDisabled}
       />
     </SafeAreaView>
   );

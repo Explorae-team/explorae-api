@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 interface Category {
   id: string;
@@ -35,7 +36,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
           fontWeight: '700',
           letterSpacing: 2,
           textTransform: 'uppercase',
-          color: '#c1c7cc',
+          color: colors.onSurfaceVariant,
           textAlign: 'center',
         }}
       >
@@ -69,13 +70,13 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
                   borderRadius: 16,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: isSelected ? '#fd6c28' : '#0d3e4e',
+                  backgroundColor: isSelected ? colors.primary : colors.surfaceBright,
                   borderWidth: 1,
-                  borderColor: isSelected ? '#fd6c28' : 'rgba(189, 233, 254, 0.1)',
+                  borderColor: isSelected ? colors.primary : 'rgba(189, 233, 254, 0.1)',
                   // Sombra só no native (boxShadow via style causes issues on web)
                   ...(Platform.OS !== 'web'
                     ? {
-                        shadowColor: isSelected ? '#fd6c28' : 'transparent',
+                        shadowColor: isSelected ? colors.primary : 'transparent',
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: isSelected ? 0.3 : 0,
                         shadowRadius: 8,
@@ -87,7 +88,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
                 <MaterialIcons
                   name={category.icon}
                   size={28}
-                  color={isSelected ? 'white' : '#fd6c28'}
+                  color={isSelected ? 'white' : colors.primary}
                 />
               </View>
               <Text
@@ -95,7 +96,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
                   fontSize: 10,
                   marginTop: 8,
                   fontWeight: '700',
-                  color: isSelected ? '#fd6c28' : '#c1c7cc',
+                  color: isSelected ? colors.primary : colors.onSurfaceVariant,
                 }}
               >
                 {category.name.toUpperCase()}

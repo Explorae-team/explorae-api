@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   Image,
   Dimensions,
-  RefreshControl
+  TouchableOpacity
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,15 +16,17 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { BadgeDetailModal } from '../../components/profile/BadgeDetailModal';
 import { ChallengeCard } from '../../components/profile/ChallengeCard';
+import { colors } from '../../constants/colors';
+import ExploraScrollView from '../../components/common/ExploraScrollView';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 const CATEGORY_COLORS = {
-  'ONBOARDING': '#ffba26',
-  'EXPLORACAO': '#fd6c28',
-  'JORNADA': '#ffb598',
-  'SOCIAL': '#a2cde1'
+  'ONBOARDING': colors.tertiary,
+  'EXPLORACAO': colors.primary,
+  'JORNADA': '#ffb598', // Tom salmão/laranja claro
+  'SOCIAL': colors.secondary
 };
 
 interface Badge {
@@ -111,30 +111,30 @@ export default function BadgesScreen() {
   const specialChallenges = challenges.filter(c => c.type === 'SPECIAL');
 
   return (
-    <View className="flex-1 bg-[#00161e]">
+    <View className="flex-1 bg-background">
       {/* Cabeçalho da tela */}
       <View
-        className="flex-row justify-between items-center px-6 pb-4 border-b border-white/5 bg-[#00161e]/95 z-10"
+        className="flex-row justify-between items-center px-6 pb-4 border-b border-white/5 bg-background/95 z-10"
         style={{ paddingTop: insets.top + 16 }}
       >
         <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-white/5">
-          <Ionicons name="arrow-back" size={20} color="white" />
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
         </TouchableOpacity>
         <Text className="text-white text-lg font-bold font-sans">Conquistas & Desafios</Text>
         <View className="w-10 h-10" />
       </View>
 
       {/* Abas de navegação */}
-      <View className="flex-row px-6 py-4 bg-[#002532]/40 border-b border-white/5">
+      <View className="flex-row px-6 py-4 bg-surface-container/40 border-b border-white/5">
         <TouchableOpacity
           onPress={() => setActiveTab('MEDALS')}
           className="flex-1 py-3 rounded-xl items-center flex-row justify-center"
-          style={{ backgroundColor: activeTab === 'MEDALS' ? '#fd6c28' : 'transparent' }}
+          style={{ backgroundColor: activeTab === 'MEDALS' ? colors.primary : 'transparent' }}
         >
-          <Ionicons name="trophy-outline" size={18} color={activeTab === 'MEDALS' ? '#00161e' : 'white'} />
+          <Ionicons name="trophy-outline" size={18} color={activeTab === 'MEDALS' ? colors.background : 'white'} />
           <Text
             className="font-bold ml-2 font-sans"
-            style={{ color: activeTab === 'MEDALS' ? '#00161e' : 'white' }}
+            style={{ color: activeTab === 'MEDALS' ? colors.background : 'white' }}
           >
             Medalhas
           </Text>
@@ -143,12 +143,12 @@ export default function BadgesScreen() {
         <TouchableOpacity
           onPress={() => setActiveTab('CHALLENGES')}
           className="flex-1 py-3 rounded-xl items-center flex-row justify-center"
-          style={{ backgroundColor: activeTab === 'CHALLENGES' ? '#fd6c28' : 'transparent' }}
+          style={{ backgroundColor: activeTab === 'CHALLENGES' ? colors.primary : 'transparent' }}
         >
-          <Ionicons name="calendar-outline" size={18} color={activeTab === 'CHALLENGES' ? '#00161e' : 'white'} />
+          <Ionicons name="calendar-outline" size={18} color={activeTab === 'CHALLENGES' ? colors.background : 'white'} />
           <Text
             className="font-bold ml-2 font-sans"
-            style={{ color: activeTab === 'CHALLENGES' ? '#00161e' : 'white' }}
+            style={{ color: activeTab === 'CHALLENGES' ? colors.background : 'white' }}
           >
             Desafios
           </Text>
@@ -157,27 +157,21 @@ export default function BadgesScreen() {
 
       {isLoading ? (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#fd6c28" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text className="text-white/60 mt-4 font-sans">Carregando dados...</Text>
         </View>
       ) : (
-        <ScrollView
+        <ExploraScrollView
           className="flex-1 px-6"
           contentContainerStyle={{ paddingVertical: 24, paddingBottom: 120 }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              tintColor="#fd6c28"
-            />
-          }
+          onRefresh={handleRefresh}
+          refreshing={isRefreshing}
         >
           {activeTab === 'MEDALS' ? (
             <View>
               {/* Progresso de conquistas da coleção */}
               <LinearGradient
-                colors={['#002532', '#001b25']}
+                colors={[colors.surfaceContainer, colors.surfaceContainerLow]}
                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}
                 className="p-5 rounded-2xl border border-white/5"
               >
@@ -188,7 +182,7 @@ export default function BadgesScreen() {
                   </Text>
                 </View>
                 <View className="bg-white/5 w-14 h-14 rounded-full items-center justify-center border border-white/10">
-                  <Text className="text-[#fd6c28] text-xl font-bold font-sans">
+                  <Text className="text-primary text-xl font-bold font-sans">
                     {Math.round((unlockedBadgeIds.size / (allBadges.length || 1)) * 100)}%
                   </Text>
                 </View>
@@ -198,7 +192,7 @@ export default function BadgesScreen() {
               <View className="flex-row flex-wrap justify-between">
                 {allBadges.map((badge) => {
                   const isUnlocked = unlockedBadgeIds.has(badge.id);
-                  const color = (CATEGORY_COLORS as any)[badge.category] || '#fd6c28';
+                  const color = (CATEGORY_COLORS as any)[badge.category] || colors.primary;
 
                   return (
                     <TouchableOpacity
@@ -208,7 +202,7 @@ export default function BadgesScreen() {
                       className="items-center mb-6"
                     >
                       <View
-                        className="w-20 h-20 rounded-full bg-[#002532] items-center justify-center border-2 mb-2 relative"
+                        className="w-20 h-20 rounded-full bg-surface-container items-center justify-center border-2 mb-2 relative"
                         style={{
                           borderColor: isUnlocked ? color : 'rgba(255,255,255,0.05)',
                           opacity: isUnlocked ? 1 : 0.6,
@@ -227,7 +221,7 @@ export default function BadgesScreen() {
                             resizeMode="cover"
                           />
                         ) : (
-                          <Ionicons name="trophy-outline" size={32} color={isUnlocked ? color : '#3a5866'} />
+                          <Ionicons name="trophy-outline" size={32} color={isUnlocked ? color : colors.outlineVariant} />
                         )}
 
                         {!isUnlocked && (
@@ -255,7 +249,7 @@ export default function BadgesScreen() {
                 Desafios Diários
               </Text>
               {dailyChallenges.length === 0 ? (
-                <View className="bg-[#002532]/40 border border-white/5 rounded-2xl p-5 items-center mb-6">
+                <View className="bg-surface-container/40 border border-white/5 rounded-2xl p-5 items-center mb-6">
                   <Text className="text-white/60 text-sm font-sans">Nenhum desafio diário ativo no momento.</Text>
                 </View>
               ) : (
@@ -272,7 +266,7 @@ export default function BadgesScreen() {
                 Desafios Semanais
               </Text>
               {weeklyChallenges.length === 0 ? (
-                <View className="bg-[#002532]/40 border border-white/5 rounded-2xl p-5 items-center mb-6">
+                <View className="bg-surface-container/40 border border-white/5 rounded-2xl p-5 items-center mb-6">
                   <Text className="text-white/60 text-sm font-sans">Nenhum desafio semanal ativo no momento.</Text>
                 </View>
               ) : (
@@ -301,7 +295,7 @@ export default function BadgesScreen() {
               )}
             </View>
           )}
-        </ScrollView>
+        </ExploraScrollView>
       )}
 
       {/* Modal de detalhes da conquista selecionada */}

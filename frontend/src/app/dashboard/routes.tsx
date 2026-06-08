@@ -25,6 +25,7 @@ if (Platform.OS !== 'web') {
 
 import api from '../../services/api'; 
 import DestinationReachedModal from '../dashboard/DestinationReachedModal';
+import { colors } from '../../constants/colors';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 const SHEET_MAX_HEIGHT = SCREEN_HEIGHT * 0.45;
@@ -60,7 +61,7 @@ const getCategoryStyle = (category: string) => {
   if (lowerCat.includes('cultura') || lowerCat.includes('arte') || lowerCat.includes('museu')) return { icon: 'palette', color: '#8338ec' };
   if (lowerCat.includes('história') || lowerCat.includes('histórico') || lowerCat.includes('monumento')) return { icon: 'account-balance', color: '#e76f51' };
   
-  return { icon: 'place', color: '#fd6c28' }; 
+  return { icon: 'place', color: colors.primary }; 
 };
 
 const decodePolyline = (t: string) => {
@@ -84,6 +85,7 @@ export default function RoutesScreen() {
   const [attractionsList, setAttractionsList] = useState<Attraction[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [userLocation, setUserLocation] = useState<{coords: {latitude: number, longitude: number}} | null>(null);
+  const [isLocationFallback, setIsLocationFallback] = useState(false);
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -180,12 +182,16 @@ export default function RoutesScreen() {
                 setUserLocation({ 
                   coords: { latitude: position.coords.latitude, longitude: position.coords.longitude } 
                 });
+                setIsLocationFallback(false);
               }
             };
 
             const handleLocationError = (error: any) => {
               console.warn(`Erro GPS Web (${error.code}):`, error.message);
-              if (isActive) setUserLocation(FALLBACK_LOCATION);
+              if (isActive) {
+                setUserLocation(FALLBACK_LOCATION);
+                setIsLocationFallback(true);
+              }
               
               if (error.code === 1) {
                 window.alert("Permissão negada. O mapa será centralizado em João Pessoa por padrão.");
@@ -197,6 +203,7 @@ export default function RoutesScreen() {
             watchId = navigator.geolocation.watchPosition(updateLocation, handleLocationError, geoOptions);
           } else {
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
             window.alert("Geolocalização não suportada. Exibindo João Pessoa.");
           }
         } else {
@@ -204,6 +211,7 @@ export default function RoutesScreen() {
           if (status !== 'granted') {
             Alert.alert('Permissão negada', 'O mapa será centralizado em João Pessoa por padrão.');
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
             mapRef.current?.animateToRegion({
               latitude: FALLBACK_LOCATION.coords.latitude,
               longitude: FALLBACK_LOCATION.coords.longitude,
@@ -219,6 +227,7 @@ export default function RoutesScreen() {
             let initialLoc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
             if (isActive) {
               setUserLocation(initialLoc);
+              setIsLocationFallback(false);
               mapRef.current?.animateToRegion({
                 latitude: initialLoc.coords.latitude,
                 longitude: initialLoc.coords.longitude,
@@ -228,12 +237,16 @@ export default function RoutesScreen() {
             }
           } catch (e) {
             setUserLocation(FALLBACK_LOCATION);
+            setIsLocationFallback(true);
           }
 
           locationSubscription = await Location.watchPositionAsync(
             { accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 1 },
             (newLocation) => {
-              if (isActive) setUserLocation(newLocation);
+              if (isActive) {
+                setUserLocation(newLocation);
+                setIsLocationFallback(false);
+              }
             }
           );
         }
@@ -601,7 +614,7 @@ export default function RoutesScreen() {
               <Polyline 
                 key={`route-line-${transportMode}`} // A MÁGICA ESTÁ AQUI!
                 coordinates={routePolyline}
-                strokeColor="#fd6c28"
+                strokeColor={colors.primary}
                 strokeWidth={4}
                 lineDashPattern={transportMode === 'walking' ? [10, 10] : undefined}
               />
@@ -629,7 +642,7 @@ export default function RoutesScreen() {
             style={styles.backButton} 
             onPress={() => router.replace('/dashboard')}
           >
-            <MaterialIcon name="arrow-back" size={24} color="#cbe7f2" />
+            <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={{ flex: 1, zIndex: 50 }}>
@@ -679,6 +692,15 @@ export default function RoutesScreen() {
             )}
           </View>
         </View>
+
+        {isLocationFallback && (
+          <View style={styles.fallbackBanner}>
+            <MaterialIcon name="gps-off" size={12} color="#ffba26" style={{ marginRight: 6 }} />
+            <Text style={styles.fallbackBannerText}>
+              GPS inativo ou sem sinal. Exibindo João Pessoa.
+            </Text>
+          </View>
+        )}
       </View>
 
       <Animated.View style={[styles.bottomSheet, { height: animatedHeight }]}>
@@ -717,21 +739,21 @@ export default function RoutesScreen() {
                 style={[styles.transportBtn, transportMode === 'driving' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('driving')}
               >
-                <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-car" size={24} color={transportMode === 'driving' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={[styles.transportBtn, transportMode === 'transit' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('transit')}
               >
-                <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-bus" size={24} color={transportMode === 'transit' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={[styles.transportBtn, transportMode === 'walking' && styles.transportBtnActive]} 
                 onPress={() => setTransportMode('walking')}
               >
-                <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? '#fd6c28' : '#e1bfb3'} />
+                <MaterialIcon name="directions-walk" size={24} color={transportMode === 'walking' ? colors.primary : '#e1bfb3'} />
               </TouchableOpacity>
               
               <View style={styles.routeMetaInfo}>
@@ -762,7 +784,7 @@ export default function RoutesScreen() {
           <View style={styles.cardsContainer}>
             {isLoadingData ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fd6c28" />
+                <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.loadingText}>Carregando pontos turísticos...</Text>
               </View>
             ) : (
@@ -862,7 +884,7 @@ const styles = StyleSheet.create({
   },
   searchBar: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(6, 35, 43, 0.9)', borderRadius: 9999, height: 48, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.2)' },
   searchInput: { flex: 1, paddingHorizontal: 8, color: '#cbe7f2', fontSize: 14 }, 
-  markerPulse: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fd6c28', justifyContent: 'center', alignItems: 'center', elevation: 4, borderWidth: 2, borderColor: 'rgba(255, 255, 255, 0.8)' },
+  markerPulse: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', elevation: 4, borderWidth: 2, borderColor: 'rgba(255, 255, 255, 0.8)' },
   searchResultsContainer: { position: 'absolute', top: 54, left: 0, right: 0, backgroundColor: 'rgba(6, 35, 43, 0.98)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(89, 65, 56, 0.3)', overflow: 'hidden', elevation: 5, zIndex: 100 },
   searchResultItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255, 255, 255, 0.05)' },
   searchResultText: { color: '#cbe7f2', fontSize: 14, fontWeight: '600', flex: 1 },
@@ -896,7 +918,7 @@ const styles = StyleSheet.create({
   cardContainer: { height: 128, backgroundColor: '#1e3841', borderRadius: 12, flexDirection: 'row', overflow: 'hidden' },
   imageWrapper: { width: 128, height: '100%', position: 'relative' },
   cardImage: { width: '100%', height: '100%', backgroundColor: '#05232b' },
-  xpBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: '#fd6c28', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999 },
+  xpBadge: { position: 'absolute', top: 8, left: 8, backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 9999 },
   xpBadgeTertiary: { backgroundColor: '#594138' },
   xpText: { fontSize: 10, fontWeight: '800', color: '#370e00' },
   xpTextTertiary: { color: '#cbe7f2' },
@@ -912,5 +934,31 @@ const styles = StyleSheet.create({
   emptyState: { padding: 24, alignItems: 'center' },
   emptyStateText: { color: '#cbe7f2', fontSize: 16, fontWeight: '600' },
   loadingContainer: { padding: 40, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loadingText: { color: 'rgba(203, 231, 242, 0.6)', fontSize: 14, fontWeight: '600' }
+  loadingText: { color: 'rgba(203, 231, 242, 0.6)', fontSize: 14, fontWeight: '600' },
+  fallbackBanner: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 120 : 100,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(8, 35, 43, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 186, 38, 0.3)',
+    borderRadius: 9999,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    zIndex: 45,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  fallbackBannerText: {
+    color: '#ffba26',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  }
 });

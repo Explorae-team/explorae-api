@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 interface DailyChallengeCardProps {
   title: string;
@@ -29,23 +30,20 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
         return {
           label: 'Desafio Semanal',
           icon: 'workspace-premium' as const,
-          iconColor: '#00e5ff',
-          tagColor: 'text-[#00e5ff]',
+          iconColor: colors.challengeWeekly,
         };
       case 'SPECIAL':
         return {
           label: 'Desafio Especial',
           icon: 'stars' as const,
-          iconColor: '#ffea00',
-          tagColor: 'text-[#ffea00]',
+          iconColor: colors.challengeSpecial,
         };
       case 'DAILY':
       default:
         return {
           label: 'Desafio Diário',
           icon: 'emoji-events' as const,
-          iconColor: '#fd6c28',
-          tagColor: 'text-[#fd6c28]',
+          iconColor: colors.primary,
         };
     }
   };
@@ -55,12 +53,15 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
   return (
     <Pressable 
       onPress={onPress}
-      className="rounded-2xl bg-[#002532] border border-white/10 overflow-hidden w-full"
+      className="rounded-2xl bg-surface-container border border-white/10 overflow-hidden w-full"
     >
       <View className="p-6 space-y-4">
         <View className="flex-row justify-between items-start">
           <View className="space-y-1 flex-1 pr-2">
-            <Text className={`text-[10px] font-black uppercase tracking-[0.2em] ${config.tagColor}`}>
+            <Text 
+              style={{ color: config.iconColor }}
+              className="text-[10px] font-black uppercase tracking-[0.2em]"
+            >
               {config.label}
             </Text>
             <Text className="text-lg font-bold text-white leading-tight">{title}</Text>
@@ -81,7 +82,7 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
           </View>
           <View className="h-2 w-full bg-white/5 border border-white/10 rounded-full overflow-hidden">
             <View 
-              className="h-full bg-[#FFB700]" 
+              className="h-full bg-explora-gold" 
               style={{ width: `${Math.min(Math.max(progress, 0), 1) * 100}%` }} 
             />
           </View>
@@ -89,13 +90,13 @@ export const DailyChallengeCard: React.FC<DailyChallengeCardProps> = ({
 
         <View className="flex-row items-center pt-2">
           <View className="flex-row items-center mr-3">
-            <MaterialIcons name="star" size={14} color="#FFB700" style={{ marginRight: 4 }} />
-            <Text className="text-[#FFB700] font-bold text-xs">+{rewardXp} XP</Text>
+            <MaterialIcons name="star" size={14} color={colors.exploraGold} style={{ marginRight: 4 }} />
+            <Text style={{ color: colors.exploraGold }} className="font-bold text-xs">+{rewardXp} XP</Text>
           </View>
           {rewardCoins > 0 && (
             <View className="flex-row items-center mr-3">
-              <MaterialIcons name="monetization-on" size={14} color="#ffba26" style={{ marginRight: 4 }} />
-              <Text className="text-[#ffba26] font-bold text-xs">+{rewardCoins} Moedas</Text>
+              <MaterialIcons name="monetization-on" size={14} color={colors.tertiary} style={{ marginRight: 4 }} />
+              <Text style={{ color: colors.tertiary }} className="font-bold text-xs">+{rewardCoins} Moedas</Text>
             </View>
           )}
           <View className="w-1 h-1 rounded-full bg-white/20 mr-3" />
