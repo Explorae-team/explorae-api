@@ -25,20 +25,20 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
 
   const { formattedTime, isTimeLow, expired } = useCountdown(tokenExpiresAt);
 
-  if (!voucher) return null;
-
   const fetchToken = async () => {
     setLoading(true);
     setError(null);
     setToken(null);
     setTokenExpiresAt(null);
 
-    const res = await rewardService.getVoucherToken(voucher.id);
-    if (res.success && res.data) {
-      setToken(res.data.token);
-      setTokenExpiresAt(res.data.expiresAt);
-    } else {
-      setError(res.message || 'Erro ao gerar QR Code dinâmico.');
+    if (voucher) {
+      const res = await rewardService.getVoucherToken(voucher.id);
+      if (res.success && res.data) {
+        setToken(res.data.token);
+        setTokenExpiresAt(res.data.expiresAt);
+      } else {
+        setError(res.message || 'Erro ao gerar QR Code dinâmico.');
+      }
     }
     setLoading(false);
   };
@@ -51,6 +51,8 @@ export const VoucherQRCodeModal: React.FC<VoucherQRCodeModalProps> = ({
       setTokenExpiresAt(null);
     }
   }, [visible, voucher?.id]);
+
+  if (!voucher) return null;
 
   const expirationText = getVoucherExpirationText(voucher);
 

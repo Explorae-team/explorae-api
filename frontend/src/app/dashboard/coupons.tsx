@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
-  RefreshControl,
+  TouchableOpacity,
   Dimensions
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -17,6 +15,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { rewardService, Reward, Voucher } from '../../services/rewardService';
 import { RewardCard } from '../../components/reward/RewardCard';
 import { VoucherCard } from '../../components/reward/VoucherCard';
+import { ExploraScrollView } from '../../components/common/ExploraScrollView';
 
 import { RedeemConfirmationModal } from '../../components/reward/RedeemConfirmationModal';
 import { RedeemSuccessModal } from '../../components/reward/RedeemSuccessModal';
@@ -131,7 +130,7 @@ export default function CouponsScreen() {
         style={{ paddingTop: insets.top + 16 }}
       >
         <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-white/5">
-          <Ionicons name="arrow-back" size={20} color="white" />
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
         </TouchableOpacity>
         <Text className="text-white text-lg font-bold font-sans">Loja de Recompensas</Text>
         <View className="w-10 h-10" />
@@ -199,17 +198,11 @@ export default function CouponsScreen() {
           <Text className="text-white/60 mt-4 font-sans text-xs">Carregando dados da loja...</Text>
         </View>
       ) : (
-        <ScrollView
+        <ExploraScrollView
           className="flex-1 px-6 mt-4"
           contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={handleRefresh}
-              tintColor={colors.primary}
-            />
-          }
+          onRefresh={handleRefresh}
+          refreshing={isRefreshing}
         >
           {errorMessage && (
             <View className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-4">
@@ -268,7 +261,7 @@ export default function CouponsScreen() {
               )}
             </View>
           )}
-        </ScrollView>
+        </ExploraScrollView>
       )}
 
       <RedeemConfirmationModal
@@ -295,11 +288,14 @@ export default function CouponsScreen() {
         }}
       />
 
-      <VoucherQRCodeModal
-        visible={!!activeVoucherQRCode}
-        voucher={activeVoucherQRCode}
-        onClose={() => setActiveVoucherQRCode(null)}
-      />
+      {activeVoucherQRCode && (
+        <VoucherQRCodeModal
+          key={activeVoucherQRCode.id}
+          visible={!!activeVoucherQRCode}
+          voucher={activeVoucherQRCode}
+          onClose={() => setActiveVoucherQRCode(null)}
+        />
+      )}
 
     </View>
   );
