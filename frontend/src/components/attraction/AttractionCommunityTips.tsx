@@ -135,7 +135,7 @@ const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: str
                       style={{ position: 'absolute', top: 30, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
                       onPress={() => setIsModalVisible(false)}
                     >
-                      <MaterialCommunityIcons name="close" size={30} color={colors.accent} />
+                      <MaterialCommunityIcons name="close" size={30} color={colors.primary} />
                     </Pressable>
 
                     <Pressable

@@ -77,7 +77,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ visible, onClose, onSu
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-white text-lg font-bold font-sans">Nova Dica</Text>
         <TouchableOpacity onPress={onClose} className="p-1 rounded-full bg-white/5">
-          <MaterialCommunityIcons name="close" size={20} color="white" />
+          <MaterialCommunityIcons name="close" size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
 

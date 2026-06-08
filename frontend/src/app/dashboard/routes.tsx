@@ -482,7 +482,7 @@ export default function RoutesScreen() {
             style={styles.backButton} 
             onPress={() => router.replace('/dashboard')}
           >
-            <MaterialIcon name="arrow-back" size={24} color="#cbe7f2" />
+            <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
           </TouchableOpacity>
 
           <View style={styles.searchBar}>

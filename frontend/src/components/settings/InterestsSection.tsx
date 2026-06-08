@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 
 export default function InterestsSection() {
   const interests = ['Gastronomia', 'Ecoturismo', 'História'];
@@ -15,14 +16,14 @@ export default function InterestsSection() {
             className="px-5 py-3 rounded-full bg-on-primary-container/20 border border-on-primary-container/30 flex-row items-center gap-2"
           >
             <Text className="text-on-primary-container text-[14px] font-bold">{interest}</Text>
-            <MaterialIcons name="close" size={16} color="#fd6c28" />
+            <MaterialIcons name="close" size={16} color={colors.primary} />
           </TouchableOpacity>
         ))}
         
         <TouchableOpacity 
           className="px-5 py-3 rounded-full bg-surface-container-high border border-transparent flex-row items-center gap-2 hover:bg-surface-bright"
         >
-          <MaterialIcons name="add" size={18} color="#c1c7cc" />
+          <MaterialIcons name="add" size={18} color={colors.onSurfaceVariant} />
           <Text className="text-on-surface-variant text-[14px] font-medium">Adicionar</Text>
         </TouchableOpacity>
       </View>

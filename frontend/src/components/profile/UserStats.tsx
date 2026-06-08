@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
@@ -216,7 +217,7 @@ export default function UserStats() {
                 disabled={isSaving}
                 className="bg-surface-container-highest px-6 py-2 rounded-full flex-row items-center space-x-2"
               >
-                <MaterialIcons name="close" size={18} color="#fd6c28" />
+                <MaterialIcons name="close" size={18} color={colors.primary} />
                 <Text className="text-primary font-bold">Cancelar</Text>
               </TouchableOpacity>
             </View>
@@ -230,7 +231,7 @@ export default function UserStats() {
                 onPress={handleToggleEdit} 
                 className="ml-2 bg-surface-container p-1 rounded-full"
               >
-                <MaterialIcons name="edit" size={18} color="#fd6c28" />
+                <MaterialIcons name="edit" size={18} color={colors.primary} />
               </TouchableOpacity>
             </View>
             <Text className="text-tertiary font-bold text-xs uppercase tracking-widest mt-1">{levelName}</Text>

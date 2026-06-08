@@ -62,7 +62,7 @@ export const FiltersModal: React.FC<FiltersModalProps> = ({
           {/* Header */}
           <View className="flex-row justify-between items-center px-8 py-6 border-b border-white/5">
             <Pressable onPress={onClose} className="p-2">
-              <MaterialIcons name="close" size={24} color={colors.onSurface} />
+              <MaterialIcons name="close" size={24} color={colors.primary} />
             </Pressable>
             <Text className="text-lg font-bold text-on-surface">Filtros</Text>
             <Pressable onPress={handleReset}>

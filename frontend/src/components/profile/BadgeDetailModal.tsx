@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Platform, Image, TouchableOpacity, Modal } from
 import { BlurView } from 'expo-blur';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { ProgressBar } from '../common/ProgressBar';
+import { colors } from '../../constants/colors';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -45,7 +46,7 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ visible, ite
           {type === 'BADGE' ? `Medalha • ${CATEGORY_LABELS[data.category as keyof typeof CATEGORY_LABELS] || data.category}` : 'Desafio'}
         </Text>
         <TouchableOpacity onPress={onClose} className="p-1 rounded-full bg-white/5">
-          <Ionicons name="close" size={20} color="white" />
+          <Ionicons name="close" size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
