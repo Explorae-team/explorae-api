@@ -456,14 +456,11 @@ export default function RoutesScreen() {
   useEffect(() => {
     if (routeQueue.length > 0 && userLocation) {
       const fetchRouteDirections = async () => {
-        try {
-          const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
-          const mode = modeMap[transportMode];
+        const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
+        const mode = modeMap[transportMode];
           
           const validQueueCoords = routeQueue.map(a => a.coordinate).filter(c => c && c.latitude !== 0 && c.longitude !== 0);
-          const waypoints = (isLocationFallback && validQueueCoords.length > 0) 
-            ? validQueueCoords 
-            : (userLocation ? [userLocation.coords, ...validQueueCoords] : validQueueCoords);
+          const waypoints = userLocation ? [userLocation.coords, ...validQueueCoords] : validQueueCoords;
 
           if (waypoints.length < 2) {
              setRoutePolyline([]);
@@ -473,7 +470,7 @@ export default function RoutesScreen() {
 
           // Reduzir precisão para o Hash para evitar loops em pingos pequenos de GPS
           const hashCoords = waypoints.map(w => w.latitude.toFixed(3) + ',' + w.longitude.toFixed(3)).join('|');
-          const currentHash = `${mode}-${hashCoords}`;
+          const currentHash = `${transportMode}-${hashCoords}`;
 
           if (currentHash === routeHashRef.current && routePolyline.length > 0) {
             return; // Cache hit: Mesma rota, sem chamadas ao OSRM necessárias
@@ -482,40 +479,51 @@ export default function RoutesScreen() {
           const coordsString = waypoints.map(c => `${c.longitude},${c.latitude}`).join(';');
           const url = `https://router.project-osrm.org/route/v1/${mode}/${coordsString}?overview=full&geometries=polyline`;
           
-          const response = await fetch(url);
-          const json = await response.json();
-          
-          if (json.code === 'Ok' && json.routes.length > 0) {
-            const route = json.routes[0];
-            const points = decodePolyline(route.geometry);
-            setRoutePolyline(points);
-            routeHashRef.current = currentHash;
-            
-            const distMeters = route.distance;
-            const durSeconds = route.duration;
-            
-            const distText = distMeters > 1000 ? `${(distMeters/1000).toFixed(1)} km` : `${Math.round(distMeters)} m`;
-            const timeText = durSeconds > 3600 ? `${Math.floor(durSeconds/3600)}h ${Math.ceil((durSeconds%3600)/60)}m` : `${Math.ceil(durSeconds/60)} min`;
-            
-            setRouteMeta({ distance: distText, time: timeText });
+          let distMeters = 0;
+          let durSeconds = 0;
+          let points = [];
 
-            if (Platform.OS !== 'web' && mapRef.current) {
-              setTimeout(() => {
-                mapRef.current?.fitToCoordinates(points, {
-                  edgePadding: { top: 100, right: 50, bottom: 300, left: 50 },
-                  animated: true,
-                });
-              }, 300);
+          try {
+            const response = await fetch(url);
+            const json = await response.json();
+            
+            if (json.code === 'Ok' && json.routes.length > 0) {
+              const route = json.routes[0];
+              points = decodePolyline(route.geometry);
+              distMeters = route.distance;
+              durSeconds = route.duration;
+              
+              if (transportMode === 'transit') durSeconds *= 1.5; // Simula tempo maior do ônibus
+            } else {
+              throw new Error("Rota não encontrada pelo OSRM");
             }
-          } else {
-            throw new Error("Rota não encontrada pelo OSRM");
+          } catch (err) {
+            console.warn("Falha na API de rotas. Usando fallback de linhas retas.", err);
+            points = waypoints;
+            for (let i = 0; i < waypoints.length - 1; i++) {
+               distMeters += getDistance(waypoints[i], waypoints[i+1]);
+            }
+            if (transportMode === 'walking') durSeconds = distMeters / 1.38; // ~5 km/h
+            else if (transportMode === 'transit') durSeconds = distMeters / 5.5; // ~20 km/h
+            else durSeconds = distMeters / 8.3; // ~30 km/h
           }
-        } catch (err) {
-          console.warn("Falha na API de rotas. Usando fallback de linhas retas.", err);
-          const fallbackMock = [userLocation.coords, ...routeQueue.map(a => a.coordinate)];
-          setRoutePolyline(fallbackMock);
-          setRouteMeta({ distance: '--', time: '--' });
-        }
+
+          setRoutePolyline(points);
+          routeHashRef.current = currentHash;
+          
+          const distText = distMeters > 1000 ? `${(distMeters/1000).toFixed(1)} km` : `${Math.round(distMeters)} m`;
+          const timeText = durSeconds > 3600 ? `${Math.floor(durSeconds/3600)}h ${Math.ceil((durSeconds%3600)/60)}m` : `${Math.ceil(durSeconds/60)} min`;
+          
+          setRouteMeta({ distance: distText, time: timeText });
+
+          if (Platform.OS !== 'web' && mapRef.current) {
+            setTimeout(() => {
+              mapRef.current?.fitToCoordinates(points, {
+                edgePadding: { top: 100, right: 50, bottom: 300, left: 50 },
+                animated: true,
+              });
+            }, 300);
+          }
       };
 
       fetchRouteDirections();
@@ -757,14 +765,14 @@ export default function RoutesScreen() {
                  let originStr = '';
                  let destinationsStr = '';
                  
-                 if (webUserLocationForMap && !isLocationFallback) {
+                 if (webUserLocationForMap) {
                    originStr = `${webUserLocationForMap.coords.latitude.toFixed(4)},${webUserLocationForMap.coords.longitude.toFixed(4)}`;
-                   destinationsStr = routeQueue.map(a => `${a.coordinate.latitude},${a.coordinate.longitude}`).join('+to:');
+                   destinationsStr = routeQueue.map(a => encodeURIComponent(`${a.title}, João Pessoa`)).join('+to:');
                  } else {
                    const first = routeQueue[0];
-                   originStr = `${first.coordinate.latitude},${first.coordinate.longitude}`;
+                   originStr = encodeURIComponent(`${first.title}, João Pessoa`);
                    if (routeQueue.length > 1) {
-                     destinationsStr = routeQueue.slice(1).map(a => `${a.coordinate.latitude},${a.coordinate.longitude}`).join('+to:');
+                     destinationsStr = routeQueue.slice(1).map(a => encodeURIComponent(`${a.title}, João Pessoa`)).join('+to:');
                    } else {
                      destinationsStr = originStr;
                    }
@@ -775,7 +783,7 @@ export default function RoutesScreen() {
                  } else {
                    iframeUrl = `https://maps.google.com/maps?q=${originStr}&z=15&output=embed`;
                  }
-               } else if (webUserLocationForMap && !isLocationFallback) {
+               } else if (webUserLocationForMap) {
                  iframeUrl = `https://maps.google.com/maps?q=${webUserLocationForMap.coords.latitude},${webUserLocationForMap.coords.longitude}&z=15&output=embed`;
                } else {
                  iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
