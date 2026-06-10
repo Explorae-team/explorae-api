@@ -88,6 +88,63 @@ const decodePolyline = (t: string) => {
 // 1. Cache fora do componente (memória global da sessão)
 const iframeUrlCache = new Map<string, string>();
 
+// Algoritmo Nearest Neighbor para ordenar o restante da fila a partir de uma atração de início
+const optimizeRouteQueue = (queue: Attraction[], startAttraction: Attraction): Attraction[] => {
+  if (queue.length <= 1) return queue;
+  
+  const remaining = queue.filter(a => a.id !== startAttraction.id);
+  const ordered: Attraction[] = [startAttraction];
+  let current = startAttraction;
+
+  while (remaining.length > 0) {
+    let nearestIdx = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < remaining.length; i++) {
+      const dist = getDistance(
+        { latitude: current.coordinate.latitude, longitude: current.coordinate.longitude },
+        { latitude: remaining[i].coordinate.latitude, longitude: remaining[i].coordinate.longitude }
+      );
+      if (dist < minDist) {
+        minDist = dist;
+        nearestIdx = i;
+      }
+    }
+    current = remaining[nearestIdx];
+    ordered.push(current);
+    remaining.splice(nearestIdx, 1);
+  }
+  return ordered;
+};
+
+// Algoritmo Nearest Neighbor para ordenar toda a fila a partir das coordenadas do usuário (GPS)
+const optimizeQueueFromLocation = (queue: Attraction[], userLat: number, userLng: number): Attraction[] => {
+  if (queue.length === 0) return queue;
+  
+  const remaining = [...queue];
+  const ordered: Attraction[] = [];
+  let currentCoords = { latitude: userLat, longitude: userLng };
+
+  while (remaining.length > 0) {
+    let nearestIdx = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < remaining.length; i++) {
+      const dist = getDistance(
+        currentCoords,
+        { latitude: remaining[i].coordinate.latitude, longitude: remaining[i].coordinate.longitude }
+      );
+      if (dist < minDist) {
+        minDist = dist;
+        nearestIdx = i;
+      }
+    }
+    const nextAttraction = remaining[nearestIdx];
+    ordered.push(nextAttraction);
+    currentCoords = { latitude: nextAttraction.coordinate.latitude, longitude: nextAttraction.coordinate.longitude };
+    remaining.splice(nearestIdx, 1);
+  }
+  return ordered;
+};
+
 export default function RoutesScreen() {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -102,6 +159,7 @@ export default function RoutesScreen() {
   const [allAttractions, setAllAttractions] = useState<Attraction[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [userLocation, setUserLocation] = useState<{coords: {latitude: number, longitude: number}} | null>(null);
+  const [webUserLocationForMap, setWebUserLocationForMap] = useState<{coords: {latitude: number, longitude: number}} | null>(null);
   const [isLocationFallback, setIsLocationFallback] = useState(false);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -203,10 +261,21 @@ export default function RoutesScreen() {
           if ('geolocation' in navigator) {
             const updateLocation = (position: any) => {
               if (isActive) {
-                setUserLocation({ 
+                const newLoc = { 
                   coords: { latitude: position.coords.latitude, longitude: position.coords.longitude } 
-                });
+                };
+                setUserLocation(newLoc);
                 setIsLocationFallback(false);
+
+                // Evita atualizações constantes na Web se o deslocamento for menor que 80 metros
+                setWebUserLocationForMap(prev => {
+                  if (!prev) return newLoc;
+                  const distance = getDistance(prev.coords, newLoc.coords);
+                  if (distance > 80) {
+                    return newLoc;
+                  }
+                  return prev;
+                });
               }
             };
 
@@ -214,6 +283,7 @@ export default function RoutesScreen() {
               console.warn(`Erro GPS Web (${error.code}):`, error.message);
               if (isActive) {
                 setUserLocation(FALLBACK_LOCATION);
+                setWebUserLocationForMap(FALLBACK_LOCATION);
                 setIsLocationFallback(true);
               }
               if (error.code === 1) window.alert("Permissão negada. O mapa será centralizado em João Pessoa por padrão.");
@@ -225,6 +295,7 @@ export default function RoutesScreen() {
             watchId = navigator.geolocation.watchPosition(updateLocation, handleLocationError, geoOptions);
           } else {
             setUserLocation(FALLBACK_LOCATION);
+            setWebUserLocationForMap(FALLBACK_LOCATION);
             setIsLocationFallback(true);
             window.alert("Geolocalização não suportada. Exibindo João Pessoa.");
           }
@@ -233,6 +304,7 @@ export default function RoutesScreen() {
           if (status !== 'granted') {
             Alert.alert('Permissão negada', 'O mapa será centralizado em João Pessoa por padrão.');
             setUserLocation(FALLBACK_LOCATION);
+            setWebUserLocationForMap(FALLBACK_LOCATION);
             setIsLocationFallback(true);
             mapRef.current?.animateToRegion({
               latitude: FALLBACK_LOCATION.coords.latitude,
@@ -249,6 +321,7 @@ export default function RoutesScreen() {
             let initialLoc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
             if (isActive) {
               setUserLocation(initialLoc);
+              setWebUserLocationForMap(initialLoc);
               setIsLocationFallback(false);
               mapRef.current?.animateToRegion({
                 latitude: initialLoc.coords.latitude,
@@ -259,6 +332,7 @@ export default function RoutesScreen() {
             }
           } catch (e) {
             setUserLocation(FALLBACK_LOCATION);
+            setWebUserLocationForMap(FALLBACK_LOCATION);
             setIsLocationFallback(true);
           }
 
@@ -267,6 +341,7 @@ export default function RoutesScreen() {
             (newLocation) => {
               if (isActive) {
                 setUserLocation(newLocation);
+                setWebUserLocationForMap(newLocation);
                 setIsLocationFallback(false);
               }
             }
@@ -470,11 +545,33 @@ export default function RoutesScreen() {
       triggeredAttractionId.current = null;
       setIsModalVisible(false);
       
-      if (filteredList.length === 0) {
-        if (Platform.OS !== 'web') Alert.alert("Parabéns! 🎉", "Você concluiu com sucesso todos os destinos do seu roteiro!");
-        else window.alert("Parabéns! 🎉 Você concluiu com sucesso todos os destinos do seu roteiro!");
       }
     }
+  };
+
+  const handleOptimizeRoute = () => {
+    if (routeQueue.length <= 1) return;
+    
+    let lat = userLocation?.coords.latitude;
+    let lng = userLocation?.coords.longitude;
+    
+    if (!lat || !lng || isLocationFallback) {
+      const first = routeQueue[0];
+      const optimized = optimizeRouteQueue(routeQueue, first);
+      setRouteQueue(optimized);
+      
+      const msg = "Roteiro otimizado a partir do seu primeiro destino (GPS indisponível).";
+      if (Platform.OS === 'web') window.alert(msg);
+      else Alert.alert("Roteiro Otimizado 🚀", msg);
+      return;
+    }
+    
+    const optimized = optimizeQueueFromLocation(routeQueue, lat, lng);
+    setRouteQueue(optimized);
+    
+    const msg = "Organizamos seu roteiro na ordem mais eficiente a partir da sua localização atual!";
+    if (Platform.OS === 'web') window.alert(msg);
+    else Alert.alert("Roteiro Otimizado 🚀", msg);
   };
 
   const mapStyleOptions = [
@@ -537,6 +634,18 @@ export default function RoutesScreen() {
             <Text style={styles.secondaryActionText}>Externo</Text>
           </TouchableOpacity>
         </View>
+
+        {routeQueue.length > 1 && (
+          <TouchableOpacity 
+            style={[styles.secondaryActionButton, { borderColor: colors.primary, marginTop: 8 }]} 
+            onPress={handleOptimizeRoute}
+          >
+            <MaterialIcon name="auto-fix-high" size={18} color={colors.primary} style={styles.buttonIcon} />
+            <Text style={[styles.secondaryActionText, { color: colors.primary }]}>
+              Otimizar Roteiro (Inteligente)
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {isLoadingData && (
@@ -572,8 +681,8 @@ export default function RoutesScreen() {
         isActive={isActive || false}
         onPress={() => {
           if (item.id !== selectedAttraction?.id) {
-            const filtered = routeQueue.filter(a => a.id !== item.id);
-            setRouteQueue([item, ...filtered]);
+            const optimized = optimizeRouteQueue(routeQueue, item);
+            setRouteQueue(optimized);
           }
         }}
         onLongPress={drag}
@@ -596,7 +705,7 @@ export default function RoutesScreen() {
            {(() => {
              // ── Monta a chave de cache com IDs das atrações em ordem ──
              const cacheKey = [
-               userLocation ? `${userLocation.coords.latitude.toFixed(3)},${userLocation.coords.longitude.toFixed(3)}` : 'noloc',
+               webUserLocationForMap ? `${webUserLocationForMap.coords.latitude.toFixed(3)},${webUserLocationForMap.coords.longitude.toFixed(3)}` : 'noloc',
                transportMode,
                routeQueue.map(a => a.id).join('->'),
              ].join('|');
@@ -605,9 +714,9 @@ export default function RoutesScreen() {
              let iframeUrl = iframeUrlCache.get(cacheKey);
 
              if (!iframeUrl) {
-               if (routeQueue.length > 0 && userLocation) {
+               if (routeQueue.length > 0 && webUserLocationForMap) {
                  const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-                 const originStr = `${userLocation.coords.latitude.toFixed(4)},${userLocation.coords.longitude.toFixed(4)}`;
+                 const originStr = `${webUserLocationForMap.coords.latitude.toFixed(4)},${webUserLocationForMap.coords.longitude.toFixed(4)}`;
                  const finalDest = routeQueue[routeQueue.length - 1];
                  const destStr = `${finalDest.coordinate.latitude},${finalDest.coordinate.longitude}`;
                  let waypointsStr = '';
@@ -619,8 +728,8 @@ export default function RoutesScreen() {
                } else if (routeQueue.length > 0) {
                  const first = routeQueue[0];
                  iframeUrl = `https://maps.google.com/maps?q=${first.coordinate.latitude},${first.coordinate.longitude}&z=15&output=embed`;
-               } else if (userLocation) {
-                 iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=15&output=embed`;
+               } else if (webUserLocationForMap) {
+                 iframeUrl = `https://maps.google.com/maps?q=${webUserLocationForMap.coords.latitude},${webUserLocationForMap.coords.longitude}&z=15&output=embed`;
                } else {
                  iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
                }
@@ -669,7 +778,18 @@ export default function RoutesScreen() {
                 coordinate={attr.coordinate} 
                 onPress={() => {
                   const exists = routeQueue.some(a => a.id === attr.id);
-                  if (!exists) setRouteQueue([...routeQueue, attr]);
+                  if (!exists) {
+                    const newQueue = [...routeQueue, attr];
+                    if (newQueue.length > 1) {
+                      const optimized = optimizeRouteQueue(newQueue, newQueue[0]);
+                      setRouteQueue(optimized);
+                    } else {
+                      setRouteQueue(newQueue);
+                    }
+                  } else {
+                    const optimized = optimizeRouteQueue(routeQueue, attr);
+                    setRouteQueue(optimized);
+                  }
                 }}
               >
                 <View style={[styles.markerPulse, { backgroundColor: color, borderColor: 'rgba(255,255,255,0.9)' }]}>
