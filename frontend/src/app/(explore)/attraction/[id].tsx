@@ -87,7 +87,7 @@ const AttractionDetail = () => {
       />
 
       <ExploraScrollView 
-        contentContainerStyle={{ paddingBottom: 220 }} 
+        contentContainerStyle={{ paddingBottom: 80 }} 
         onRefresh={refresh}
         refreshing={refreshing}
       >
@@ -196,17 +196,6 @@ const AttractionDetail = () => {
           </TouchableOpacity>
         </View>
       </ExploraScrollView>
-
-      {/* Botão de Check-in Flutuante */}
-      <View className="absolute bottom-10 left-6 right-6">
-        <PrimaryButton 
-          title={isCheckingIn ? "REALIZANDO CHECK-IN..." : "CHECK-IN NO LOCAL"}
-          onPress={checkIn}
-          disabled={isCheckingIn}
-          className="bg-explora-gold shadow-explora-gold/30"
-          rightIcon={isCheckingIn ? <ActivityIndicator size="small" color={colors.background} /> : <MaterialCommunityIcons name="checkbox-marked-circle" size={20} color={colors.background} />}
-        />
-      </View>
 
       {/* Modal de Nova Review Reutilizável */}
       <ReviewModal 
