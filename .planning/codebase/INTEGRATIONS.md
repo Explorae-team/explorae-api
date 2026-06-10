@@ -55,4 +55,4 @@ Para o upload e exibição de fotos de perfil (avatares) de usuários e imagens 
 O banco de dados PostgreSQL é completamente automatizado na inicialização do backend.
 
 *   **Liquibase:** Monitora e aplica scripts SQL estruturados em XML/YAML para criar tabelas, índices e restrições.
-*   **Seeds Automáticos:** O arquivo de changelog inicial da Liquibase popula o banco de dados de desenvolvimento com um conjunto pré-definido de **20 atrações turísticas** com coordenadas geográficas exatas, categorias, descrições e imagens, garantindo que o catálogo e o mapa já comecem povoados no primeiro build.
+*   **Seeds Automáticos:** O arquivo de changelog da Liquibase popula o banco de dados de desenvolvimento com um conjunto enriquecido de **105 atrações turísticas** com coordenadas geográficas exatas, categorias, descrições e imagens, garantindo que o catálogo e o mapa já comecem povoados no primeiro build.

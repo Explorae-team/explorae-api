@@ -37,23 +37,31 @@ backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/br/edu/ifpb/explorae/       # Pacote Java Base
-│   │   │   ├── api/                         # Camada Web REST
-│   │   │   │   ├── controller/              # Endpoints HTTP da API
-│   │   │   │   ├── dto/                     # Classes de Transferência de Dados (DTO)
+│   │   │   ├── api/                         # Camada Web REST Genérica
 │   │   │   │   ├── exception/               # Manipuladores de Exceções Globais
-│   │   │   │   └── mapper/                  # Mapeamentos MapStruct
-│   │   │   ├── config/                      # Configurações do Spring Boot (Security, CORS, etc.)
-│   │   │   ├── domain/                      # Entidades de Domínio do JPA
-│   │   │   │   ├── attraction/              # Atrações, reviews, check-ins, favoritos
-│   │   │   │   ├── gamification/            # Badges, desafios, históricos de XP
-│   │   │   │   └── user/                    # Entidade User, categorias e preferências
-│   │   │   ├── listener/                    # Triggers assíncronos (Gamification, Desafios)
-│   │   │   └── service/                     # Lógicas de Negócio e Serviços
-│   │   │       └── badge/                   # Estratégias do Strategy Pattern de medalhas
+│   │   │   │   └── DTOs/                    # DTOs compartilhados (StandardResponseDTO)
+│   │   │   ├── config/                      # Configurações do Spring Boot (Security, CORS, Supabase, etc.)
+│   │   │   ├── gamification/                # Módulo de Gamificação
+│   │   │   │   ├── controller/              # Endpoints (Badge, Challenge, Reward)
+│   │   │   │   ├── domain/                  # Entidades (Badge, Challenge, Reward, Voucher, XpHistory)
+│   │   │   │   ├── dto/                     # DTOs específicos de Gamificação
+│   │   │   │   ├── event/                   # Eventos assíncronos (UserLevelUpEvent, XpEarnedEvent)
+│   │   │   │   ├── listener/                # Listeners de eventos de pontuação
+│   │   │   │   ├── mapper/                  # Mapeadores MapStruct de conquistas
+│   │   │   │   ├── repository/              # Repositórios JPA de gamificação
+│   │   │   │   └── service/                 # Lógicas e Patterns de medalhas (Strategy)
+│   │   │   ├── user/                        # Módulo de Autenticação e Usuários
+│   │   │   │   ├── controller/              # Endpoints (AuthController, UserController, CategoryController)
+│   │   │   │   ├── domain/                  # Entidades (User, TravelPreference, Category)
+│   │   │   │   ├── dto/                     # DTOs específicos de Usuário
+│   │   │   │   ├── mapper/                  # Mapeador MapStruct de usuário (UserMapper)
+│   │   │   │   ├── repository/              # Repositórios JPA de perfil e preferências
+│   │   │   │   └── service/                 # Serviços de autenticação e preferências
+│   │   │   └── domain/                      # Entidades e repositórios de Atrações e Favoritos
 │   │   └── resources/
 │   │       ├── db/changelog/                # Arquivos XML do Liquibase (DDL e Seeds)
 │   │       ├── application.properties       # Configurações globais do Spring
-│   │       └── application-prod.properties  # Propriedades para ambiente de produção
+│   │       └── application-local.properties # Propriedades locais
 │   └── test/                                # Testes Unitários e Integração do Spring
 ├── Dockerfile                               # Conteinerização do backend
 ├── mvnw                                     # Maven Wrapper para execução independente de IDE
@@ -64,28 +72,32 @@ backend/
 
 ## 📱 2. Estrutura Física do Frontend (`/frontend`)
 
-O frontend utiliza Expo Router, onde os arquivos contidos em `/src/app` representam automaticamente as telas do aplicativo.
+O frontend utiliza Expo Router, organizado em grupos de rotas protegidas (`(auth)` e `(explore)`) para gerenciar a navegação.
 
 ```text
 frontend/
 ├── src/
 │   ├── app/                                 # Telas e Rotas (Expo Router)
-│   │   ├── attraction/                      # Sub-rotas de detalhes e reviews
-│   │   ├── dashboard/                       # Módulos principais (Mapa, Perfil, Conquistas)
+│   │   ├── (auth)/                          # Roteamento público e autenticação
+│   │   │   ├── login.tsx                    # Tela de Login
+│   │   │   ├── cadastro.tsx                 # Tela de Cadastro
+│   │   │   ├── recuperar-senha.tsx          # Recuperação de acesso
+│   │   │   └── reset-password.tsx           # Redefinição de senha
+│   │   ├── (explore)/                       # Roteamento privado da jornada
+│   │   │   ├── attraction/                  # Sub-rota de detalhes da atração ([id].tsx)
+│   │   │   ├── dashboard/                   # Painel (Mapa, Perfil, Conquistas, Cupons, Favorites)
+│   │   │   ├── preferences.tsx              # Onboarding de Interesses de Viagem
+│   │   │   └── settings.tsx                 # Configurações e Logout
 │   │   ├── _layout.jsx                      # Componente Root de Roteamento e Contextos
-│   │   ├── index.jsx                        # Ponto de entrada padrão
-│   │   ├── login.tsx                        # Tela de Login
-│   │   ├── cadastro.tsx                     # Tela de Cadastro
-│   │   ├── preferences.tsx                  # Onboarding de Interesses de Viagem
-│   │   └── settings.tsx                     # Ajustes e Logout
+│   │   └── index.jsx                        # Entrada padrão e redirecionamento inicial
 │   ├── components/                          # Componentes Customizados Reutilizáveis
 │   │   ├── attraction/                      # Cards de atração, modais de review
 │   │   ├── profile/                         # Elementos do perfil do explorador
 │   │   └── common/                          # Botões, barras de progresso genéricas
 │   ├── constants/                           # Cores da marca, fontes e chaves
-│   ├── contexts/                            # Provedores Globais de Estado (Auth, Badge)
-│   ├── hooks/                               # Hooks reutilizáveis (useLocation, etc.)
-│   ├── services/                            # Axios clients, chamadas de API
+│   ├── contexts/                            # Provedores Globais de Estado (Auth, Celebration, Toast)
+│   ├── hooks/                               # Hooks reutilizáveis (useAttraction, useBadges)
+│   ├── services/                            # Axios client e chamadas (userService)
 │   ├── styles/                              # Estilos globais Tailwind
 │   └── types/                               # Arquivos de tipagem TypeScript
 ├── assets/                                  # Imagens estáticas, logotipos e fontes

@@ -8,9 +8,9 @@ Este documento elenca as preocupações arquiteturais, potenciais riscos de impl
 
 Como a principal tarefa da Sprint 04 é a implementação do **Mapa Interativo** das atrações em tempo real, as seguintes preocupações técnicas devem ser mitigadas:
 
-*   **Compatibilidade do React Native Maps na Web:**
-    *   *Contexto:* A biblioteca `react-native-maps` possui excelente suporte nativo para iOS (Apple Maps) e Android (Google Maps). No entanto, o comportamento em navegadores Web (PWA) é historicamente instável e pode quebrar sem uma camada adaptadora (`react-native-web-maps`).
-    *   *Mitigação:* Desenvolver o mapa prevendo fallbacks elegantes de visualização no ambiente de desenvolvimento Web (ex: utilizando APIs baseadas em Leaflet ou Iframes interativos se a biblioteca nativa falhar ao ser montada no browser).
+*   **Compatibilidade do React Native Maps na Web (RESOLVIDO):**
+    *   *Contexto:* A biblioteca `react-native-maps` possui excelente suporte nativo para iOS e Android, mas é incompatível e instável na Web.
+    *   *Resolução:* Implementamos um fallback de geolocalização com renderização via Iframe interativo do Google Maps. Para otimizar a usabilidade na web e mitigar telas brancas durante reordenações, removemos a recriação de componentes reatribuindo chaves e implementamos um cache global de URLs (`iframeUrlCache`) na página de rotas.
 *   **Segurança e Restrição de Chaves do Google Maps:**
     *   *Contexto:* Para que a renderização ocorra no cliente, a chave `GOOGLE_MAPS_API_KEY` deve estar embutida no frontend. Chaves de API expostas em aplicativos nativos ou PWAs correm o risco de serem extraídas por engenharia reversa.
     *   *Mitigação:* É altamente recomendável instruir o proprietário do console do Google Cloud a **restringir o uso da chave**, limitando as requisições especificamente ao bundle ID do app Android (`com.herbertcarvalho021.exploraenew`), aos certificados digitais (SHA-1 fingerprint) correspondentes e, na Web, aos domínios autorizados.

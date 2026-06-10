@@ -21,20 +21,23 @@ graph TD
 
 ---
 
-## ☕ 2. Arquitetura do Backend (Spring Boot Layered)
+## ☕ 2. Arquitetura do Backend (Spring Boot Layered & Modular)
 
-O backend é organizado no padrão clássico de **Arquitetura em Camadas** (Layered Architecture), separando rigorosamente as preocupações de transporte, negócio e persistência.
+O backend é organizado no padrão de **Arquitetura em Camadas** (Layered Architecture) associado a uma divisão **Modular de Domínio**, isolando as responsabilidades de usuários, gamificação e atração:
 
 1.  **Camada de Entrada (Controllers / DTOs):**
-    *   Fica em `br.edu.ifpb.explorae.api`.
-    *   Recebe requisições HTTP, valida payloads de entrada com as anotações do Spring Validation (`@Valid`, `@NotNull`) e responde no padrão `StandardResponseDTO`.
-    *   Mapeia DTOs para Entidades de domínio utilizando **MapStruct** para manter a independência das classes de banco de dados.
+    *   Divisão por subdomínio:
+        *   Perfil e autenticação de usuários em `br.edu.ifpb.explorae.user.controller` e `br.edu.ifpb.explorae.user.dto`.
+        *   Badges, conquistas e recompensas em `br.edu.ifpb.explorae.gamification.controller` e `br.edu.ifpb.explorae.gamification.dto`.
+        *   Atrações e reviews em `br.edu.ifpb.explorae.api.controller` e `br.edu.ifpb.explorae.api.dto`.
+    *   Responde no padrão StandardResponseDTO e valida payloads com anotações do Spring Validation (`@Valid`, `@NotNull`).
+    *   Mapeia DTOs para Entidades de domínio utilizando **MapStruct** para isolar as classes de persistência.
 2.  **Camada de Negócio (Services):**
-    *   Fica em `br.edu.ifpb.explorae.service`.
-    *   Centraliza todas as regras de negócio complexas da aplicação, transações (`@Transactional`) e orquestrações.
+    *   Serviços de regras de negócio em `br.edu.ifpb.explorae.user.service`, `br.edu.ifpb.explorae.gamification.service` e `br.edu.ifpb.explorae.service`.
+    *   Centraliza transações (`@Transactional`) e orquestrações.
 3.  **Camada de Persistência (Repositories & Domain Entities):**
-    *   Fica em `br.edu.ifpb.explorae.domain`.
-    *   Contém entidades do JPA anotadas para mapeamento objeto-relacional (ORM) e interfaces de repositórios que herdam de `JpaRepository` com UUIDs como chaves primárias.
+    *   Entidades JPA localizadas em `br.edu.ifpb.explorae.user.domain`, `br.edu.ifpb.explorae.gamification.domain` e `br.edu.ifpb.explorae.domain`.
+    *   Repositórios herdam de `JpaRepository` com UUIDs como chaves primárias.
 
 ---
 
@@ -43,14 +46,14 @@ O backend é organizado no padrão clássico de **Arquitetura em Camadas** (Laye
 A gamificação do Exploraê é um dos diferenciais de sua arquitetura. Para evitar acúmulos de lógicas condicionais complexas (`if/else`) ao desbloquear novas conquistas, o sistema adota o **Padrão Strategy** (Strategy Pattern) no processamento de medalhas.
 
 *   **Interface Base (`BadgeProgressStrategy`):** Define o contrato unificado para avaliar o progresso de desbloqueio de uma medalha.
-*   **Classes de Estratégia Específicas:** Localizadas em `br.edu.ifpb.explorae.service.badge`, cada classe herda de `BadgeProgressStrategy` e avalia um critério de negócio isolado:
+*   **Classes de Estratégia Específicas:** Localizadas em `br.edu.ifpb.explorae.gamification.service.badge`, cada classe herda de `BadgeProgressStrategy` e avalia um critério de negócio isolado:
     *   `PioneiroBadgeStrategy`: Avalia o desbloqueio para os primeiros check-ins.
     *   `ColecionadorBadgeStrategy`: Mede o acúmulo de favoritos e locais salvos.
     *   `CriticoBadgeStrategy`: Verifica a quantidade de avaliações escritas.
     *   `DesbravadorBadgeStrategy`: Analisa explorações por categorias específicas de locais.
 *   **Orquestração Assíncrona via Eventos:**
     *   Interações críticas de usuários (fazer check-in, favoritar, escrever reviews) disparam eventos internos do Spring (`ApplicationEventPublisher`).
-    *   Os listeners assíncronos `GamificationListener` e `ChallengeListener` reagem a esses eventos para computar ganhos de XP, avaliar progressão de nível e acionar o `BadgeEvaluationService` que executa todas as estratégias registradas no contexto, mantendo as rotas de interação extremamente rápidas e responsivas.
+    *   Os listeners assíncronos `ChallengeListener` e `GamificationListener` (sob `br.edu.ifpb.explorae.gamification.listener`) reagem a esses eventos para computar ganhos de XP, avaliar progressão de nível e acionar o `BadgeEvaluationService` que executa todas as estratégias registradas no contexto, mantendo as rotas de interação extremamente rápidas e responsivas.
 
 ---
 
@@ -60,12 +63,15 @@ O aplicativo utiliza uma estrutura baseada em recursos (Feature-based e modular)
 
 1.  **Roteamento (App Router - Expo Router):**
     *   Localizado na pasta `/src/app`.
-    *   Utiliza roteamento declarativo e dinâmico estruturado por pastas.
+    *   Organizado em grupos de rotas:
+        *   `(auth)`: Contém fluxos públicos de login, cadastro e recuperação de senha.
+        *   `(explore)`: Agrupa as telas privadas da jornada (dashboard, preferências, settings e atração).
     *   Contém controle de guardas de navegação (exemplo: redirecionamento obrigatório para `/preferences` se o usuário logado ainda não realizou o onboarding inicial de interesses de viagem).
 2.  **Componentes (Components):**
     *   Separados por área em `/src/components` (`attraction`, `profile`, `common`).
     *   Compostos e altamente reutilizáveis, seguindo o padrão de estilização do Tailwind com NativeWind.
-3.  **Provedores de Contexto (Contexts):**
-    *   Centralizam o estado compartilhado, como o contexto de autenticação do usuário (`AuthContext`) e o disparo de animações visuais de medalhas conquistadas (`BadgeCelebrationContext`).
+3.  **Provedores de Contexto e Hooks Customizados:**
+    *   Contextos globais de estado em `/src/contexts` (autenticação `AuthContext`, celebração de conquistas `BadgeCelebrationContext`, notificações `ToastContext`).
+    *   Encapsulamento de chamadas e estado da API em Hooks em `/src/hooks` (`useAttraction`, `useBadges`).
 4.  **Serviços e APIs (Services):**
-    *   Responsáveis pelo consumo das APIs do Spring Boot, isolando a lógica de requisições de rede dos componentes de UI.
+    *   Responsáveis pelo consumo das APIs do Spring Boot, isolando a lógica de requisições de rede dos componentes de UI e hooks.
