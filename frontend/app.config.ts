@@ -2,6 +2,11 @@ export default {
   expo: {
     name: "Exploraê",
     slug: "explorae-app",
+    extra: {
+      eas: {
+        projectId: "e371e387-26ef-47db-b2d1-4ba332b85cf2"
+      }
+    },
     scheme: "explorae", // <-- Mesclado da main
     version: "1.0.0",
     orientation: "portrait",
