@@ -10,6 +10,8 @@ import ExploraScrollView from '../../../components/common/ExploraScrollView';
 import { useAttraction } from '../../../hooks/useAttraction';
 import { ReviewModal } from '../../../components/attraction/ReviewModal';
 import { colors } from '../../../constants/colors';
+import { useRouteStore } from '../../../store/useRouteStore';
+import { useToast } from '../../../contexts/ToastContext';
 
 // Sub-componentes Especializados
 import AttractionActionHeader from '../../../components/attraction/AttractionActionHeader';
@@ -20,6 +22,10 @@ import AttractionCommunityTips from '../../../components/attraction/AttractionCo
 const AttractionDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+
+  const { showToast } = useToast();
+  const addToRoute = useRouteStore((state) => state.addToRoute);
+  const navigateNow = useRouteStore((state) => state.navigateNow);
 
   const {
     attraction,
@@ -115,12 +121,58 @@ const AttractionDetail = () => {
             {attraction.longDescription || attraction.shortDescription}
           </Text>
 
-          {/* Ação Principal: Rota */}
-          <PrimaryButton
-            title="TRAÇAR ROTA"
-            className="mt-8"
-            rightIcon={<MaterialCommunityIcons name="navigation-variant" size={24} color="white" />}
-          />
+          {/* Ações Principais: Roteamento */}
+          <View className="flex-row gap-3 mt-8">
+            <TouchableOpacity
+              onPress={() => {
+                const lat = attraction.coordinate?.latitude !== undefined ? attraction.coordinate.latitude : (attraction.latitude || 0);
+                const lng = attraction.coordinate?.longitude !== undefined ? attraction.coordinate.longitude : (attraction.longitude || 0);
+                const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
+
+                const attrPayload = {
+                  id: attraction.id,
+                  category: attraction.category || 'Exploração',
+                  title: attraction.name,
+                  imageUrl: img,
+                  coordinate: {
+                    latitude: lat,
+                    longitude: lng
+                  }
+                };
+                addToRoute(attrPayload);
+                showToast('Atração adicionada ao seu roteiro!', 'success');
+              }}
+              className="flex-1 border-2 border-primary py-4 rounded-xl flex-row justify-center items-center gap-2"
+            >
+              <MaterialCommunityIcons name="playlist-plus" size={18} color={colors.primary} />
+              <Text className="text-primary font-bold text-xs text-center">ADICIONAR AO ROTEIRO</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                const lat = attraction.coordinate?.latitude !== undefined ? attraction.coordinate.latitude : (attraction.latitude || 0);
+                const lng = attraction.coordinate?.longitude !== undefined ? attraction.coordinate.longitude : (attraction.longitude || 0);
+                const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
+
+                const attrPayload = {
+                  id: attraction.id,
+                  category: attraction.category || 'Exploração',
+                  title: attraction.name,
+                  imageUrl: img,
+                  coordinate: {
+                    latitude: lat,
+                    longitude: lng
+                  }
+                };
+                navigateNow(attrPayload);
+                router.push('/dashboard/routes');
+              }}
+              className="flex-1 bg-primary py-4 rounded-xl flex-row justify-center items-center gap-2"
+            >
+              <MaterialCommunityIcons name="navigation-variant" size={18} color="white" />
+              <Text className="text-white font-bold text-xs text-center">NAVEGAR AGORA</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Grid de Informações Bento */}
           <AttractionInfoGrid

@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { Vibration, Platform } from 'react-native';
 import api from '../services/api';
 import { useCelebration } from '../contexts/BadgeCelebrationContext';
+import { useToast } from '../contexts/ToastContext';
 
 export function useAttraction(id: string | string[] | undefined) {
   const { triggerCelebration } = useCelebration();
+  const { showToast } = useToast();
 
   const [attraction, setAttraction] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +62,7 @@ export function useAttraction(id: string | string[] | undefined) {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert('Check-in realizado com sucesso! Compartilhe sua dica com a galera.');
+        showToast('Check-in realizado com sucesso! Compartilhe sua dica com a galera.', 'success');
       }
       
       // Abre automaticamente o modal de dica pós check-in
@@ -68,11 +70,11 @@ export function useAttraction(id: string | string[] | undefined) {
     } catch (err) {
       console.error('Erro ao realizar check-in:', err);
       Vibration.vibrate([100, 100, 100]); // Vibrar erro
-      alert('Não foi possível realizar o check-in no momento.');
+      showToast('Não foi possível realizar o check-in no momento.', 'error');
     } finally {
       setIsCheckingIn(false);
     }
-  }, [id, isCheckingIn, triggerCelebration]);
+  }, [id, isCheckingIn, triggerCelebration, showToast]);
 
   const toggleSave = useCallback(async () => {
     if (isSavingAttraction || !id) return;
@@ -90,15 +92,15 @@ export function useAttraction(id: string | string[] | undefined) {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert(newSavedState ? 'Atração salva nos favoritos!' : 'Atração removida dos favoritos!');
+        showToast(newSavedState ? 'Atração salva nos favoritos!' : 'Atração removida dos favoritos!', 'success');
       }
     } catch (err) {
       console.error('Erro ao favoritar/salvar atração:', err);
-      alert('Não foi possível salvar a atração no momento.');
+      showToast('Não foi possível salvar a atração no momento.', 'error');
     } finally {
       setIsSavingAttraction(false);
     }
-  }, [id, isSavingAttraction, triggerCelebration]);
+  }, [id, isSavingAttraction, triggerCelebration, showToast]);
 
   const addReview = useCallback(async (rating: number, content: string, photoUri?: string) => {
     if (!id) return;
@@ -147,14 +149,14 @@ export function useAttraction(id: string | string[] | undefined) {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert('Obrigado pela sua avaliação!');
+        showToast('Obrigado pela sua avaliação!', 'success');
       }
     } catch (err) {
       console.error('Erro ao adicionar avaliação:', err);
-      alert('Não foi possível enviar sua avaliação no momento.');
+      showToast('Não foi possível enviar sua avaliação no momento.', 'error');
       throw err; // Propaga para o modal tratar o estado interno de envio
     }
-  }, [id, triggerCelebration]);
+  }, [id, triggerCelebration, showToast]);
 
   return {
     attraction,

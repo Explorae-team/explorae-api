@@ -5,7 +5,8 @@ import {
   ActivityIndicator,
   Pressable,
   Platform,
-  ScrollView
+  ScrollView,
+  useWindowDimensions
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -40,6 +41,7 @@ export default function ExploreScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterState | null>(null);
+  const { width: windowWidth } = useWindowDimensions();
 
   const [coords, setCoords] = useState<LocationCoords>({
   latitude: -7.1196,
@@ -212,7 +214,11 @@ export default function ExploreScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
-                contentContainerStyle={{ paddingHorizontal: 24 }}
+                contentContainerStyle={{ 
+                  paddingHorizontal: 24,
+                  minWidth: '100%',
+                  justifyContent: windowWidth >= 768 ? 'center' : 'flex-start'
+                }}
               >
                 {challenges.map((challenge, index) => (
                   <View 
@@ -263,7 +269,11 @@ export default function ExploreScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
-                contentContainerStyle={{ paddingHorizontal: 24 }}
+                contentContainerStyle={{ 
+                  paddingHorizontal: 24,
+                  minWidth: '100%',
+                  justifyContent: windowWidth >= 768 ? 'center' : 'flex-start'
+                }}
               >
                 {[1, 2, 3].map((i) => (
                   <View key={i} style={{ marginRight: 12 }}>
@@ -276,7 +286,11 @@ export default function ExploreScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
-                contentContainerStyle={{ paddingHorizontal: 24 }}
+                contentContainerStyle={{ 
+                  paddingHorizontal: 24,
+                  minWidth: '100%',
+                  justifyContent: windowWidth >= 768 ? 'center' : 'flex-start'
+                }}
               >
                 {recsTop.slice(0, 10).map((attraction, index) => (
                   <View key={attraction.id} style={index < Math.min(recsTop.length, 10) - 1 ? { marginRight: 12 } : undefined}>
@@ -297,7 +311,7 @@ export default function ExploreScreen() {
 
           <MapQuickAccess onPress={() => console.log('Open Map')} />
 
-          <View style={Platform.OS === 'web'
+          <View style={Platform.OS === 'web' 
             ? { paddingBottom: 128 }
             : { paddingHorizontal: 24, paddingBottom: 128 }
           }>
@@ -321,7 +335,7 @@ export default function ExploreScreen() {
               {hasActiveFilters ? (
                 isLoading && !isRefreshing ? (
                   [1, 2, 3].map((i) => (
-                    <View key={i} style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}>
+                    <View key={i} style={Platform.OS === 'web' ? { width: '100%', paddingHorizontal: 8, marginBottom: 32, ...(windowWidth >= 768 ? { width: '33.33%' } : {}) } : { marginBottom: 40 }}>
                       <AttractionSkeleton />
                     </View>
                   ))
@@ -329,7 +343,7 @@ export default function ExploreScreen() {
                   attractions.map((attraction, index) => (
                     <View
                       key={`${attraction.id}-${index}`}
-                      style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}
+                      style={Platform.OS === 'web' ? { width: '100%', paddingHorizontal: 8, marginBottom: 32, ...(windowWidth >= 768 ? { width: '33.33%' } : {}) } : { marginBottom: 40 }}
                     >
                       <AttractionCard
                         {...attraction}
@@ -352,7 +366,7 @@ export default function ExploreScreen() {
               ) : (
                 isLoadingRecsVert && !isRefreshing ? (
                   [1, 2, 3].map((i) => (
-                    <View key={i} style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}>
+                    <View key={i} style={Platform.OS === 'web' ? { width: '100%', paddingHorizontal: 8, marginBottom: 32, ...(windowWidth >= 768 ? { width: '33.33%' } : {}) } : { marginBottom: 40 }}>
                       <AttractionSkeleton />
                     </View>
                   ))
@@ -360,7 +374,7 @@ export default function ExploreScreen() {
                   recsVertical.map((attraction, index) => (
                     <View
                       key={`${attraction.id}-${index}`}
-                      style={Platform.OS === 'web' ? { width: '33.33%', paddingHorizontal: 8, marginBottom: 32 } : { marginBottom: 40 }}
+                      style={Platform.OS === 'web' ? { width: '100%', paddingHorizontal: 8, marginBottom: 32, ...(windowWidth >= 768 ? { width: '33.33%' } : {}) } : { marginBottom: 40 }}
                     >
                       <AttractionCard
                         {...attraction}

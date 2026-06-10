@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
 
@@ -28,6 +28,9 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
   selectedCategoryId,
   onSelect,
 }) => {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width >= 768;
+
   return (
     <View style={{ width: '100%', gap: 24 }}>
       <Text
@@ -50,6 +53,8 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({
         style={Platform.OS === 'web' ? { overflowX: 'auto' } as any : undefined}
         contentContainerStyle={{
           paddingHorizontal: 24,
+          minWidth: '100%',
+          justifyContent: isLargeScreen ? 'center' : 'flex-start',
         }}
       >
         {CATEGORIES.map((category, index) => {
