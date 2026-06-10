@@ -7,6 +7,7 @@ jest.setTimeout(30000);
 
 // Mock do Contexto de Autenticação
 const mockUpdateProfile = jest.fn();
+const mockUpdateUserPreferences = jest.fn();
 jest.mock('../../src/contexts/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
@@ -44,10 +45,10 @@ jest.mock('axios', () => ({
 jest.mock('../../src/services/api', () => ({
   __esModule: true,
   default: {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
+    get: jest.fn(() => Promise.resolve({ data: {} })),
+    post: jest.fn(() => Promise.resolve({ data: { success: true, data: 'file://mock-avatar.jpg' } })),
+    put: jest.fn(() => Promise.resolve({ data: {} })),
+    delete: jest.fn(() => Promise.resolve({ data: {} })),
   },
 }));
 
@@ -66,6 +67,7 @@ describe('UserStats Component', () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: mockUser,
       updateProfile: mockUpdateProfile,
+      updateUserPreferences: mockUpdateUserPreferences,
     });
   });
 

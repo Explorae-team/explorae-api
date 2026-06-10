@@ -55,6 +55,12 @@ export default {
       "expo-router",
       "expo-font",
       "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          photosPermission: "O aplicativo precisa de acesso às suas fotos para alterar sua foto de perfil."
+        }
+      ],
       [ // <-- Da sua branch
         "expo-build-properties",
         {

@@ -1,11 +1,12 @@
 package br.edu.ifpb.explorae.integration.service;
+import br.edu.ifpb.explorae.gamification.domain.Badge;
 
-import br.edu.ifpb.explorae.api.dto.TravelPreferenceRequestDTO;
-import br.edu.ifpb.explorae.domain.user.User;
-import br.edu.ifpb.explorae.repository.BadgeRepository;
-import br.edu.ifpb.explorae.repository.UserRepository;
-import br.edu.ifpb.explorae.repository.XpHistoryRepository;
-import br.edu.ifpb.explorae.service.TravelPreferenceService;
+import br.edu.ifpb.explorae.user.dto.TravelPreferenceRequestDTO;
+import br.edu.ifpb.explorae.user.domain.User;
+import br.edu.ifpb.explorae.gamification.repository.BadgeRepository;
+import br.edu.ifpb.explorae.user.repository.UserRepository;
+import br.edu.ifpb.explorae.gamification.repository.XpHistoryRepository;
+import br.edu.ifpb.explorae.user.service.TravelPreferenceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ class GamificationIntegrationTest {
 
         // Garante que a medalha PIONEIRO existe
         if (badgeRepository.findByName("PIONEIRO").isEmpty()) {
-            badgeRepository.save(br.edu.ifpb.explorae.domain.gamification.Badge.builder()
+            badgeRepository.save(Badge.builder()
                     .name("PIONEIRO")
                     .description("Pioneiro")
                     .category("ONBOARDING")

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
-import Register from '../src/app/cadastro';
+import Register from '../src/app/(auth)/cadastro';
 import { useAuth } from '../src/contexts/AuthContext';
 
 jest.setTimeout(30000);

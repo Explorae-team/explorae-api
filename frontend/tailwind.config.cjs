@@ -33,6 +33,7 @@ module.exports = {
         "on-tertiary-container": "#c88f00",
         "outline-variant": "#41484b",
         "surface-container-lowest": "#001017",
+        "error": "#ffb4ab",
       },
       fontFamily: {
         headline: ["Inter", "sans-serif"],

@@ -40,10 +40,12 @@ interface ProgressBarProps {
   targetValue?: number;
 }
 
+import { colors } from '../../constants/colors';
+
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progressPercentage,
   variant = 'compact',
-  fillColor = '#fd6c28', // cor primária padrão
+  fillColor = colors.primary, // cor primária padrão
   glowColor,
   style,
   label,

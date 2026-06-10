@@ -1,7 +1,7 @@
 package br.edu.ifpb.explorae.config;
 
-import br.edu.ifpb.explorae.service.TokenService;
-import br.edu.ifpb.explorae.service.UserService;
+import br.edu.ifpb.explorae.user.service.TokenService;
+import br.edu.ifpb.explorae.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

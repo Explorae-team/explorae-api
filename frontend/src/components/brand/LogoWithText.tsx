@@ -69,13 +69,10 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
             viewBox="0 0 100 90"
             style={{ overflow: 'visible' }}
           >
-            {/* Metade Esquerda (Laranja Base / Claro) */}
             <Path 
               d="M 50 0 L 0 90 L 50 90 L 50 55 L 25 70 L 50 30 Z" 
               fill={colors.brandOrangeLight} 
             />
-            
-            {/* Metade Direita (Laranja Escuro - Sombra) */}
             <Path 
               d="M 50 0 L 50 30 L 75 70 L 50 55 L 50 90 L 100 90 Z" 
               fill={colors.brandOrangeDark} 

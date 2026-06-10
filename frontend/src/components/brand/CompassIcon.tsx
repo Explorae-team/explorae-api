@@ -47,28 +47,23 @@ export const CompassIcon: React.FC<CompassIconProps> = ({
         height="100%"
         style={{ overflow: 'visible' }}
       >
-        {/* ================= CAMADA 1 & 2: BASE DO MARCADOR (Sem filtros SVG instáveis) ================= */}
         <G>
-          {/* Metade Esquerda (Fundo completo em Laranja Claro) */}
           <Path 
             d="M100,10 C50.29,10 10,50.29 10,100 C10,167.5 100,230 100,230 C100,230 190,167.5 190,100 C190,50.29 149.71,10 100,10 Z" 
             fill={compassColors.orangeLight} 
           />
-          {/* Metade Direita (Sobreposição Laranja Escuro) */}
           <Path 
             d="M100,10 C149.71,10 190,50.29 190,100 C190,167.5 100,230 100,230 Z" 
             fill={compassColors.orangeDark} 
           />
         </G>
-        {/* ================= CAMADA 3: ROSA DOS VENTOS (Pontas) ================= */}
         <G fill={compassColors.white}>
-          <Path d="M 93,85 L 107,85 L 100,52 Z" /> {/* Norte */}
-          <Path d="M 93,115 L 107,115 L 100,148 Z" /> {/* Sul */}
-          <Path d="M 85,93 L 85,107 L 52,100 Z" /> {/* Oeste (O) */}
-          <Path d="M 115,93 L 115,107 L 148,100 Z" /> {/* Leste (L) */}
+          <Path d="M 93,85 L 107,85 L 100,52 Z" />
+          <Path d="M 93,115 L 107,115 L 100,148 Z" />
+          <Path d="M 85,93 L 85,107 L 52,100 Z" />
+          <Path d="M 115,93 L 115,107 L 148,100 Z" />
         </G>
 
-        {/* ================= CAMADA 4: BOTÃO PLAY ARREDONDADO ================= */}
         <Path 
           d="M 84.5,74 L 84.5,126 L 130.5,100 Z" 
           fill={compassColors.white} 
@@ -77,30 +72,19 @@ export const CompassIcon: React.FC<CompassIconProps> = ({
           strokeLinejoin="round" 
         />
 
-        {/* ================= CAMADA 5: AGULHA DA BÚSSOLA ================= */}
         <G transform="translate(100, 100) rotate(55)">
-          {/* Agulha Real - Metade de Cima/Esquerda (Clara) */}
           <Path d="M 0,-24 L -8,0 L 0,24 Z" fill={compassColors.orangeLight} />
-          {/* Agulha Real - Metade de Baixo/Direita (Escura) */}
           <Path d="M 0,-24 L 8,0 L 0,24 Z" fill={compassColors.orangeDark} />
-          
-          {/* Furo central do eixo da agulha */}
           <Circle cx="0" cy="0" r="3.5" fill={compassColors.white} />
         </G>
 
-        {/* ================= CAMADA 6: LETRAS CARDEAIS (N, S, O, L) ================= */}
         <G 
           fill={compassColors.white} 
           fontFamily="Arial, Helvetica, sans-serif" 
           fontWeight="900" 
           fontSize="22px" 
           textAnchor="middle"
-        >
-          <SvgText x="100" y="42">N</SvgText>
-          <SvgText x="100" y="178">S</SvgText>
-          <SvgText x="32" y="108">O</SvgText>
-          <SvgText x="168" y="108">L</SvgText>
-        </G>
+        ><SvgText x="100" y="42">N</SvgText><SvgText x="100" y="178">S</SvgText><SvgText x="32" y="108">O</SvgText><SvgText x="168" y="108">L</SvgText></G>
       </Svg>
     </View>
   );
