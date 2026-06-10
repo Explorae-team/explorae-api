@@ -164,6 +164,12 @@ export default function RoutesScreen() {
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // Estados de Busca
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Attraction[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // O primeiro da fila é sempre o alvo atual principal
   const selectedAttraction = routeQueue.length > 0 ? routeQueue[0] : null;
 
@@ -225,6 +231,32 @@ export default function RoutesScreen() {
       return () => { isMounted = false; };
     }, [])
   );
+
+  // Efeito de Busca (Debounce 400ms)
+  useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+    if (searchQuery.length < 3) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(() => {
+      const query = searchQuery.toLowerCase();
+      const results = allAttractions.filter(attr => 
+        attr.title.toLowerCase().includes(query) || 
+        attr.category.toLowerCase().includes(query)
+      );
+      setSearchResults(results.slice(0, 5)); // Limita a 5 resultados
+      setIsSearching(false);
+    }, 400);
+
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [searchQuery, allAttractions]);
 
   // Pan Responder Condicional (Mais sensível na Web se for usar)
   const panResponder = useRef(
@@ -544,8 +576,6 @@ export default function RoutesScreen() {
       setCanCheckIn(false);
       triggeredAttractionId.current = null;
       setIsModalVisible(false);
-      
-      }
     }
   };
 
@@ -808,6 +838,74 @@ export default function RoutesScreen() {
         >
           <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
+
+        <View style={styles.searchBar}>
+          <MaterialIcon name="search" size={20} color="#e1bfb3" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar destino..."
+            placeholderTextColor="rgba(203, 231, 242, 0.5)"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <MaterialIcon name="close" size={20} color="#ffb4ab" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Dropdown de Resultados da Busca */}
+        {searchQuery.length >= 3 && (
+          <View style={styles.searchResultsContainer}>
+            {isSearching ? (
+              <View style={styles.searchLoading}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((result) => (
+                <TouchableOpacity
+                  key={result.id}
+                  style={styles.searchResultItem}
+                  onPress={() => {
+                    const exists = routeQueue.some(a => a.id === result.id);
+                    if (!exists) {
+                      const newQueue = [...routeQueue, result];
+                      if (newQueue.length > 1) {
+                        const optimized = optimizeRouteQueue(newQueue, newQueue[0]);
+                        setRouteQueue(optimized);
+                      } else {
+                        setRouteQueue(newQueue);
+                      }
+                    } else {
+                      const optimized = optimizeRouteQueue(routeQueue, result);
+                      setRouteQueue(optimized);
+                    }
+                    
+                    if (Platform.OS !== 'web' && mapRef.current) {
+                      mapRef.current.animateToRegion({
+                        latitude: result.coordinate.latitude,
+                        longitude: result.coordinate.longitude,
+                        latitudeDelta: 0.05,
+                        longitudeDelta: 0.05,
+                      }, 1000);
+                    }
+                    
+                    setSearchQuery('');
+                  }}
+                >
+                  <MaterialIcon name={getCategoryStyle(result.category).icon as any} size={16} color={getCategoryStyle(result.category).color} style={{ marginRight: 12 }} />
+                  <Text style={styles.searchResultText}>{result.title}</Text>
+                  <MaterialIcon name="add-circle-outline" size={20} color={colors.primary} />
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={styles.searchEmpty}>
+                <Text style={styles.searchEmptyText}>Nenhum local encontrado.</Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
 
       {isLocationFallback && (
@@ -901,18 +999,24 @@ function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPre
       {isWeb && (
         <View style={styles.webSortControls}>
           <TouchableOpacity 
-            style={[styles.sortButton, isFirst && { opacity: 0.2 }]} 
-            onPress={onMoveUp} 
+            style={[styles.sortButton, isFirst && { opacity: 0.3 }]} 
+            onPress={onMoveUp}
             disabled={isFirst}
           >
-            <MaterialIcon name="keyboard-arrow-up" size={24} color="#e1bfb3" />
+            <MaterialIcon name="keyboard-arrow-up" size={20} color={isFirst ? "rgba(225, 191, 179, 0.3)" : "#e1bfb3"} />
           </TouchableOpacity>
           <TouchableOpacity 
-            style={[styles.sortButton, isLast && { opacity: 0.2 }]} 
-            onPress={onMoveDown} 
+            style={[styles.sortButton, isLast && { opacity: 0.3 }]} 
+            onPress={onMoveDown}
             disabled={isLast}
           >
-            <MaterialIcon name="keyboard-arrow-down" size={24} color="#e1bfb3" />
+            <MaterialIcon name="keyboard-arrow-down" size={20} color={isLast ? "rgba(225, 191, 179, 0.3)" : "#e1bfb3"} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.sortButton, { marginTop: 8 }]} 
+            onPress={onRemove}
+          >
+            <MaterialIcon name="delete-outline" size={20} color="#ffb4ab" />
           </TouchableOpacity>
         </View>
       )}
@@ -939,14 +1043,6 @@ function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPre
             <View style={styles.distanceWrapper}>
               {!isWeb && <MaterialIcon name="drag-indicator" size={14} color="#e1bfb3" style={{ marginRight: 4, opacity: 0.5 }} />}
               <Text style={styles.distanceText}>{distanceText}</Text>
-              
-              <TouchableOpacity 
-                onPress={onRemove}
-                style={{ marginLeft: 8, padding: 4 }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <MaterialIcon name="delete-outline" size={18} color="#ffb4ab" />
-              </TouchableOpacity>
             </View>
           </View>
           <Text style={styles.cardTitle} numberOfLines={1}>{title}</Text>

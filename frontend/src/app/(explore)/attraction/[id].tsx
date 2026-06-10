@@ -130,7 +130,7 @@ const AttractionDetail = () => {
                 const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
 
                 const attrPayload = {
-                  id: attraction.id,
+                  id: attraction.id || (Array.isArray(id) ? id[0] : id),
                   category: attraction.category || 'Exploração',
                   title: attraction.name,
                   imageUrl: img,
@@ -155,7 +155,7 @@ const AttractionDetail = () => {
                 const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
 
                 const attrPayload = {
-                  id: attraction.id,
+                  id: attraction.id || (Array.isArray(id) ? id[0] : id),
                   category: attraction.category || 'Exploração',
                   title: attraction.name,
                   imageUrl: img,
