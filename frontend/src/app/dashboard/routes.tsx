@@ -85,8 +85,12 @@ const decodePolyline = (t: string) => {
   return points;
 };
 
+// 1. Cache fora do componente (memória global da sessão)
+const iframeUrlCache = new Map<string, string>();
+
 export default function RoutesScreen() {
   const router = useRouter();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const { width: windowWidth } = useWindowDimensions();
   const isDesktopWeb = Platform.OS === 'web' && windowWidth >= 768;
 
@@ -594,35 +598,44 @@ export default function RoutesScreen() {
       {Platform.OS === 'web' ? (
          <View style={{ flex: 1, backgroundColor: '#05232b', overflow: 'hidden' }}>
            {(() => {
-             let iframeUrl = '';
-             
-             if (routeQueue.length > 0 && userLocation) {
-               const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-               const originStr = `${userLocation.coords.latitude.toFixed(4)},${userLocation.coords.longitude.toFixed(4)}`;
-               
-               const finalDest = routeQueue[routeQueue.length - 1];
-               const destStr = `${finalDest.coordinate.latitude},${finalDest.coordinate.longitude}`;
-               
-               let waypointsStr = '';
-               if (routeQueue.length > 1) {
-                  const intermediate = routeQueue.slice(0, -1);
-                  waypointsStr = intermediate.map(a => `+to:${a.coordinate.latitude},${a.coordinate.longitude}`).join('');
+             // ── Monta a chave de cache com IDs das atrações em ordem ──
+             const cacheKey = [
+               userLocation ? `${userLocation.coords.latitude.toFixed(3)},${userLocation.coords.longitude.toFixed(3)}` : 'noloc',
+               transportMode,
+               routeQueue.map(a => a.id).join('->'),
+             ].join('|');
+
+             // ── Verifica cache antes de recalcular a URL ──
+             let iframeUrl = iframeUrlCache.get(cacheKey);
+
+             if (!iframeUrl) {
+               if (routeQueue.length > 0 && userLocation) {
+                 const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
+                 const originStr = `${userLocation.coords.latitude.toFixed(4)},${userLocation.coords.longitude.toFixed(4)}`;
+                 const finalDest = routeQueue[routeQueue.length - 1];
+                 const destStr = `${finalDest.coordinate.latitude},${finalDest.coordinate.longitude}`;
+                 let waypointsStr = '';
+                 if (routeQueue.length > 1) {
+                   const intermediate = routeQueue.slice(0, -1);
+                   waypointsStr = intermediate.map(a => `+to:${a.coordinate.latitude},${a.coordinate.longitude}`).join('');
+                 }
+                 iframeUrl = `https://maps.google.com/maps?saddr=${originStr}${waypointsStr}&daddr=${destStr}&dirflg=${dirFlag}&z=14&output=embed`;
+               } else if (routeQueue.length > 0) {
+                 const first = routeQueue[0];
+                 iframeUrl = `https://maps.google.com/maps?q=${first.coordinate.latitude},${first.coordinate.longitude}&z=15&output=embed`;
+               } else if (userLocation) {
+                 iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=15&output=embed`;
+               } else {
+                 iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
                }
-               
-               // A URL clássica e gratuita do maps não sofre restrições do Console GCP e resolve as origens/destinos por coordenda
-               iframeUrl = `https://maps.google.com/maps?saddr=${originStr}${waypointsStr}&daddr=${destStr}&dirflg=${dirFlag}&z=14&output=embed`;
-             } else if (routeQueue.length > 0) {
-               const first = routeQueue[0];
-               iframeUrl = `https://maps.google.com/maps?q=${first.coordinate.latitude},${first.coordinate.longitude}&z=15&output=embed`;
-             } else if (userLocation) {
-               iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=15&output=embed`;
-             } else {
-               iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
+
+               // ── Armazena no cache ──
+               iframeUrlCache.set(cacheKey, iframeUrl);
              }
-             
+
              return (
                <iframe
-                 key={`web-map-${iframeUrl}`}
+                 ref={iframeRef as any}
                  src={iframeUrl}
                  width="100%"
                  height="115%"
@@ -632,7 +645,6 @@ export default function RoutesScreen() {
                />
              );
            })()}
-
          </View>
       ) : (
         <MapView
