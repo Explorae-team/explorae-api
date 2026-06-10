@@ -460,8 +460,16 @@ export default function RoutesScreen() {
           const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
           const mode = modeMap[transportMode];
           
-          const waypoints = [userLocation.coords, ...routeQueue.map(a => a.coordinate)].filter(c => c && c.latitude !== 0 && c.longitude !== 0);
-          if (waypoints.length < 2) throw new Error("Pontos insuficientes para traçar rota");
+          const validQueueCoords = routeQueue.map(a => a.coordinate).filter(c => c && c.latitude !== 0 && c.longitude !== 0);
+          const waypoints = (isLocationFallback && validQueueCoords.length > 0) 
+            ? validQueueCoords 
+            : (userLocation ? [userLocation.coords, ...validQueueCoords] : validQueueCoords);
+
+          if (waypoints.length < 2) {
+             setRoutePolyline([]);
+             setRouteMeta({ distance: '--', time: '--' });
+             return;
+          }
 
           // Reduzir precisão para o Hash para evitar loops em pingos pequenos de GPS
           const hashCoords = waypoints.map(w => w.latitude.toFixed(3) + ',' + w.longitude.toFixed(3)).join('|');
@@ -744,21 +752,30 @@ export default function RoutesScreen() {
              let iframeUrl = iframeUrlCache.get(cacheKey);
 
              if (!iframeUrl) {
-               if (routeQueue.length > 0 && webUserLocationForMap) {
+               if (routeQueue.length > 0) {
                  const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-                 const originStr = `${webUserLocationForMap.coords.latitude.toFixed(4)},${webUserLocationForMap.coords.longitude.toFixed(4)}`;
-                 const finalDest = routeQueue[routeQueue.length - 1];
-                 const destStr = `${finalDest.coordinate.latitude},${finalDest.coordinate.longitude}`;
-                 let waypointsStr = '';
-                 if (routeQueue.length > 1) {
-                   const intermediate = routeQueue.slice(0, -1);
-                   waypointsStr = intermediate.map(a => `+to:${a.coordinate.latitude},${a.coordinate.longitude}`).join('');
+                 let originStr = '';
+                 let destinationsStr = '';
+                 
+                 if (webUserLocationForMap && !isLocationFallback) {
+                   originStr = `${webUserLocationForMap.coords.latitude.toFixed(4)},${webUserLocationForMap.coords.longitude.toFixed(4)}`;
+                   destinationsStr = routeQueue.map(a => `${a.coordinate.latitude},${a.coordinate.longitude}`).join('+to:');
+                 } else {
+                   const first = routeQueue[0];
+                   originStr = `${first.coordinate.latitude},${first.coordinate.longitude}`;
+                   if (routeQueue.length > 1) {
+                     destinationsStr = routeQueue.slice(1).map(a => `${a.coordinate.latitude},${a.coordinate.longitude}`).join('+to:');
+                   } else {
+                     destinationsStr = originStr;
+                   }
                  }
-                 iframeUrl = `https://maps.google.com/maps?saddr=${originStr}${waypointsStr}&daddr=${destStr}&dirflg=${dirFlag}&z=14&output=embed`;
-               } else if (routeQueue.length > 0) {
-                 const first = routeQueue[0];
-                 iframeUrl = `https://maps.google.com/maps?q=${first.coordinate.latitude},${first.coordinate.longitude}&z=15&output=embed`;
-               } else if (webUserLocationForMap) {
+
+                 if (destinationsStr !== originStr) {
+                   iframeUrl = `https://maps.google.com/maps?saddr=${originStr}&daddr=${destinationsStr}&dirflg=${dirFlag}&z=14&output=embed`;
+                 } else {
+                   iframeUrl = `https://maps.google.com/maps?q=${originStr}&z=15&output=embed`;
+                 }
+               } else if (webUserLocationForMap && !isLocationFallback) {
                  iframeUrl = `https://maps.google.com/maps?q=${webUserLocationForMap.coords.latitude},${webUserLocationForMap.coords.longitude}&z=15&output=embed`;
                } else {
                  iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
