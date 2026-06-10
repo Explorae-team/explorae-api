@@ -15,6 +15,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Store
 import { useRouteStore, Attraction } from '../../../store/useRouteStore';
+import { useToast } from '../../../contexts/ToastContext';
 
 // Imports condicionais para evitar crash na web
 let MapView: any;
@@ -149,6 +150,7 @@ export default function RoutesScreen() {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { width: windowWidth } = useWindowDimensions();
+  const { showToast } = useToast();
   const isDesktopWeb = Platform.OS === 'web' && windowWidth >= 768;
 
   // Zustand Global Store
@@ -542,8 +544,7 @@ export default function RoutesScreen() {
 
   const handleOpenNativeMaps = () => {
     if (!selectedAttraction) {
-      if(Platform.OS !== 'web') Alert.alert("Aviso", "Por favor, selecione um destino no mapa ou na lista primeiro.");
-      else window.alert("Por favor, selecione um destino no mapa ou na lista primeiro.");
+      showToast("Por favor, selecione um destino no mapa ou na lista primeiro.", "error");
       return;
     }
     const { latitude, longitude } = selectedAttraction.coordinate;
@@ -557,25 +558,17 @@ export default function RoutesScreen() {
     Linking.canOpenURL(url).then(supported => {
       if (supported) Linking.openURL(url);
       else {
-        Alert.alert("Erro", "Não foi possível abrir o aplicativo de mapas.");
+        showToast("Não foi possível abrir o aplicativo de mapas.", "error");
       }
     }).catch(() => {
-        Alert.alert("Erro", "Ocorreu um erro ao tentar exportar a rota.");
+        showToast("Ocorreu um erro ao tentar exportar a rota.", "error");
     });
   };
 
   const handleStartRoute = async () => {
     if (!selectedAttraction) return;
     
-    if (Platform.OS !== 'web') {
-      Alert.alert(
-        "Rota Iniciada! 🚀", 
-        `A sua jornada pelo roteiro planejado começou.\n\nCompletar esta etapa renderá +150 XP!`,
-        [{ text: "Bora explorar!" }]
-      );
-    } else {
-      window.alert(`Rota Iniciada! Completar a etapa renderá +150 XP.`);
-    }
+    showToast(`Rota Iniciada! Completar esta etapa renderá +150 XP!`, "success");
   };
 
   const handleCheckInClick = () => {
@@ -606,18 +599,14 @@ export default function RoutesScreen() {
       const optimized = optimizeRouteQueue(routeQueue, first);
       setRouteQueue(optimized);
       
-      const msg = "Roteiro otimizado a partir do seu primeiro destino (GPS indisponível).";
-      if (Platform.OS === 'web') window.alert(msg);
-      else Alert.alert("Roteiro Otimizado 🚀", msg);
+      showToast("Roteiro otimizado a partir do seu primeiro destino.", "success");
       return;
     }
     
     const optimized = optimizeQueueFromLocation(routeQueue, lat, lng);
     setRouteQueue(optimized);
     
-    const msg = "Organizamos seu roteiro na ordem mais eficiente a partir da sua localização atual!";
-    if (Platform.OS === 'web') window.alert(msg);
-    else Alert.alert("Roteiro Otimizado 🚀", msg);
+    showToast("Organizamos seu roteiro na ordem mais eficiente a partir da sua localização atual!", "success");
   };
 
   const mapStyleOptions = [
