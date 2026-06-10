@@ -749,57 +749,120 @@ export default function RoutesScreen() {
       {Platform.OS === 'web' ? (
          <View style={{ flex: 1, backgroundColor: '#05232b', overflow: 'hidden' }}>
            {(() => {
-             // ── Monta a chave de cache com IDs das atrações em ordem ──
+             // ── Monta a chave de cache com IDs das atrações em ordem e polyline ──
              const cacheKey = [
                webUserLocationForMap ? `${webUserLocationForMap.coords.latitude.toFixed(3)},${webUserLocationForMap.coords.longitude.toFixed(3)}` : 'noloc',
                transportMode,
                routeQueue.map(a => a.id).join('->'),
+               routePolyline.length
              ].join('|');
 
-             // ── Verifica cache antes de recalcular a URL ──
-             let iframeUrl = iframeUrlCache.get(cacheKey);
+             // ── Verifica cache antes de recalcular o HTML ──
+             let leafletHtml = iframeUrlCache.get(cacheKey);
 
-             if (!iframeUrl) {
-               if (routeQueue.length > 0) {
-                 const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-                 let originStr = '';
-                 let destinationsStr = '';
-                 
-                 if (webUserLocationForMap) {
-                   originStr = `${webUserLocationForMap.coords.latitude.toFixed(4)},${webUserLocationForMap.coords.longitude.toFixed(4)}`;
-                   destinationsStr = routeQueue.map(a => encodeURIComponent(`${a.title}, João Pessoa`)).join('+to:');
-                 } else {
-                   const first = routeQueue[0];
-                   originStr = encodeURIComponent(`${first.title}, João Pessoa`);
-                   if (routeQueue.length > 1) {
-                     destinationsStr = routeQueue.slice(1).map(a => encodeURIComponent(`${a.title}, João Pessoa`)).join('+to:');
-                   } else {
-                     destinationsStr = originStr;
-                   }
-                 }
-
-                 if (destinationsStr !== originStr) {
-                   iframeUrl = `https://maps.google.com/maps?saddr=${originStr}&daddr=${destinationsStr}&dirflg=${dirFlag}&z=14&output=embed`;
-                 } else {
-                   iframeUrl = `https://maps.google.com/maps?q=${originStr}&z=15&output=embed`;
-                 }
-               } else if (webUserLocationForMap) {
-                 iframeUrl = `https://maps.google.com/maps?q=${webUserLocationForMap.coords.latitude},${webUserLocationForMap.coords.longitude}&z=15&output=embed`;
-               } else {
-                 iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
+             if (!leafletHtml) {
+               const routeCoords = routePolyline.map(p => `[${p.latitude}, ${p.longitude}]`).join(',');
+               
+               const markers = [];
+               if (webUserLocationForMap && !isLocationFallback) {
+                 markers.push(`{lat: ${webUserLocationForMap.coords.latitude}, lng: ${webUserLocationForMap.coords.longitude}, title: "Você está aqui", color: "blue"}`);
+               } else if (webUserLocationForMap && isLocationFallback) {
+                 markers.push(`{lat: ${webUserLocationForMap.coords.latitude}, lng: ${webUserLocationForMap.coords.longitude}, title: "Centro", color: "gray"}`);
                }
 
+               routeQueue.forEach(attr => {
+                 markers.push(`{lat: ${attr.coordinate.latitude}, lng: ${attr.coordinate.longitude}, title: "${attr.title.replace(/"/g, '\\"')}", color: "red"}`);
+               });
+
+               const markersStr = `[${markers.join(',')}]`;
+               const dashArray = transportMode === 'walking' ? "'10, 10'" : "null";
+
+               leafletHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #05232b; font-family: sans-serif; }
+        #map { width: 100vw; height: 100vh; }
+        .custom-tooltip {
+            background-color: #370e00;
+            color: white;
+            border: 1px solid #e55a28;
+            border-radius: 4px;
+            font-weight: bold;
+            padding: 4px 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .leaflet-tooltip-top:before { border-top-color: #e55a28; }
+        .custom-div-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map', { zoomControl: false }).setView([-7.115, -34.861], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var routeCoords = [${routeCoords}];
+        var polyline = null;
+        if (routeCoords.length > 0) {
+           polyline = L.polyline(routeCoords, {color: '#e55a28', weight: 4, dashArray: ${dashArray}}).addTo(map);
+        }
+
+        var markers = ${markersStr};
+        var bounds = L.latLngBounds();
+        
+        markers.forEach(function(m) {
+           var bgColor = m.color === 'blue' ? '#2196F3' : m.color === 'gray' ? '#999' : '#e55a28';
+           var myIcon = L.divIcon({
+               className: 'custom-div-icon',
+               html: '<div style="background-color:' + bgColor + ';width:100%;height:100%;border-radius:50%;"></div>',
+               iconSize: [16, 16],
+               iconAnchor: [8, 8]
+           });
+           
+           var marker = L.marker([m.lat, m.lng], {icon: myIcon}).addTo(map);
+           marker.bindTooltip(m.title, {
+               permanent: true, 
+               direction: 'top', 
+               className: 'custom-tooltip',
+               offset: [0, -10]
+           });
+           bounds.extend([m.lat, m.lng]);
+        });
+
+        if (routeCoords.length > 0) {
+           map.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+        } else if (markers.length > 0) {
+           map.fitBounds(bounds, {padding: [50, 50], maxZoom: 15});
+        }
+    </script>
+</body>
+</html>
+               `;
+
                // ── Armazena no cache ──
-               iframeUrlCache.set(cacheKey, iframeUrl);
+               iframeUrlCache.set(cacheKey, leafletHtml);
              }
 
              return (
                <iframe
                  ref={iframeRef as any}
-                 src={iframeUrl}
+                 srcDoc={leafletHtml}
                  width="100%"
-                 height="115%"
-                 style={{ border: 'none', outline: 'none', marginTop: '-15%', pointerEvents: 'auto' }}
+                 height="100%"
+                 style={{ border: 0 }}
                  allowFullScreen
                  loading="lazy"
                />
