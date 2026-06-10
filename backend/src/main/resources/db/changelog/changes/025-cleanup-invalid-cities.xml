@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    
+    <changeSet id="025-cleanup-invalid-cities" author="explorae-team" runOnChange="true">
+        <validCheckSum>any</validCheckSum>
+        <sql>
+            -- Remover referências em attraction_images
+            DELETE FROM public.attraction_images 
+            WHERE attraction_id IN (
+                SELECT id FROM public.attractions 
+                WHERE address NOT ILIKE '%João Pessoa%' 
+                  AND address NOT ILIKE '%Joao Pessoa%'
+                  AND address NOT ILIKE '%Cabedelo%'
+                  AND address NOT ILIKE '%Conde%'
+                  AND address NOT ILIKE '%Lucena%'
+                  AND address NOT ILIKE '%Pitimbu%'
+                  AND address NOT ILIKE '%Bayeux%'
+                  AND address NOT ILIKE '%Santa Rita%'
+                  AND address NOT ILIKE '%Rio Tinto%'
+            );
+
+            -- Remover referências em attraction_highlights
+            DELETE FROM public.attraction_highlights 
+            WHERE attraction_id IN (
+                SELECT id FROM public.attractions 
+                WHERE address NOT ILIKE '%João Pessoa%' 
+                  AND address NOT ILIKE '%Joao Pessoa%'
+                  AND address NOT ILIKE '%Cabedelo%'
+                  AND address NOT ILIKE '%Conde%'
+                  AND address NOT ILIKE '%Lucena%'
+                  AND address NOT ILIKE '%Pitimbu%'
+                  AND address NOT ILIKE '%Bayeux%'
+                  AND address NOT ILIKE '%Santa Rita%'
+                  AND address NOT ILIKE '%Rio Tinto%'
+            );
+
+            -- Remover referências em saved_attractions
+            DELETE FROM public.saved_attractions 
+            WHERE attraction_id IN (
+                SELECT id FROM public.attractions 
+                WHERE address NOT ILIKE '%João Pessoa%' 
+                  AND address NOT ILIKE '%Joao Pessoa%'
+                  AND address NOT ILIKE '%Cabedelo%'
+                  AND address NOT ILIKE '%Conde%'
+                  AND address NOT ILIKE '%Lucena%'
+                  AND address NOT ILIKE '%Pitimbu%'
+                  AND address NOT ILIKE '%Bayeux%'
+                  AND address NOT ILIKE '%Santa Rita%'
+                  AND address NOT ILIKE '%Rio Tinto%'
+            );
+
+            -- Remover referências em attraction_reviews
+            DELETE FROM public.attraction_reviews 
+            WHERE attraction_id IN (
+                SELECT id FROM public.attractions 
+                WHERE address NOT ILIKE '%João Pessoa%' 
+                  AND address NOT ILIKE '%Joao Pessoa%'
+                  AND address NOT ILIKE '%Cabedelo%'
+                  AND address NOT ILIKE '%Conde%'
+                  AND address NOT ILIKE '%Lucena%'
+                  AND address NOT ILIKE '%Pitimbu%'
+                  AND address NOT ILIKE '%Bayeux%'
+                  AND address NOT ILIKE '%Santa Rita%'
+                  AND address NOT ILIKE '%Rio Tinto%'
+            );
+
+            -- Remover referências em user_interactions
+            DELETE FROM public.user_interactions 
+            WHERE attraction_id IN (
+                SELECT id FROM public.attractions 
+                WHERE address NOT ILIKE '%João Pessoa%' 
+                  AND address NOT ILIKE '%Joao Pessoa%'
+                  AND address NOT ILIKE '%Cabedelo%'
+                  AND address NOT ILIKE '%Conde%'
+                  AND address NOT ILIKE '%Lucena%'
+                  AND address NOT ILIKE '%Pitimbu%'
+                  AND address NOT ILIKE '%Bayeux%'
+                  AND address NOT ILIKE '%Santa Rita%'
+                  AND address NOT ILIKE '%Rio Tinto%'
+            );
+
+            -- Finalmente, remover a atração indesejada
+            DELETE FROM public.attractions 
+            WHERE address NOT ILIKE '%João Pessoa%' 
+              AND address NOT ILIKE '%Joao Pessoa%'
+              AND address NOT ILIKE '%Cabedelo%'
+              AND address NOT ILIKE '%Conde%'
+              AND address NOT ILIKE '%Lucena%'
+              AND address NOT ILIKE '%Pitimbu%'
+              AND address NOT ILIKE '%Bayeux%'
+              AND address NOT ILIKE '%Santa Rita%'
+              AND address NOT ILIKE '%Rio Tinto%';
+        </sql>
+    </changeSet>
+</databaseChangeLog>

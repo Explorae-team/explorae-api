@@ -30,4 +30,6 @@
     <include file="db/changelog/changes/021-create-rewards-tables.xml"/>
     <include file="db/changelog/changes/022-add-expires-at-to-vouchers.xml"/>
     <include file="db/changelog/changes/023-add-used-at-to-vouchers.xml"/>
+    <include file="db/changelog/changes/024-seed-enriched-and-new-attractions.xml"/>
+    <include file="db/changelog/changes/025-cleanup-invalid-cities.xml"/>
 </databaseChangeLog>

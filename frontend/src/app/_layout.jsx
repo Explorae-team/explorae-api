@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { BadgeCelebrationProvider } from '../contexts/BadgeCelebrationContext';
+import { ToastProvider } from '../contexts/ToastContext';
 import AppFooter from '../components/AppFooter';
 import { colors } from '../constants/colors';
 
@@ -126,9 +127,11 @@ export default function RootLayout() {
     <SafeAreaProvider style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flex: 1, height: Platform.OS === 'web' ? '100vh' : '100%', backgroundColor: colors.background, overflow: 'hidden' }}>
         <AuthProvider>
-          <BadgeCelebrationProvider>
-            <InitialLayout />
-          </BadgeCelebrationProvider>
+          <ToastProvider>
+            <BadgeCelebrationProvider>
+              <InitialLayout />
+            </BadgeCelebrationProvider>
+          </ToastProvider>
         </AuthProvider>
       </View>
     </SafeAreaProvider>

@@ -49,6 +49,7 @@ interface PointCardProps extends Attraction {
   onMoveDown?: () => void;
   isFirst?: boolean;
   isLast?: boolean;
+  onRemove: () => void;
 }
 
 type TransportMode = 'driving' | 'transit' | 'walking';
@@ -92,6 +93,7 @@ export default function RoutesScreen() {
   // Zustand Global Store
   const routeQueue = useRouteStore((state) => state.routeQueue);
   const setRouteQueue = useRouteStore((state) => state.setRouteQueue);
+  const removeAttraction = useRouteStore((state) => state.removeAttraction);
 
   const [allAttractions, setAllAttractions] = useState<Attraction[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -103,12 +105,7 @@ export default function RoutesScreen() {
   // O primeiro da fila é sempre o alvo atual principal
   const selectedAttraction = routeQueue.length > 0 ? routeQueue[0] : null;
 
-  // ESTADOS DE PESQUISA
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Attraction[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showSearchResults, setShowSearchResults] = useState(false);
+  // ESTADOS DE PESQUISA REMOVIDOS PARA LIMPEZA VISUAL
 
   // ESTADOS PARA A SPRINT 4
   const [transportMode, setTransportMode] = useState<TransportMode>('driving');
@@ -119,6 +116,19 @@ export default function RoutesScreen() {
   const animatedHeight = useRef(new Animated.Value(SHEET_MIN_HEIGHT)).current;
   const lastDrivenHeight = useRef(SHEET_MIN_HEIGHT);
   const triggeredAttractionId = useRef<string | null>(null);
+  const routeHashRef = useRef<string>('');
+
+  // Purga atrações que corromperiam o mapa com coordenadas inválidas (0, 0) (e.g. Null Island)
+  useEffect(() => {
+    if (routeQueue.length > 0) {
+      const validQueue = routeQueue.filter(item => 
+        item.coordinate && item.coordinate.latitude !== 0 && item.coordinate.longitude !== 0
+      );
+      if (validQueue.length !== routeQueue.length) {
+        setRouteQueue(validQueue);
+      }
+    }
+  }, [routeQueue, setRouteQueue]);
 
   // Fetch Data
   useFocusEffect(
@@ -321,63 +331,7 @@ export default function RoutesScreen() {
     }, [userLocation, routeQueue])
   );
 
-  // Debounce Pesquisa
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Busca Local
-  useEffect(() => {
-    if (!debouncedQuery.trim()) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
-
-    let isMounted = true;
-    const fetchSearch = async () => {
-      setIsSearching(true);
-      try {
-        const res = await api.get('/api/v1/attractions', { params: { fetchAll: true } });
-        if (isMounted && res.data?.data?.content) {
-          const term = debouncedQuery.toLowerCase();
-          const filteredItems = res.data.data.content.filter((item: any) => 
-            (item.name || '').toLowerCase().includes(term)
-          ).slice(0, 5); 
-
-          const data = filteredItems.map((item: any) => ({
-            id: item.id,
-            category: item.category || 'Exploração',
-            title: item.name, 
-            imageUrl: item.mainImageUrl || 'https://via.placeholder.com/150',
-            coordinate: {
-              latitude: item.coordinate?.latitude || 0,
-              longitude: item.coordinate?.longitude || 0
-            }
-          }));
-          setSearchResults(data);
-        }
-      } catch (e) {
-        console.error("Erro na busca do mapa:", e);
-      } finally {
-        if (isMounted) setIsSearching(false);
-      }
-    };
-
-    fetchSearch();
-    return () => { isMounted = false; };
-  }, [debouncedQuery]);
-
-  const handleSelectSearchResult = (attr: Attraction) => {
-    setShowSearchResults(false);
-    setSearchQuery('');
-    
-    const exists = routeQueue.some(a => a.id === attr.id);
-    if (!exists) {
-      setRouteQueue([...routeQueue, attr]);
-    }
-  };
+  // Busca Removida para manter a tela limpa
 
   const moveQueueItem = (index: number, direction: 'up' | 'down') => {
     if (direction === 'up' && index > 0) {
@@ -391,7 +345,7 @@ export default function RoutesScreen() {
     }
   };
 
-  // Traçar a Polyline com MÚLTIPLOS Waypoints
+  // Traçar a Polyline com MÚLTIPLOS Waypoints (Com Memoização via Hash)
   useEffect(() => {
     if (routeQueue.length > 0 && userLocation) {
       const fetchRouteDirections = async () => {
@@ -399,13 +353,18 @@ export default function RoutesScreen() {
           const modeMap = { driving: 'car', transit: 'car', walking: 'foot' }; 
           const mode = modeMap[transportMode];
           
-          // Constroi a URL passando pelo userLocation e iterando toda a fila do roteiro, removendo coords invalidas
           const waypoints = [userLocation.coords, ...routeQueue.map(a => a.coordinate)].filter(c => c && c.latitude !== 0 && c.longitude !== 0);
-          
           if (waypoints.length < 2) throw new Error("Pontos insuficientes para traçar rota");
 
+          // Reduzir precisão para o Hash para evitar loops em pingos pequenos de GPS
+          const hashCoords = waypoints.map(w => w.latitude.toFixed(3) + ',' + w.longitude.toFixed(3)).join('|');
+          const currentHash = `${mode}-${hashCoords}`;
+
+          if (currentHash === routeHashRef.current && routePolyline.length > 0) {
+            return; // Cache hit: Mesma rota, sem chamadas ao OSRM necessárias
+          }
+
           const coordsString = waypoints.map(c => `${c.longitude},${c.latitude}`).join(';');
-          
           const url = `https://router.project-osrm.org/route/v1/${mode}/${coordsString}?overview=full&geometries=polyline`;
           
           const response = await fetch(url);
@@ -415,6 +374,7 @@ export default function RoutesScreen() {
             const route = json.routes[0];
             const points = decodePolyline(route.geometry);
             setRoutePolyline(points);
+            routeHashRef.current = currentHash;
             
             const distMeters = route.distance;
             const durSeconds = route.duration;
@@ -437,7 +397,6 @@ export default function RoutesScreen() {
           }
         } catch (err) {
           console.warn("Falha na API de rotas. Usando fallback de linhas retas.", err);
-          
           const fallbackMock = [userLocation.coords, ...routeQueue.map(a => a.coordinate)];
           setRoutePolyline(fallbackMock);
           setRouteMeta({ distance: '--', time: '--' });
@@ -625,6 +584,7 @@ export default function RoutesScreen() {
         onMoveDown={() => moveQueueItem(index, 'down')}
         isFirst={index === 0}
         isLast={index === routeQueue.length - 1}
+        onRemove={() => removeAttraction(item.id)}
       />
     );
   };
@@ -632,35 +592,47 @@ export default function RoutesScreen() {
   const renderMapCanvas = () => (
     <View style={styles.mapCanvas}>
       {Platform.OS === 'web' ? (
-         <View style={{ flex: 1, backgroundColor: '#05232b' }}>
+         <View style={{ flex: 1, backgroundColor: '#05232b', overflow: 'hidden' }}>
            {(() => {
              let iframeUrl = '';
-             if (selectedAttraction && userLocation) {
+             
+             if (routeQueue.length > 0 && userLocation) {
                const dirFlag = transportMode === 'walking' ? 'w' : transportMode === 'transit' ? 'r' : 'd';
-               iframeUrl = `https://maps.google.com/maps?saddr=${userLocation.coords.latitude},${userLocation.coords.longitude}&daddr=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&dirflg=${dirFlag}&output=embed`;
-             } else if (selectedAttraction) {
-               iframeUrl = `https://maps.google.com/maps?q=${selectedAttraction.coordinate.latitude},${selectedAttraction.coordinate.longitude}&z=15&output=embed`;
+               const originStr = `${userLocation.coords.latitude.toFixed(4)},${userLocation.coords.longitude.toFixed(4)}`;
+               
+               const finalDest = routeQueue[routeQueue.length - 1];
+               const destStr = `${finalDest.coordinate.latitude},${finalDest.coordinate.longitude}`;
+               
+               let waypointsStr = '';
+               if (routeQueue.length > 1) {
+                  const intermediate = routeQueue.slice(0, -1);
+                  waypointsStr = intermediate.map(a => `+to:${a.coordinate.latitude},${a.coordinate.longitude}`).join('');
+               }
+               
+               // A URL clássica e gratuita do maps não sofre restrições do Console GCP e resolve as origens/destinos por coordenda
+               iframeUrl = `https://maps.google.com/maps?saddr=${originStr}${waypointsStr}&daddr=${destStr}&dirflg=${dirFlag}&z=14&output=embed`;
+             } else if (routeQueue.length > 0) {
+               const first = routeQueue[0];
+               iframeUrl = `https://maps.google.com/maps?q=${first.coordinate.latitude},${first.coordinate.longitude}&z=15&output=embed`;
              } else if (userLocation) {
-               iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=16&output=embed`;
+               iframeUrl = `https://maps.google.com/maps?q=${userLocation.coords.latitude},${userLocation.coords.longitude}&z=15&output=embed`;
+             } else {
+               iframeUrl = `https://maps.google.com/maps?q=Joao+Pessoa&z=12&output=embed`;
              }
              
-             if (iframeUrl) {
-               return (
-                 <iframe 
-                   key="google-maps-iframe-constant"
-                   width="100%" height="100%" frameBorder="0" style={{ border: 0 }}
-                   src={iframeUrl}
-                 />
-               );
-             } else {
-               return (
-                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
-                   <MaterialIcon name="explore" size={64} color="#bde9fe" />
-                   <Text style={{ color: '#bde9fe', marginTop: 16 }}>Buscando sua localização atual...</Text>
-                 </View>
-               );
-             }
+             return (
+               <iframe
+                 key={`web-map-${iframeUrl}`}
+                 src={iframeUrl}
+                 width="100%"
+                 height="115%"
+                 style={{ border: 'none', outline: 'none', marginTop: '-15%', pointerEvents: 'auto' }}
+                 allowFullScreen
+                 loading="lazy"
+               />
+             );
            })()}
+
          </View>
       ) : (
         <MapView
@@ -701,60 +673,13 @@ export default function RoutesScreen() {
         </MapView>
       )}
 
-      <View style={[styles.topBarContainer, isDesktopWeb && { width: '100%' }]}>
+      <View style={[styles.topBarContainer, isDesktopWeb && { width: '100%' }]} pointerEvents="box-none">
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => router.replace('/dashboard')}
         >
           <MaterialIcon name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-
-        <View style={{ flex: 1, zIndex: 50 }}>
-          <View style={styles.searchBar}>
-            <MaterialIcon name="search" size={20} color="#e1bfb3" />
-            <TextInput 
-              style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]} 
-              placeholder="Onde vamos explorar?" 
-              placeholderTextColor="#e1bfb3" 
-              value={searchQuery}
-              onChangeText={(text) => {
-                setSearchQuery(text);
-                setShowSearchResults(true);
-              }}
-              onFocus={() => setShowSearchResults(true)}
-            />
-            {searchQuery.length > 0 ? (
-              <TouchableOpacity onPress={() => { setSearchQuery(''); setShowSearchResults(false); }}>
-                <MaterialIcon name="close" size={20} color="#e1bfb3" />
-              </TouchableOpacity>
-            ) : (
-              <MaterialIcon name="mic" size={20} color="#e1bfb3" />
-            )}
-          </View>
-
-          {showSearchResults && searchQuery.trim().length > 0 && (
-            <View style={styles.searchResultsContainer}>
-              {isSearching ? (
-                <View style={styles.searchLoading}>
-                  <ActivityIndicator size="small" color="#fd6c28" />
-                </View>
-              ) : searchResults.length > 0 ? (
-                <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 200 }}>
-                  {searchResults.map(attr => (
-                    <TouchableOpacity key={attr.id} style={styles.searchResultItem} onPress={() => handleSelectSearchResult(attr)}>
-                      <MaterialIcon name="place" size={16} color="#fd6c28" style={styles.buttonIcon} />
-                      <Text style={styles.searchResultText} numberOfLines={1}>{attr.title}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              ) : (
-                <View style={styles.searchEmpty}>
-                  <Text style={styles.searchEmptyText}>Nenhum destino encontrado.</Text>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
       </View>
 
       {isLocationFallback && (
@@ -839,7 +764,7 @@ export default function RoutesScreen() {
   );
 }
 
-function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPress, isActive, canCheckIn, onCheckIn, onMoveUp, onMoveDown, isFirst, isLast }: PointCardProps) {
+function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPress, isActive, canCheckIn, onCheckIn, onMoveUp, onMoveDown, isFirst, isLast, onRemove }: PointCardProps) {
   const isWeb = Platform.OS === 'web';
 
   return (
@@ -886,6 +811,14 @@ function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPre
             <View style={styles.distanceWrapper}>
               {!isWeb && <MaterialIcon name="drag-indicator" size={14} color="#e1bfb3" style={{ marginRight: 4, opacity: 0.5 }} />}
               <Text style={styles.distanceText}>{distanceText}</Text>
+              
+              <TouchableOpacity 
+                onPress={onRemove}
+                style={{ marginLeft: 8, padding: 4 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <MaterialIcon name="delete-outline" size={18} color="#ffb4ab" />
+              </TouchableOpacity>
             </View>
           </View>
           <Text style={styles.cardTitle} numberOfLines={1}>{title}</Text>

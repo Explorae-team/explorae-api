@@ -9,6 +9,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 import api from '../../services/api';
 import ExploraScrollView from '../../components/common/ExploraScrollView';
 import { useCelebration } from '../../contexts/BadgeCelebrationContext';
+import { useToast } from '../../contexts/ToastContext';
 import { ReviewModal } from '../../components/attraction/ReviewModal';
 import { colors } from '../../constants/colors';
 import { useRouteStore } from '../../store/useRouteStore';
@@ -23,6 +24,7 @@ const AttractionDetail = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { triggerCelebration } = useCelebration();
+  const { showToast } = useToast();
   const addToRoute = useRouteStore((state) => state.addToRoute);
   const navigateNow = useRouteStore((state) => state.navigateNow);
 
@@ -82,7 +84,7 @@ const AttractionDetail = () => {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert('Check-in realizado com sucesso! Compartilhe sua dica com a galera.');
+        showToast('Check-in realizado com sucesso! Compartilhe sua dica com a galera.', 'success');
       }
       
       // Abre automaticamente o modal de dica pós check-in
@@ -90,7 +92,7 @@ const AttractionDetail = () => {
     } catch (err) {
       console.error('Erro ao realizar check-in:', err);
       Vibration.vibrate([100, 100, 100]); // Vibrar erro
-      alert('Não foi possível realizar o check-in no momento.');
+      showToast('Não foi possível realizar o check-in no momento.', 'error');
     } finally {
       setIsCheckingIn(false);
     }
@@ -111,11 +113,11 @@ const AttractionDetail = () => {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert(newSavedState ? 'Atração salva nos favoritos!' : 'Atração removida dos favoritos!');
+        showToast(newSavedState ? 'Atração salva nos favoritos!' : 'Atração removida dos favoritos!', 'success');
       }
     } catch (err) {
       console.error('Erro ao favoritar/salvar atração:', err);
-      alert('Não foi possível salvar a atração no momento.');
+      showToast('Não foi possível salvar a atração no momento.', 'error');
     } finally {
       setIsSavingAttraction(false);
     }
@@ -166,11 +168,11 @@ const AttractionDetail = () => {
       if (unlockedBadges && unlockedBadges.length > 0) {
         triggerCelebration(unlockedBadges);
       } else {
-        alert('Obrigado pela sua avaliação!');
+        showToast('Obrigado pela sua avaliação!', 'success');
       }
     } catch (err) {
       console.error('Erro ao adicionar avaliação:', err);
-      alert('Não foi possível enviar sua avaliação no momento.');
+      showToast('Não foi possível enviar sua avaliação no momento.', 'error');
       throw err; // Propaga para o modal tratar o estado interno de envio
     }
   };
@@ -258,18 +260,22 @@ const AttractionDetail = () => {
           <View className="flex-row gap-3 mt-8">
             <TouchableOpacity
               onPress={() => {
+                const lat = attraction.coordinate?.latitude !== undefined ? attraction.coordinate.latitude : (attraction.latitude || 0);
+                const lng = attraction.coordinate?.longitude !== undefined ? attraction.coordinate.longitude : (attraction.longitude || 0);
+                const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
+
                 const attrPayload = {
                   id: attraction.id,
                   category: attraction.category || 'Exploração',
                   title: attraction.name,
-                  imageUrl: attraction.mainImageUrl || 'https://via.placeholder.com/150',
+                  imageUrl: img,
                   coordinate: {
-                    latitude: attraction.coordinate?.latitude || 0,
-                    longitude: attraction.coordinate?.longitude || 0
+                    latitude: lat,
+                    longitude: lng
                   }
                 };
                 addToRoute(attrPayload);
-                alert('Atração adicionada ao seu roteiro!');
+                showToast('Atração adicionada ao seu roteiro!', 'success');
               }}
               className="flex-1 border-2 border-primary py-4 rounded-xl flex-row justify-center items-center gap-2"
             >
@@ -279,14 +285,18 @@ const AttractionDetail = () => {
 
             <TouchableOpacity
               onPress={() => {
+                const lat = attraction.coordinate?.latitude !== undefined ? attraction.coordinate.latitude : (attraction.latitude || 0);
+                const lng = attraction.coordinate?.longitude !== undefined ? attraction.coordinate.longitude : (attraction.longitude || 0);
+                const img = attraction.mainImageUrl || attraction.imageUrls?.[0] || 'https://via.placeholder.com/150';
+
                 const attrPayload = {
                   id: attraction.id,
                   category: attraction.category || 'Exploração',
                   title: attraction.name,
-                  imageUrl: attraction.mainImageUrl || 'https://via.placeholder.com/150',
+                  imageUrl: img,
                   coordinate: {
-                    latitude: attraction.coordinate?.latitude || 0,
-                    longitude: attraction.coordinate?.longitude || 0
+                    latitude: lat,
+                    longitude: lng
                   }
                 };
                 navigateNow(attrPayload);
