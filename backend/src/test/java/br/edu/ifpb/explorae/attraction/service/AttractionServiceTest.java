@@ -42,10 +42,10 @@ class AttractionServiceTest {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Attraction> page = new PageImpl<>(List.of(attraction), pageable, 1);
         
-        when(repository.findAll(any(Pageable.class))).thenReturn(page);
+        when(repository.findAll()).thenReturn(List.of(attraction));
 
         // Act
-        Page<AttractionResponseDTO> result = service.findAll(null, pageable);
+        Page<AttractionResponseDTO> result = service.findAll(null, null, null, null, null, null, null, null, pageable);
 
         // Assert
         assertThat(result).isNotNull();

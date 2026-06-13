@@ -1,18 +1,30 @@
-# Requirements - Sprint 04
+# Requirements - Sprint 05
 
 ## Overview
-A Sprint 04 focará no desenvolvimento do Mapa Interativo de Atrações e na exibição em tempo real de atrações turísticas com base no raio de geolocalização do usuário, integrando rotas e cálculo de distância preciso.
+A Sprint 05 focará no desenvolvimento do fluxo de validação presencial das visitas (Check-In por Proximidade via GPS) para engajamento e gamificação ativa, e no sistema de resgate de vouchers/cupons em parceria com estabelecimentos locais para tangibilizar as recompensas do app Exploraê.
 
 ## User Stories
 
-### [SDGEU-158] Mapa Interativo de Atrações
-**Descrição**: Como um explorador, desejo visualizar as atrações em um mapa interativo em tempo real para encontrar pontos de interesse próximos a mim de forma geo-referenciada.
+### [SDGEU-CHECKIN] Check-In por Proximidade
+**Descrição**: Como um explorador, desejo realizar check-in ao me aproximar fisicamente de uma atração turística para registrar minha visita oficial e receber recompensas (XP, moedas virtuais e medalhas).
 
 - **Requisitos Funcionais**:
-  - [ ] Integrar biblioteca de mapas multiplataforma (React Native Maps).
-  - [ ] Renderizar pins customizados por categoria no mapa.
-  - [ ] Permitir filtrar os pins no mapa por categoria e avaliação.
+  - [ ] Validar no backend as coordenadas do usuário em relação à localização cadastrada da atração (raio padrão de proximidade de 50 metros).
+  - [ ] Interface no mobile com botão de check-in dinâmico ativo apenas quando o usuário estiver dentro do raio da atração.
+  - [ ] Adicionar transações no histórico de gamificação para registrar o ganho de recompensas de check-in.
+  - [ ] Feedbacks de animações visuais premium ao atingir level up após ganhar XP de check-in.
 - **Critérios de Aceite**:
-  - [ ] Exibe a localização em tempo real do dispositivo no mapa.
-  - [ ] Ao clicar em um pin, exibe um mini-card de atração (Callout) contendo foto, nome e rating, com atalho para tela de detalhes completos.
-  - [ ] Carrega automaticamente novos pins ao arrastar/mover o centro geográfico do mapa (Lazy Loading espacial).
+  - [ ] O check-in só é permitido se a distância calculada for menor ou igual ao limite de proximidade configurado.
+  - [ ] O check-in deve ser único por atração a cada 24 horas (ou período configurado) para evitar abusos de ganho de XP.
+
+### [SDGEU-VOUCHER] Sistema de Vouchers & Cupons
+**Descrição**: Como um explorador, desejo trocar minhas moedas de exploração por cupons de desconto de parceiros locais para obter benefícios tangíveis nas minhas viagens.
+
+- **Requisitos Funcionais**:
+  - [ ] Cadastro de parceiros comerciais e vouchers de descontos (Spring Boot, Liquibase).
+  - [ ] Fluxo de resgate de moedas virtuais por vouchers gerados em tempo real.
+  - [ ] Exibição da carteira de vouchers do usuário com status (Disponível, Resgatado, Expirado).
+  - [ ] Geração de QR Code e código alfanumérico exclusivo para cada cupom resgatado, para ser exibido e escaneado no estabelecimento parceiro.
+- **Critérios de Aceite**:
+  - [ ] O usuário não pode resgatar um voucher se não tiver o saldo mínimo de moedas necessário.
+  - [ ] O status do voucher deve mudar para "Resgatado" quando validado e não pode ser reutilizado.

@@ -20,9 +20,12 @@ Personalização da experiência turística através de perfis detalhados e reco
 - [x] **SDGEU-155**: Filtros de Atrações por categoria, preço e avaliação (Sprint 3)
 - [x] **SDGEU-156**: Recomendações Inteligentes baseadas nas preferências do usuário (Sprint 3)
 - [x] **SDGEU-157**: Detalhes da Atração com galeria e fotos completas (Sprint 3)
+- [x] **SDGEU-158**: Mapa Interativo com exibição geo-referenciada em tempo real (Sprint 4)
+- [x] **SDGEU-REF-01**: Refatoração de Backend para Package-by-Feature (Sprint 4)
 
-### Active (Sprint 04)
-- [ ] **SDGEU-158**: Mapa Interativo com exibição geo-referenciada em tempo real.
+### Active (Sprint 05)
+- [ ] **SDGEU-CHECKIN**: Check-In por Proximidade (validação física de presença via GPS para conceder recompensas).
+- [ ] **SDGEU-VOUCHER**: Sistema de Vouchers/Recompensas (geração e resgate de cupons de descontos com parceiros locais).
 
 ### Out of Scope
 - Gamificação social (Rankings globais)
@@ -47,4 +50,4 @@ Personalização da experiência turística através de perfis detalhados e reco
 | Tiers de XP | Gamificação visual baseada em cores (Bronze, Prata, Ouro) | ✓ Good |
 
 ---
-*Last updated: 2026-05-20 for Sprint 04 Initialization*
+*Last updated: 2026-06-13 for Sprint 05 Initialization*

@@ -77,7 +77,7 @@ public class AttractionService {
                     if (minPrice == null && maxPrice == null) return true;
                     if (attr.getPriceRange() == null) return false;
                     
-                    int priceLevel = attr.getPriceRange().length(); // $, $$, $$$
+                    int priceLevel = attr.getPriceRange(); // 1 to 4
                     Double estimatedMin = priceLevel == 1 ? 0.0 : (priceLevel == 2 ? 50.0 : 150.0);
                     Double estimatedMax = priceLevel == 1 ? 50.0 : (priceLevel == 2 ? 150.0 : 500.0);
                     
