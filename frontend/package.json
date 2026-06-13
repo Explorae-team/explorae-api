@@ -3,12 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "main": "expo-router/entry",
-  "type": "module",
   "scripts": {
-    "start": "node scripts/update-ip.cjs && expo start",
-    "android": "node scripts/update-ip.cjs && expo start --android",
-    "ios": "node scripts/update-ip.cjs && expo start --ios",
-    "web": "node scripts/update-ip.cjs && expo start --web",
+    "start": "node scripts/update-ip.js && expo start",
+    "android": "node scripts/update-ip.js && expo start --android",
+    "ios": "node scripts/update-ip.js && expo start --ios",
+    "web": "node scripts/update-ip.js && expo start --web",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "jest"
   },

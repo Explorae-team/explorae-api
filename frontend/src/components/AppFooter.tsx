@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../constants/colors';
 
 export interface FooterTab {
@@ -26,6 +27,7 @@ const AppFooter: React.FC<AppFooterProps> = ({
 }) => {
   const router = useRouter();
   const segments = useSegments();
+  const insets = useSafeAreaInsets();
 
   const tabs: FooterTab[] = [
     { key: 'routes', label: 'Rotas', icon: 'map-outline', route: '/dashboard/routes' },
@@ -49,8 +51,11 @@ const AppFooter: React.FC<AppFooterProps> = ({
   };
 
   return (
-    <View className="bg-surface/95 border-t border-outline-variant/10 flex-row items-end justify-around pb-8 pt-2 px-2"
+    <View 
+      className="bg-surface/95 border-t border-outline-variant/10 flex-row items-end justify-around px-2"
       style={{
+        paddingTop: 8,
+        paddingBottom: Math.max(insets.bottom, 16),
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.05,

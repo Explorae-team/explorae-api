@@ -877,30 +877,36 @@ export default function RoutesScreen() {
             />
           )}
 
-          {allAttractions.map((attr) => {
-            const { icon, color } = getCategoryStyle(attr.category);
+          {routeQueue.map((attr) => {
             return (
               <Marker 
                 key={attr.id} 
-                coordinate={attr.coordinate} 
+                coordinate={attr.coordinate}
+                anchor={{ x: 0.5, y: 0.5 }} // Centra o marcador na coordenada, assim como no Leaflet
                 onPress={() => {
-                  const exists = routeQueue.some(a => a.id === attr.id);
-                  if (!exists) {
-                    const newQueue = [...routeQueue, attr];
-                    if (newQueue.length > 1) {
-                      const optimized = optimizeRouteQueue(newQueue, newQueue[0]);
-                      setRouteQueue(optimized);
-                    } else {
-                      setRouteQueue(newQueue);
-                    }
-                  } else {
-                    const optimized = optimizeRouteQueue(routeQueue, attr);
-                    setRouteQueue(optimized);
-                  }
+                  // No web os marcadores renderizados já estão na fila, 
+                  // clicar neles apenas otimiza a rota a partir do ponto clicado.
+                  const optimized = optimizeRouteQueue(routeQueue, attr);
+                  setRouteQueue(optimized);
                 }}
               >
-                <View style={[styles.markerPulse, { backgroundColor: color, borderColor: 'rgba(255,255,255,0.9)' }]}>
-                   <MaterialIcon name={icon as any} size={16} color="#fff" />
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <View style={[styles.mobileTooltip, { position: 'absolute', bottom: 12 }]}>
+                    <Text style={styles.mobileTooltipText} numberOfLines={1}>{attr.title}</Text>
+                  </View>
+                  <View style={{
+                    width: 16, 
+                    height: 16, 
+                    borderRadius: 8, 
+                    backgroundColor: '#e55a28', 
+                    borderWidth: 2, 
+                    borderColor: 'white',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.5,
+                    shadowRadius: 4,
+                    elevation: 4
+                  }} />
                 </View>
               </Marker>
             );
@@ -1118,6 +1124,11 @@ function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPre
           <View style={styles.cardRowTop}>
             <Text style={styles.categoryText}>{category}</Text>
             <View style={styles.distanceWrapper}>
+              {!isWeb && (
+                <TouchableOpacity onPress={onRemove} style={styles.mobileRemoveBtn}>
+                  <MaterialIcon name="delete-outline" size={16} color="#ffb4ab" />
+                </TouchableOpacity>
+              )}
               {!isWeb && <MaterialIcon name="drag-indicator" size={14} color="#e1bfb3" style={{ marginRight: 4, opacity: 0.5 }} />}
               <Text style={styles.distanceText}>{distanceText}</Text>
             </View>
@@ -1238,5 +1249,32 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  mobileTooltip: {
+    backgroundColor: '#370e00',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderColor: '#e55a28',
+    borderWidth: 1,
+    marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 3,
+    elevation: 4,
+    maxWidth: 120,
+  },
+  mobileTooltipText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  mobileRemoveBtn: {
+    padding: 4,
+    marginRight: 8,
+    backgroundColor: 'rgba(255, 180, 171, 0.1)',
+    borderRadius: 6,
   }
 });
