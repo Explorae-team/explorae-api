@@ -32,4 +32,5 @@
     <include file="db/changelog/changes/023-add-used-at-to-vouchers.xml"/>
     <include file="db/changelog/changes/024-seed-enriched-and-new-attractions.xml"/>
     <include file="db/changelog/changes/025-cleanup-invalid-cities.xml"/>
+    <include file="db/changelog/changes/026-fix-fk-travel-preferences.xml"/>
 </databaseChangeLog>

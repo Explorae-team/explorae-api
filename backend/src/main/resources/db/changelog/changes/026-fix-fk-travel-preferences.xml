@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="026-fix-fk-travel-preferences" author="explorae">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="fk_travel_pref_user"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="travel_preferences" constraintName="fk_travel_pref_user"/>
+    </changeSet>
+
+    <changeSet id="026-recreate-fk-travel-preferences" author="explorae">
+        <addForeignKeyConstraint baseTableName="travel_preferences" 
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_travel_pref_user"
+                                 referencedTableName="users" 
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
