@@ -26,8 +26,7 @@ Personalização da experiência turística através de perfis detalhados e reco
 - [x] **SDGEU-VOUCHER**: Sistema de Vouchers/Recompensas de parceiros locais (Sprint 5)
 
 ### Active (Sprint 06)
-- [ ] **SDGEU-OFFLINE**: Suporte offline e sincronização para visualização de detalhes de atrações favoritas e histórico de check-ins.
-- [ ] **SDGEU-NOTIF**: Notificações Push baseadas em geofencing (alertas ao se aproximar de atrações sem abrir o app).
+- [ ] **SDGEU-REF-USER**: Refatoração SOLID do módulo de Usuários (User) no backend.
 
 ### Out of Scope
 - Gamificação social (Rankings globais)
@@ -52,4 +51,4 @@ Personalização da experiência turística através de perfis detalhados e reco
 | Tiers de XP | Gamificação visual baseada em cores (Bronze, Prata, Ouro) | ✓ Good |
 
 ---
-*Last updated: 2026-06-13 for Sprint 06 Initialization*
+*Last updated: 2026-06-13 for Sprint 06 (Backend Refactoring) Initialization*
