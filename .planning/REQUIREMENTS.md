@@ -1,30 +1,27 @@
-# Requirements - Sprint 05
+# Requirements - Sprint 06
 
 ## Overview
-A Sprint 05 focará no desenvolvimento do fluxo de validação presencial das visitas (Check-In por Proximidade via GPS) para engajamento e gamificação ativa, e no sistema de resgate de vouchers/cupons em parceria com estabelecimentos locais para tangibilizar as recompensas do app Exploraê.
+A Sprint 06 focará na robustez da experiência de uso do Exploraê em ambientes com conectividade restrita (suporte offline para favoritas e check-ins) e na notificação passiva baseada na localização em tempo real do dispositivo, disparando alertas georreferenciados em segundo plano.
 
 ## User Stories
 
-### [SDGEU-CHECKIN] Check-In por Proximidade
-**Descrição**: Como um explorador, desejo realizar check-in ao me aproximar fisicamente de uma atração turística para registrar minha visita oficial e receber recompensas (XP, moedas virtuais e medalhas).
+### [SDGEU-OFFLINE] Suporte Offline e Sincronização
+**Descrição**: Como um explorador, desejo visualizar minhas atrações favoritas cadastradas e realizar check-ins mesmo quando não tiver acesso à internet, para que minha experiência de viagem não seja interrompida.
 
 - **Requisitos Funcionais**:
-  - [ ] Validar no backend as coordenadas do usuário em relação à localização cadastrada da atração (raio padrão de proximidade de 50 metros).
-  - [ ] Interface no mobile com botão de check-in dinâmico ativo apenas quando o usuário estiver dentro do raio da atração.
-  - [ ] Adicionar transações no histórico de gamificação para registrar o ganho de recompensas de check-in.
-  - [ ] Feedbacks de animações visuais premium ao atingir level up após ganhar XP de check-in.
+  - [ ] Integrar banco de dados local leve (SQLite / WatermelonDB) no Expo.
+  - [ ] Salvar localmente dados de perfil, medalhas e atrações salvas como favoritos.
+  - [ ] Criar buffer/fila de check-ins offline para reenvio e sincronização.
 - **Critérios de Aceite**:
-  - [ ] O check-in só é permitido se a distância calculada for menor ou igual ao limite de proximidade configurado.
-  - [ ] O check-in deve ser único por atração a cada 24 horas (ou período configurado) para evitar abusos de ganho de XP.
+  - [ ] O app exibe o feed e a aba de favoritos no modo avião / sem internet.
+  - [ ] O check-in realizado offline é armazenado localmente e enviado automaticamente para o backend assim que a internet é reestabelecida.
 
-### [SDGEU-VOUCHER] Sistema de Vouchers & Cupons
-**Descrição**: Como um explorador, desejo trocar minhas moedas de exploração por cupons de desconto de parceiros locais para obter benefícios tangíveis nas minhas viagens.
+### [SDGEU-NOTIF] Notificações por Geofencing Passivo
+**Descrição**: Como um explorador, desejo receber notificações automáticas no meu smartphone ao passar perto de um local histórico de interesse ou de uma atração parceira com descontos especiais, sem precisar estar com o app aberto.
 
 - **Requisitos Funcionais**:
-  - [ ] Cadastro de parceiros comerciais e vouchers de descontos (Spring Boot, Liquibase).
-  - [ ] Fluxo de resgate de moedas virtuais por vouchers gerados em tempo real.
-  - [ ] Exibição da carteira de vouchers do usuário com status (Disponível, Resgatado, Expirado).
-  - [ ] Geração de QR Code e código alfanumérico exclusivo para cada cupom resgatado, para ser exibido e escaneado no estabelecimento parceiro.
+  - [ ] Implementar monitoramento de geofencing passivo em background no Expo.
+  - [ ] Integrar com o serviço de notificações nativas do Android/iOS.
+  - [ ] Configurar controle de frequência de notificações para evitar spam e economia de bateria.
 - **Critérios de Aceite**:
-  - [ ] O usuário não pode resgatar um voucher se não tiver o saldo mínimo de moedas necessário.
-  - [ ] O status do voucher deve mudar para "Resgatado" quando validado e não pode ser reutilizado.
+  - [ ] O usuário recebe uma notificação local (push notification) ao entrar em um raio de 100m de uma atração ativa parceira, mesmo com o app em background ou fechado.

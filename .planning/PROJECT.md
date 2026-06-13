@@ -22,10 +22,12 @@ Personalização da experiência turística através de perfis detalhados e reco
 - [x] **SDGEU-157**: Detalhes da Atração com galeria e fotos completas (Sprint 3)
 - [x] **SDGEU-158**: Mapa Interativo com exibição geo-referenciada em tempo real (Sprint 4)
 - [x] **SDGEU-REF-01**: Refatoração de Backend para Package-by-Feature (Sprint 4)
+- [x] **SDGEU-CHECKIN**: Check-In por Proximidade com validação física via GPS (Sprint 5)
+- [x] **SDGEU-VOUCHER**: Sistema de Vouchers/Recompensas de parceiros locais (Sprint 5)
 
-### Active (Sprint 05)
-- [ ] **SDGEU-CHECKIN**: Check-In por Proximidade (validação física de presença via GPS para conceder recompensas).
-- [ ] **SDGEU-VOUCHER**: Sistema de Vouchers/Recompensas (geração e resgate de cupons de descontos com parceiros locais).
+### Active (Sprint 06)
+- [ ] **SDGEU-OFFLINE**: Suporte offline e sincronização para visualização de detalhes de atrações favoritas e histórico de check-ins.
+- [ ] **SDGEU-NOTIF**: Notificações Push baseadas em geofencing (alertas ao se aproximar de atrações sem abrir o app).
 
 ### Out of Scope
 - Gamificação social (Rankings globais)
@@ -50,4 +52,4 @@ Personalização da experiência turística através de perfis detalhados e reco
 | Tiers de XP | Gamificação visual baseada em cores (Bronze, Prata, Ouro) | ✓ Good |
 
 ---
-*Last updated: 2026-06-13 for Sprint 05 Initialization*
+*Last updated: 2026-06-13 for Sprint 06 Initialization*
