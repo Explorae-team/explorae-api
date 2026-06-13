@@ -2,12 +2,9 @@ package br.edu.ifpb.explorae.user.service;
 
 import br.edu.ifpb.explorae.user.dto.UserRegistrationDTO;
 import br.edu.ifpb.explorae.user.dto.UserResponseDTO;
-import br.edu.ifpb.explorae.user.dto.UserUpdateDTO;
 import br.edu.ifpb.explorae.user.mapper.UserMapper;
 import br.edu.ifpb.explorae.user.domain.User;
 import br.edu.ifpb.explorae.user.repository.UserRepository;
-import br.edu.ifpb.explorae.attraction.repository.UserInteractionRepository;
-import br.edu.ifpb.explorae.gamification.repository.ChallengeRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,21 +20,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final UserInteractionRepository userInteractionRepository;
-    private final ChallengeRepository challengeRepository;
 
     public UserServiceImpl(
             UserRepository userRepository, 
             PasswordEncoder passwordEncoder, 
-            UserMapper userMapper,
-            UserInteractionRepository userInteractionRepository,
-            ChallengeRepository challengeRepository
+            UserMapper userMapper
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
-        this.userInteractionRepository = userInteractionRepository;
-        this.challengeRepository = challengeRepository;
     }
 
     // Busca o User e entrega pro Spring Security.
@@ -71,59 +62,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuário não encontrado"));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserResponseDTO getUserProfile(java.util.UUID id) {
-        User user = userRepository.findByIdWithDetails(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
-        
-        UserResponseDTO baseDTO = userMapper.toResponseDTO(user);
-        
-        long checkInCount = userInteractionRepository.countDistinctAttractionsByUserIdAndInteractionType(id, "CHECK_IN");
-        long activeChallengesCount = challengeRepository.findActiveChallenges(java.time.LocalDateTime.now()).size();
-        
-        return new UserResponseDTO(
-                baseDTO.id(),
-                baseDTO.name(),
-                baseDTO.email(),
-                baseDTO.phone(),
-                baseDTO.bio(),
-                baseDTO.photoUrl(),
-                baseDTO.xp(),
-                baseDTO.level(),
-                baseDTO.coins(),
-                baseDTO.levelName(),
-                baseDTO.hasPreferences(),
-                baseDTO.badges(),
-                (int) checkInCount,
-                (int) activeChallengesCount
-        );
-    }
-
-    @Override
-    @Transactional
-    public void updateAvatar(java.util.UUID userId, String photoUrl) {
-        User user = findById(userId);
-        user.setPhotoUrl(photoUrl);
-        userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    public UserResponseDTO updateUser(java.util.UUID userId, UserUpdateDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Usuário não encontrado"));
-
-        if (dto.name() != null) user.setName(dto.name());
-        if (dto.phone() != null) user.setPhone(dto.phone());
-        if (dto.bio() != null) user.setBio(dto.bio());
-        if (dto.photoUrl() != null) user.setPhotoUrl(dto.photoUrl());
-        
-        User updatedUser = userRepository.save(user);
-        return userMapper.toResponseDTO(updatedUser);
     }
 
     @Override

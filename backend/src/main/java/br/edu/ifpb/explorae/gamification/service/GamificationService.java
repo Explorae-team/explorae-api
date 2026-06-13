@@ -55,7 +55,20 @@ public class GamificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado para ganho de XP"));
 
-        boolean levelUp = user.addXp(amount);
+        int currentXp = user.getXp() != null ? user.getXp() : 0;
+        int newXp = currentXp + (amount != null ? amount : 0);
+        user.setXp(newXp);
+
+        int oldLevel = user.getLevel() != null ? user.getLevel() : 1;
+        int currentLevel = oldLevel;
+        while (newXp >= br.edu.ifpb.explorae.gamification.util.GamificationRules.getXpThresholdForLevel(currentLevel + 1)) {
+            currentLevel++;
+        }
+        boolean levelUp = currentLevel > oldLevel;
+        if (levelUp) {
+            user.setLevel(currentLevel);
+        }
+
         if (coins != null && coins > 0) {
             user.setCoins(user.getCoins() + coins);
         }

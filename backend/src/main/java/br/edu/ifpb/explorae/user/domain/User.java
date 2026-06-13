@@ -68,38 +68,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBadge> userBadges;
 
-    /**
-     * Adiciona XP e verifica se subiu de nível.
-     * Retorna true se houve level up.
-     */
-    public boolean addXp(Integer amount) {
-        if (amount == null || amount <= 0)
-            return false;
-        this.xp += amount;
-        return checkLevelUp();
-    }
-
-    private boolean checkLevelUp() {
-        int oldLevel = this.level;
-        // Fórmula de RPG Cumulativa (Opção B):
-        // Nível 1 -> 2: 100 XP (Total: 100 XP)
-        // Nível 2 -> 3: 200 XP (Total: 300 XP)
-        // Nível 3 -> 4: 300 XP (Total: 600 XP)
-        // Limite para nível L = 50 * L * (L - 1)
-        while (this.xp >= getXpThresholdForLevel(this.level + 1)) {
-            this.level++;
-        }
-        return this.level > oldLevel;
-    }
-
-    public int getXpThresholdForLevel(int l) {
-        if (l <= 1) return 0;
-        return 50 * l * (l - 1);
-    }
-
-    public int getXpForNextLevel() {
-        return getXpThresholdForLevel(this.level + 1);
-    }
 
 
     /**
