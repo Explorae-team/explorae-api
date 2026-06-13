@@ -6,7 +6,7 @@ import AppFooter from '../../components/AppFooter';
 import { colors } from '../../constants/colors';
 
 export default function ExploreLayout() {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth() as any;
   const segments = useSegments();
   const router = useRouter();
   const params = useGlobalSearchParams();
@@ -59,6 +59,7 @@ export default function ExploreLayout() {
         }}
       >
         <Stack.Screen name="dashboard/index" />
+        <Stack.Screen name="dashboard/search" />
         <Stack.Screen name="dashboard/profile" />
         <Stack.Screen name="dashboard/badges" />
         <Stack.Screen name="dashboard/favorites" />

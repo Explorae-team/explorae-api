@@ -59,15 +59,60 @@ public class AttractionService {
     private final BadgeMapper badgeMapper;
 
     @Transactional(readOnly = true)
-    public Page<AttractionResponseDTO> findAll(String category, Pageable pageable) {
-        Page<Attraction> page;
+    public Page<AttractionResponseDTO> findAll(
+            String category, Double minRating, Double minPrice, Double maxPrice, 
+            Boolean openNow, Double latitude, Double longitude, Double maxDistance, 
+            Pageable pageable) {
+        
+        List<Attraction> allAttractions;
         if (category != null && !category.isEmpty()) {
-            page = attractionRepository.findByCategory(category, pageable);
+            allAttractions = attractionRepository.findByCategory(category, Pageable.unpaged()).getContent();
         } else {
-            page = attractionRepository.findAll(pageable);
+            allAttractions = attractionRepository.findAll();
         }
-        return page.map(attraction -> AttractionResponseDTO.fromEntity(attraction, "1.2 km"));
 
+        List<AttractionResponseDTO> filtered = allAttractions.stream()
+                .filter(attr -> minRating == null || (attr.getAverageRating() != null && attr.getAverageRating() >= minRating))
+                .filter(attr -> {
+                    if (minPrice == null && maxPrice == null) return true;
+                    if (attr.getPriceRange() == null) return false;
+                    
+                    int priceLevel = attr.getPriceRange().length(); // $, $$, $$$
+                    Double estimatedMin = priceLevel == 1 ? 0.0 : (priceLevel == 2 ? 50.0 : 150.0);
+                    Double estimatedMax = priceLevel == 1 ? 50.0 : (priceLevel == 2 ? 150.0 : 500.0);
+                    
+                    if (minPrice != null && estimatedMax < minPrice) return false;
+                    if (maxPrice != null && estimatedMin > maxPrice) return false;
+                    
+                    return true;
+                })
+                .filter(attr -> {
+                    if (openNow == null || !openNow) return true;
+                    // Mock implementation for openNow as entity might not have schedules yet
+                    return true; 
+                })
+                .filter(attr -> {
+                    if (latitude != null && longitude != null && maxDistance != null) {
+                        double dist = calculateHaversineDistance(latitude, longitude, attr.getLatitude(), attr.getLongitude());
+                        return dist <= maxDistance;
+                    }
+                    return true;
+                })
+                .map(attr -> {
+                    String distanceStr = "Localizando...";
+                    if (latitude != null && longitude != null) {
+                        double dist = calculateHaversineDistance(latitude, longitude, attr.getLatitude(), attr.getLongitude());
+                        distanceStr = dist > 1.0 ? String.format("%.1f km", dist).replace(".", ",") : Math.round(dist * 1000) + " m";
+                    }
+                    return AttractionResponseDTO.fromEntity(attr, distanceStr);
+                })
+                .collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filtered.size());
+
+        List<AttractionResponseDTO> pageContent = start <= end ? filtered.subList(start, end) : List.of();
+        return new PageImpl<>(pageContent, pageable, filtered.size());
     }
 
     @Transactional

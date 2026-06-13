@@ -31,33 +31,33 @@ export default function RecentActivity() {
     );
   }
 
-  if (activities.length === 0) {
+    if (activities.length === 0) {
+      return (
+        <View className="mt-10 mb-8">
+          <View className="flex-row justify-between items-center mb-6">
+            <Text className="text-xl font-bold tracking-tight text-on-surface">Atividade Recente</Text>
+            <TouchableOpacity onPress={() => router.push('/dashboard/badges?tab=challenges')}>
+              <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
+            </TouchableOpacity>
+          </View>
+          <View className="bg-surface-container p-6 rounded-xl border border-on-background/5 items-center">
+            <MaterialIcons name="history" size={40} color="#fd6c2820" />
+            <Text className="text-on-surface-variant text-center mt-2 font-sans">
+              Nenhuma atividade registrada ainda.
+            </Text>
+          </View>
+        </View>
+      );
+    }
+  
     return (
       <View className="mt-10 mb-8">
         <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-xl font-bold tracking-tight text-on-surface">Atividade Recente</Text>
-          <TouchableOpacity onPress={() => router.push({ pathname: '/dashboard/badges', params: { tab: 'challenges' } })}>
+          <Text className="text-xl font-bold tracking-tight text-on-surface">Histórico de Desafios</Text>
+          <TouchableOpacity onPress={() => router.push('/dashboard/badges?tab=challenges')}>
             <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
           </TouchableOpacity>
         </View>
-        <View className="bg-surface-container p-6 rounded-xl border border-on-background/5 items-center">
-          <MaterialIcons name="history" size={40} color="#fd6c2820" />
-          <Text className="text-on-surface-variant text-center mt-2 font-sans">
-            Nenhuma atividade registrada ainda.
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
-  return (
-    <View className="mt-10 mb-8">
-      <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-xl font-bold tracking-tight text-on-surface">Histórico de Desafios</Text>
-        <TouchableOpacity onPress={() => router.push({ pathname: '/dashboard/badges', params: { tab: 'challenges' } })}>
-          <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
-        </TouchableOpacity>
-      </View>
       {activities.map((item) => (
         <View key={item.id} className="bg-surface-container-high rounded-3xl p-4 flex-row items-center mb-4 border border-on-background/5">
           <View className="bg-tertiary/20 w-12 h-12 rounded-2xl items-center justify-center">

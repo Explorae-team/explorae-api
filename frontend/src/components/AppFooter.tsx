@@ -55,7 +55,7 @@ const AppFooter: React.FC<AppFooterProps> = ({
       className="bg-surface/95 border-t border-outline-variant/10 flex-row items-end justify-around px-2"
       style={{
         paddingTop: 8,
-        paddingBottom: Math.max(insets.bottom, 16),
+        paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom, 24) : Math.max(insets.bottom, 16),
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.05,

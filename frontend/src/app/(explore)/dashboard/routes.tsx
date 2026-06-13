@@ -45,6 +45,7 @@ interface PointCardProps extends Attraction {
   canCheckIn: boolean;
   onCheckIn: () => void;
   onLongPress?: () => void;
+  onDragStart?: () => void;
   isActive?: boolean;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
@@ -721,6 +722,7 @@ export default function RoutesScreen() {
           }
         }}
         onLongPress={drag}
+        onDragStart={drag}
         canCheckIn={selectedAttraction?.id === item.id && canCheckIn}
         onCheckIn={handleCheckInClick}
         // Para Web:
@@ -1073,7 +1075,7 @@ export default function RoutesScreen() {
   );
 }
 
-function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPress, isActive, canCheckIn, onCheckIn, onMoveUp, onMoveDown, isFirst, isLast, onRemove }: PointCardProps) {
+function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPress, onDragStart, isActive, canCheckIn, onCheckIn, onMoveUp, onMoveDown, isFirst, isLast, onRemove }: PointCardProps) {
   const isWeb = Platform.OS === 'web';
 
   return (
@@ -1129,7 +1131,11 @@ function PointCard({ category, distanceText, title, imageUrl, onPress, onLongPre
                   <MaterialIcon name="delete-outline" size={16} color="#ffb4ab" />
                 </TouchableOpacity>
               )}
-              {!isWeb && <MaterialIcon name="drag-indicator" size={14} color="#e1bfb3" style={{ marginRight: 4, opacity: 0.5 }} />}
+              {!isWeb && (
+                <TouchableOpacity onPressIn={onDragStart} style={{ padding: 4 }}>
+                  <MaterialIcon name="drag-indicator" size={18} color="#e1bfb3" style={{ opacity: 0.8 }} />
+                </TouchableOpacity>
+              )}
               <Text style={styles.distanceText}>{distanceText}</Text>
             </View>
           </View>
