@@ -1,8 +1,7 @@
 package br.edu.ifpb.explorae.attraction.service;
 
 import br.edu.ifpb.explorae.attraction.dto.AttractionResponseDTO;
-import br.edu.ifpb.explorae.attraction.domain.Attraction;
-import br.edu.ifpb.explorae.attraction.repository.AttractionRepository;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,26 +22,23 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AttractionServiceTest {
+class AttractionServiceFacadeTest {
 
     @Mock
-    private AttractionRepository repository;
+    private AttractionSearchService searchService;
 
     @InjectMocks
-    private AttractionService service;
+    private AttractionServiceFacade service;
 
     @Test
     @DisplayName("Deve listar atrações paginadas corretamente")
     void shouldListAttractionsPaginated() {
         // Arrange
-        Attraction attraction = new Attraction();
-        attraction.setId(UUID.randomUUID());
-        attraction.setName("Teste");
-        
+        AttractionResponseDTO dto = new AttractionResponseDTO(UUID.randomUUID(), "Teste", null, null, null, null, null, null, null, null);
         Pageable pageable = PageRequest.of(0, 5);
-        Page<Attraction> page = new PageImpl<>(List.of(attraction), pageable, 1);
+        Page<AttractionResponseDTO> page = new PageImpl<>(List.of(dto), pageable, 1);
         
-        when(repository.findAll()).thenReturn(List.of(attraction));
+        when(searchService.findAll(null, null, null, null, null, null, null, null, pageable)).thenReturn(page);
 
         // Act
         Page<AttractionResponseDTO> result = service.findAll(null, null, null, null, null, null, null, null, pageable);

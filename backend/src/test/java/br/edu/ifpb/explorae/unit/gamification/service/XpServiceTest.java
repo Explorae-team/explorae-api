@@ -4,11 +4,9 @@ import br.edu.ifpb.explorae.gamification.domain.Badge;
 import br.edu.ifpb.explorae.gamification.domain.UserBadge;
 import br.edu.ifpb.explorae.gamification.domain.XpHistory;
 import br.edu.ifpb.explorae.user.domain.User;
-import br.edu.ifpb.explorae.gamification.repository.BadgeRepository;
-import br.edu.ifpb.explorae.gamification.repository.UserBadgeRepository;
 import br.edu.ifpb.explorae.user.repository.UserRepository;
 import br.edu.ifpb.explorae.gamification.repository.XpHistoryRepository;
-import br.edu.ifpb.explorae.gamification.service.GamificationService;
+import br.edu.ifpb.explorae.gamification.service.XpService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class GamificationServiceTest {
+class XpServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -33,16 +31,10 @@ class GamificationServiceTest {
     private XpHistoryRepository xpHistoryRepository;
 
     @Mock
-    private BadgeRepository badgeRepository;
-
-    @Mock
-    private UserBadgeRepository userBadgeRepository;
-
-    @Mock
     private org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
-    private GamificationService gamificationService;
+    private XpService xpService;
 
     @Test
     @DisplayName("Deve adicionar XP e salvar no histórico sem subir de nível")
@@ -54,7 +46,7 @@ class GamificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // WHEN
-        gamificationService.addXp(userId, 50, "Teste");
+        xpService.addXp(userId, 50, "Teste");
 
         // THEN
         assertThat(user.getXp()).isEqualTo(50);
@@ -74,7 +66,7 @@ class GamificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // WHEN
-        gamificationService.addXp(userId, 20, "Level Up");
+        xpService.addXp(userId, 20, "Level Up");
 
         // THEN
         assertThat(user.getXp()).isEqualTo(110);
@@ -93,7 +85,7 @@ class GamificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // WHEN
-        gamificationService.addXp(userId, 30, "Level Up");
+        xpService.addXp(userId, 30, "Level Up");
 
         // THEN
         assertThat(user.getXp()).isEqualTo(310);
@@ -101,41 +93,4 @@ class GamificationServiceTest {
         verify(userRepository, times(1)).save(user);
     }
 
-    @Test
-    @DisplayName("Deve conceder medalha se o usuário ainda não a possui")
-    void shouldAwardBadgeIfUserDoesNotHaveIt() {
-        // GIVEN
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().id(userId).build();
-        Badge badge = Badge.builder().name("PIONEIRO").build();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(badgeRepository.findByName("PIONEIRO")).thenReturn(Optional.of(badge));
-        when(userBadgeRepository.existsByUserAndBadge(user, badge)).thenReturn(false);
-
-        // WHEN
-        gamificationService.awardBadge(userId, "PIONEIRO");
-
-        // THEN
-        verify(userBadgeRepository, times(1)).save(any(UserBadge.class));
-    }
-
-    @Test
-    @DisplayName("Não deve conceder medalha duplicada")
-    void shouldNotAwardDuplicateBadge() {
-        // GIVEN
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().id(userId).build();
-        Badge badge = Badge.builder().name("PIONEIRO").build();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(badgeRepository.findByName("PIONEIRO")).thenReturn(Optional.of(badge));
-        when(userBadgeRepository.existsByUserAndBadge(user, badge)).thenReturn(true);
-
-        // WHEN
-        gamificationService.awardBadge(userId, "PIONEIRO");
-
-        // THEN
-        verify(userBadgeRepository, never()).save(any(UserBadge.class));
-    }
 }

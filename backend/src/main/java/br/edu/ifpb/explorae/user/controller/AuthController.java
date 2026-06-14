@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import br.edu.ifpb.explorae.common.security.RateLimited;
 
 /**
  * O usuário apresenta suas credenciais
@@ -51,6 +52,7 @@ public class AuthController {
      * 3. Cria e devolve o Token JWT.
      */
     @PostMapping("/login")
+    @RateLimited(key = "login", capacity = 5, periodInMinutes = 1)
     public ResponseEntity<StandardResponseDTO<AuthLoginResponseDTO>> login(@RequestBody @Valid LoginDTO loginDTO) {
         AuthLoginResponseDTO responseDTO = authService.login(loginDTO);
 

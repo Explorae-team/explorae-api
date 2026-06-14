@@ -52,15 +52,7 @@ public class ChallengeService {
 
         List<UserChallengeProgress> result = new ArrayList<>();
         for (Challenge challenge : activeChallenges) {
-            UserChallengeProgress progress = progressMap.get(challenge.getId());
-            if (progress == null) {
-                progress = UserChallengeProgress.builder()
-                        .user(user)
-                        .challenge(challenge)
-                        .currentValue(0)
-                        .completed(false)
-                        .build();
-            }
+            UserChallengeProgress progress = progressMap.getOrDefault(challenge.getId(), buildDefaultProgress(user, challenge));
             result.add(progress);
         }
 
@@ -84,12 +76,7 @@ public class ChallengeService {
 
         for (Challenge challenge : matchingChallenges) {
             UserChallengeProgress progress = progressRepository.findByUserIdAndChallengeId(userId, challenge.getId())
-                    .orElseGet(() -> UserChallengeProgress.builder()
-                            .user(user)
-                            .challenge(challenge)
-                            .currentValue(0)
-                            .completed(false)
-                            .build());
+                    .orElseGet(() -> buildDefaultProgress(user, challenge));
 
             if (Boolean.TRUE.equals(progress.getCompleted())) {
                 continue;
@@ -113,5 +100,14 @@ public class ChallengeService {
                 progressRepository.save(progress);
             }
         }
+    }
+
+    private UserChallengeProgress buildDefaultProgress(User user, Challenge challenge) {
+        return UserChallengeProgress.builder()
+                .user(user)
+                .challenge(challenge)
+                .currentValue(0)
+                .completed(false)
+                .build();
     }
 }

@@ -7,9 +7,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import br.edu.ifpb.explorae.common.security.RateLimitInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private RateLimitInterceptor rateLimitInterceptor;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -21,5 +27,10 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadAbsolutePath + "/");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(rateLimitInterceptor);
     }
 }

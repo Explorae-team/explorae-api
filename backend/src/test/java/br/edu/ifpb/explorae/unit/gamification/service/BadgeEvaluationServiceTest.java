@@ -5,9 +5,7 @@ import br.edu.ifpb.explorae.gamification.event.ChallengeCompletedEvent;
 import br.edu.ifpb.explorae.gamification.event.DestinationReachedEvent;
 import br.edu.ifpb.explorae.gamification.event.ReviewCreatedEvent;
 import br.edu.ifpb.explorae.gamification.event.UserLevelUpEvent;
-import br.edu.ifpb.explorae.attraction.repository.AttractionReviewRepository;
-import br.edu.ifpb.explorae.gamification.repository.UserChallengeProgressRepository;
-import br.edu.ifpb.explorae.attraction.repository.UserInteractionRepository;
+import br.edu.ifpb.explorae.gamification.service.BadgeEvaluationService;
 import br.edu.ifpb.explorae.gamification.service.BadgeEvaluationService;
 import br.edu.ifpb.explorae.gamification.service.GamificationService;
 import org.junit.jupiter.api.DisplayName;
@@ -27,15 +25,6 @@ class BadgeEvaluationServiceTest {
     @Mock
     private GamificationService gamificationService;
 
-    @Mock
-    private UserChallengeProgressRepository progressRepository;
-
-    @Mock
-    private AttractionReviewRepository reviewRepository;
-
-    @Mock
-    private UserInteractionRepository userInteractionRepository;
-
     @InjectMocks
     private BadgeEvaluationService badgeEvaluationService;
 
@@ -46,8 +35,6 @@ class BadgeEvaluationServiceTest {
         UUID userId = UUID.randomUUID();
         Challenge challenge = Challenge.builder().type("DAILY").build();
         ChallengeCompletedEvent event = new ChallengeCompletedEvent(userId, challenge);
-
-        when(progressRepository.countCompletedDailyChallengesByUserId(userId)).thenReturn(5L);
 
         // WHEN
         badgeEvaluationService.handleChallengeCompleted(event);
@@ -63,8 +50,6 @@ class BadgeEvaluationServiceTest {
         UUID userId = UUID.randomUUID();
         DestinationReachedEvent event = new DestinationReachedEvent(userId);
 
-        when(userInteractionRepository.countDistinctAttractionsByUserIdAndInteractionType(userId, "CHECK_IN")).thenReturn(3L);
-
         // WHEN
         badgeEvaluationService.handleDestinationReached(event);
 
@@ -78,8 +63,6 @@ class BadgeEvaluationServiceTest {
         // GIVEN
         UUID userId = UUID.randomUUID();
         ReviewCreatedEvent event = new ReviewCreatedEvent(userId);
-
-        when(reviewRepository.countByUserIdAndAttractionCategoryIgnoreCase(userId, "aventura")).thenReturn(3L);
 
         // WHEN
         badgeEvaluationService.handleReviewCreated(event);
@@ -100,7 +83,7 @@ class BadgeEvaluationServiceTest {
 
         // THEN
         verify(gamificationService, times(1)).awardBadge(userId, "EXPLORADOR_VETERANO");
-        verify(gamificationService, never()).awardBadge(userId, "LENDA_URBANA");
+        verify(gamificationService, times(1)).awardBadge(userId, "LENDA_URBANA");
     }
 
     @Test

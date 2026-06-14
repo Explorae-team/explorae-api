@@ -21,7 +21,7 @@ public class BadgeController {
     private final BadgeService badgeService;
 
     @GetMapping
-    public ResponseEntity<StandardResponseDTO<List<BadgeResponseDTO>>> getAllBadges(@AuthenticationPrincipal User principal) {
+    public ResponseEntity<StandardResponseDTO<List<BadgeResponseDTO>>> getAllBadges(@AuthenticationPrincipal(expression = "user") User principal) {
         List<BadgeResponseDTO> badges = badgeService.getAllBadgesWithProgress(principal);
         return ResponseEntity.ok(StandardResponseDTO.success("Medalhas recuperadas com sucesso", badges));
     }

@@ -22,17 +22,20 @@ public class BadgeService {
     private final BadgeRepository badgeRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final UserRepository userRepository;
+    private final BadgeUnlockTracker badgeUnlockTracker;
     private final Map<String, BadgeProgressStrategy> strategyMap;
 
     public BadgeService(
             BadgeRepository badgeRepository,
             UserBadgeRepository userBadgeRepository,
             UserRepository userRepository,
+            BadgeUnlockTracker badgeUnlockTracker,
             List<BadgeProgressStrategy> strategies
     ) {
         this.badgeRepository = badgeRepository;
         this.userBadgeRepository = userBadgeRepository;
         this.userRepository = userRepository;
+        this.badgeUnlockTracker = badgeUnlockTracker;
         this.strategyMap = strategies.stream()
                 .collect(Collectors.toMap(
                         s -> s.getBadgeName().toUpperCase(),
@@ -88,5 +91,63 @@ public class BadgeService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Avalia uma Strategy e atribui a medalha caso o usuário atinja o objetivo.
+     */
+    @Transactional
+    public void evaluateAndAward(UUID userId, String badgeName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado para atribuição de medalha"));
+
+        java.util.Optional<br.edu.ifpb.explorae.gamification.domain.Badge> badgeOpt = badgeRepository.findByName(badgeName);
+        if (badgeOpt.isEmpty()) {
+            System.err.println("WARN: Medalha não encontrada: " + badgeName + ". Ignorando erro para não travar a aplicação.");
+            return;
+        }
+        br.edu.ifpb.explorae.gamification.domain.Badge badge = badgeOpt.get();
+
+        if (userBadgeRepository.existsByUserAndBadge(user, badge)) {
+            return; // Já possui a medalha
+        }
+
+        BadgeProgressStrategy strategy = strategyMap.get(badgeName.toUpperCase());
+        if (strategy != null) {
+            int current = strategy.calculateCurrentValue(user);
+            int target = strategy.getTargetValue();
+            if (current >= target) {
+                br.edu.ifpb.explorae.gamification.domain.UserBadge userBadge = br.edu.ifpb.explorae.gamification.domain.UserBadge.builder()
+                        .user(user)
+                        .badge(badge)
+                        .build();
+                userBadgeRepository.save(userBadge);
+                badgeUnlockTracker.add(badge);
+            }
+        } else {
+            // Se não tem Strategy, apenas assume que o trigger já fez a validação e concede direto (ex: GamificationService antigo que concedia direto).
+            br.edu.ifpb.explorae.gamification.domain.UserBadge userBadge = br.edu.ifpb.explorae.gamification.domain.UserBadge.builder()
+                    .user(user)
+                    .badge(badge)
+                    .build();
+            userBadgeRepository.save(userBadge);
+            badgeUnlockTracker.add(badge);
+        }
+    }
+
+    /**
+     * Verifica se o usuário já possui uma determinada medalha.
+     */
+    @Transactional(readOnly = true)
+    public boolean hasBadge(UUID userId, String badgeName) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        java.util.Optional<br.edu.ifpb.explorae.gamification.domain.Badge> badgeOpt = badgeRepository.findByName(badgeName);
+        if (badgeOpt.isEmpty()) {
+            return false;
+        }
+        return userBadgeRepository.existsByUserAndBadge(user, badgeOpt.get());
     }
 }

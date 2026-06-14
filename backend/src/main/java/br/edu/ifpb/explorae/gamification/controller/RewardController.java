@@ -33,7 +33,7 @@ public class RewardController {
 
     @PostMapping("/redeem/{rewardId}")
     public ResponseEntity<StandardResponseDTO<VoucherResponseDTO>> redeemReward(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal(expression = "user") User user,
             @PathVariable UUID rewardId) {
         
         VoucherResponseDTO voucher = rewardService.redeemReward(user.getId(), rewardId);
@@ -42,7 +42,7 @@ public class RewardController {
 
     @GetMapping("/my-vouchers")
     public ResponseEntity<StandardResponseDTO<List<VoucherResponseDTO>>> getUserVouchers(
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal(expression = "user") User user) {
         
         List<VoucherResponseDTO> vouchers = rewardService.getUserVouchers(user.getId());
         return ResponseEntity.ok(StandardResponseDTO.success("Seus vouchers foram recuperados com sucesso.", vouchers));
@@ -50,7 +50,7 @@ public class RewardController {
 
     @PostMapping("/vouchers/{voucherId}/token")
     public ResponseEntity<StandardResponseDTO<VoucherTokenResponseDTO>> generateVoucherToken(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal(expression = "user") User user,
             @PathVariable UUID voucherId) {
         
         VoucherTokenResponseDTO tokenResponse = rewardService.generateVoucherToken(user.getId(), voucherId);

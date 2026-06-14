@@ -8,6 +8,8 @@ import br.edu.ifpb.explorae.user.domain.User;
 import br.edu.ifpb.explorae.user.repository.UserRepository;
 import br.edu.ifpb.explorae.attraction.repository.UserInteractionRepository;
 import br.edu.ifpb.explorae.gamification.repository.ChallengeRepository;
+import br.edu.ifpb.explorae.gamification.service.GamificationService;
+import br.edu.ifpb.explorae.gamification.dto.XpHistoryResponseDTO;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,26 +27,30 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final UserInteractionRepository userInteractionRepository;
     private final ChallengeRepository challengeRepository;
+    private final GamificationService gamificationService;
 
     public UserService(
             UserRepository userRepository, 
             PasswordEncoder passwordEncoder, 
             UserMapper userMapper,
             UserInteractionRepository userInteractionRepository,
-            ChallengeRepository challengeRepository
+            ChallengeRepository challengeRepository,
+            GamificationService gamificationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.userInteractionRepository = userInteractionRepository;
         this.challengeRepository = challengeRepository;
+        this.gamificationService = gamificationService;
     }
 
     // Busca o User e entrega pro Spring Security.
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("O e-mail não está cadastrado."));
+        return new br.edu.ifpb.explorae.common.security.UserDetailsImpl(user);
     }
 
     @Transactional
@@ -135,5 +141,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com este e-mail"));
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<XpHistoryResponseDTO> getXpHistory(java.util.UUID userId) {
+        return gamificationService.getXpHistory(userId);
     }
 }

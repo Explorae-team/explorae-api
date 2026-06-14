@@ -22,7 +22,7 @@ public class ChallengeController {
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<List<ChallengeProgressDTO>>> getActiveChallenges(
-            @AuthenticationPrincipal User principal) {
+            @AuthenticationPrincipal(expression = "user") User principal) {
         
         List<ChallengeProgressDTO> progress = challengeService.getActiveChallengesForUser(principal.getId());
         return ResponseEntity.ok(StandardResponseDTO.success("Desafios recuperados com sucesso", progress));

@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Primary // Define esta como a implementação principal para o Spring injetar nos controllers
 public class SupabaseFileStorageService implements FileStorageService {
@@ -75,7 +77,7 @@ public class SupabaseFileStorageService implements FileStorageService {
                     .retrieve()
                     .toBodilessEntity();
         } catch (Exception ex) {
-            // Ignora erro na deleção para não quebrar fluxo principal
+            log.warn("Falha silenciosa ao excluir arquivo no Supabase: {} - Erro: {}", fileUrl, ex.getMessage());
         }
     }
 }

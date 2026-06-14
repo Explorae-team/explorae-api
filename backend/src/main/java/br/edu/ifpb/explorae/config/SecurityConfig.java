@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import br.edu.ifpb.explorae.common.security.RateLimitFilter;
 
 import java.util.List;
 
@@ -33,11 +32,9 @@ public class SecurityConfig {
     private String allowedOrigins;
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, RateLimitFilter rateLimitFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -67,9 +64,6 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.
                         .anyRequest().authenticated())
-                // O filtro de Rate Limit vem primeiro para evitar processamento inútil de
-                // ataques.
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 // O filtro JWT valida o Token.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

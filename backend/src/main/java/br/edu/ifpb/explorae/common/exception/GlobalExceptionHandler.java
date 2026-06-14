@@ -14,12 +14,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<StandardResponseDTO<Void>> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Tentativa de login falha: credenciais inválidas.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(StandardResponseDTO.error("E-mail ou senha inválidos."));
     }
@@ -35,6 +38,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors()
                 .stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
         
+        log.warn("Erro de validação: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(StandardResponseDTO.error("Erro de validação nos campos", errors));
     }
@@ -53,6 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<StandardResponseDTO<Void>> handleBusinessException(BusinessException ex) {
+        log.warn("BusinessException disparada: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(StandardResponseDTO.error(ex.getMessage()));
     }
@@ -65,6 +70,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<StandardResponseDTO<Void>> handleGeneralExceptions(Exception ex) {
+        log.error("Erro interno não tratado no servidor", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(StandardResponseDTO.error("Ocorreu um erro interno no servidor: " + ex.getMessage()));
     }

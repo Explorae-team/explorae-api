@@ -11,7 +11,7 @@ import br.edu.ifpb.explorae.user.repository.CategoryRepository;
 import br.edu.ifpb.explorae.user.repository.TravelPreferenceRepository;
 import br.edu.ifpb.explorae.attraction.repository.UserInteractionRepository;
 import br.edu.ifpb.explorae.user.repository.UserRepository;
-import br.edu.ifpb.explorae.attraction.service.AttractionService;
+import br.edu.ifpb.explorae.attraction.service.AttractionServiceFacade;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RecommendationIntegrationTest {
 
     @Autowired
-    private AttractionService attractionService;
+    private AttractionServiceFacade attractionService;
 
     @Autowired
     private UserRepository userRepository;
