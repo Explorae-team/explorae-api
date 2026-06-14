@@ -22,11 +22,7 @@ public interface UserMapper {
     UserResponseDTO toResponseDTO(User user);
 
     default String calculateLevelName(Integer xp) {
-        if (xp == null) return "Explorador Bronze";
-        if (xp < 1000) return "Explorador Bronze";
-        if (xp < 2000) return "Explorador Prata";
-        if (xp < 3000) return "Explorador Ouro";
-        return "Explorador Platina";
+        return br.edu.ifpb.explorae.gamification.util.GamificationRules.getLevelName(xp);
     }
 
     default List<BadgeResponseDTO> mapBadges(List<UserBadge> userBadges) {

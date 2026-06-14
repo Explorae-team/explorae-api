@@ -1,30 +1,21 @@
-# Requirements - Sprint 05
+# Requirements - Sprint 06 (Refatoração do Módulo User)
 
 ## Overview
-A Sprint 05 focará no desenvolvimento do fluxo de validação presencial das visitas (Check-In por Proximidade via GPS) para engajamento e gamificação ativa, e no sistema de resgate de vouchers/cupons em parceria com estabelecimentos locais para tangibilizar as recompensas do app Exploraê.
+A Sprint 06 focará na aplicação estrita dos princípios SOLID (SRP, OCP, LSP, ISP e DIP) no módulo `user` do backend (Spring Boot), visando desacoplar a camada de serviços com interfaces e implementações segregadas, estruturar controllers sem lógica de negócio residual e limpar a entidade de domínio JPA de acoplamentos externos.
 
 ## User Stories
 
-### [SDGEU-CHECKIN] Check-In por Proximidade
-**Descrição**: Como um explorador, desejo realizar check-in ao me aproximar fisicamente de uma atração turística para registrar minha visita oficial e receber recompensas (XP, moedas virtuais e medalhas).
+### [SDGEU-REF-USER] Refatoração SOLID do Módulo User
+**Descrição**: Como arquiteto/desenvolvedor de software, desejo refatorar o módulo de Usuário (User) para que o código siga as boas práticas do SOLID, melhorando a manutenibilidade, testabilidade e desacoplamento do sistema.
 
 - **Requisitos Funcionais**:
-  - [ ] Validar no backend as coordenadas do usuário em relação à localização cadastrada da atração (raio padrão de proximidade de 50 metros).
-  - [ ] Interface no mobile com botão de check-in dinâmico ativo apenas quando o usuário estiver dentro do raio da atração.
-  - [ ] Adicionar transações no histórico de gamificação para registrar o ganho de recompensas de check-in.
-  - [ ] Feedbacks de animações visuais premium ao atingir level up após ganhar XP de check-in.
+  - [ ] **Introdução de Interfaces de Serviço (LSP/DIP):** Criar interfaces e implementações concretas (ex: `UserService` e `UserServiceImpl`, `AuthService` e `AuthServiceImpl`, etc.). Garantir que controllers e outros componentes dependam das abstrações (interfaces), facilitando mocks em testes.
+  - [ ] **Segregação de Responsabilidades (SRP/ISP):** Dividir as responsabilidades do `UserService` que atua como God Service. Extrair a lógica de gamificação, perfil agregado e controle de preferências para serviços coesos (ex: `UserProfileService`, `UserPreferenceService`).
+  - [ ] **Limpeza de Controllers (SRP):** Refatorar o `UserController` para atuar puramente como camada de recepção e resposta HTTP, delegando qualquer validação complexa ou regra de negócio para a camada de serviços. Impedir o uso direto de Repositórios e injeções impróprias de outras features.
+  - [ ] **Desacoplamento da Entidade de Domínio (OCP):** Limpar a classe de domínio `User` (JPA Entity), isolando validações de DTOs (Bean Validation) e transferindo lógicas de apresentação/negócio secundárias para componentes adequados.
+  - [ ] **Suite de Testes Integrais:** Ajustar todos os testes unitários e de integração existentes no backend para refletirem as novas estruturas, garantindo que não existam regressões no fluxo de login, cadastro, perfil e gamificação.
 - **Critérios de Aceite**:
-  - [ ] O check-in só é permitido se a distância calculada for menor ou igual ao limite de proximidade configurado.
-  - [ ] O check-in deve ser único por atração a cada 24 horas (ou período configurado) para evitar abusos de ganho de XP.
-
-### [SDGEU-VOUCHER] Sistema de Vouchers & Cupons
-**Descrição**: Como um explorador, desejo trocar minhas moedas de exploração por cupons de desconto de parceiros locais para obter benefícios tangíveis nas minhas viagens.
-
-- **Requisitos Funcionais**:
-  - [ ] Cadastro de parceiros comerciais e vouchers de descontos (Spring Boot, Liquibase).
-  - [ ] Fluxo de resgate de moedas virtuais por vouchers gerados em tempo real.
-  - [ ] Exibição da carteira de vouchers do usuário com status (Disponível, Resgatado, Expirado).
-  - [ ] Geração de QR Code e código alfanumérico exclusivo para cada cupom resgatado, para ser exibido e escaneado no estabelecimento parceiro.
-- **Critérios de Aceite**:
-  - [ ] O usuário não pode resgatar um voucher se não tiver o saldo mínimo de moedas necessário.
-  - [ ] O status do voucher deve mudar para "Resgatado" quando validado e não pode ser reutilizado.
+  - [ ] O backend compila sem erros.
+  - [ ] Todos os serviços do módulo `user` possuem interfaces expostas como seus respectivos contratos.
+  - [ ] As responsabilidades de perfil/autenticação/gamificação estão claramente distribuídas.
+  - [ ] A cobertura de testes automatizados é mantida e todos os 49+ testes JUnit de backend passam com sucesso.

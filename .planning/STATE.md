@@ -1,22 +1,35 @@
-# State - Sprint 05
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-06-13T15:51:14.177Z"
+---
+
+# State - Sprint 06
 
 ## Context
-Iniciando a Sprint 05 do Exploraê. Com o Mapa Interativo e o traçado de rotas dinâmicas totalmente funcionais na Sprint 04, e o backend estruturado em Package-by-Feature, focamos agora na mecânica de engajamento presencial. O check-in presencial validado por GPS e a troca de moedas virtuais por vouchers de descontos em estabelecimentos locais trarão a essência da gamificação e parcerias para a plataforma.
+
+Iniciando a Sprint 06 do Exploraê, focada inteiramente na refatoração e conformidade com os princípios SOLID no módulo `user` do backend. Atualmente, o módulo possui alta responsabilidade acumulada na classe `UserService` (God Service sem interface contratual) e no controller, com injeções diretas e validações misturadas. Essa sprint organizará a arquitetura do módulo para torná-lo flexível e limpo para as próximas extensões.
 
 ## Current Phase
-- **Active**: Phase 1 - [SDGEU-250] Criar serviço de verificação física de proximidade no backend
-- **Status**: ⌛ Ready to discuss.
+
+- **Active**: Phase 4 - [SDGEU-REF-USER-4] Limpar a classe de entidade `User` (JPA Entity), isolando validações e mapeamentos.
+- **Status**: ⌛ Ready to plan.
 
 ## Recent Progress
-- [X] Conclusão da Sprint 04 com entrega do mapa interativo, pinos e callouts personalizados, busca de locais com debounce, roteamento inteligente (OSRM) e Nearest Neighbor.
-- [X] Refatoração da arquitetura geral do backend para o formato de Package-by-Feature (removendo pacotes vazios globais de service e repository).
-- [X] Execução de testes unitários e de integração, com todos os 49 testes de backend passando sem regressões.
+
+- [X] Phase 1 concluída: Criação de interfaces de contrato `UserService` e `AuthService` (LSP/DIP).
+- [X] Phase 2 concluída: Segregação da lógica agregada de perfil e gamificação para `UserProfileService` (SRP).
+- [X] Phase 3 concluída: Desacoplamento do `UserController` com injeções separadas para preferências e gamificação (SRP).
 
 ## Session Continuity
+
 - **Last session**: 2026-06-13
-- **Stopped at**: Sprint 04 milestone closed, audited and archived.
+- **Stopped at**: Sprint 05 closed and Sprint 06 (refactor_backend) initialized.
 - **Resume file**: .planning/ROADMAP.md
 
 ## Notes
-- Definir raio de tolerância adequado para o geofencing do check-in (ex: 50 a 100m).
-- Estruturar o banco de dados para parceiros e vouchers com as respectivas chaves estrangeiras e índices para busca rápida.
+
+- Garantir que a criação das interfaces de serviço não quebre as dependências do Spring Security (como o `UserDetailsService` do `UserService`).
+- Preservar a consistência das transações (`@Transactional`) nas novas implementações.

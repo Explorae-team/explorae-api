@@ -1,7 +1,6 @@
 package br.edu.ifpb.explorae.config;
 
 import br.edu.ifpb.explorae.user.service.TokenService;
-import br.edu.ifpb.explorae.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.context.annotation.Lazy;
@@ -24,11 +24,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(TokenService tokenService, @Lazy UserService userService) {
+    public JwtAuthenticationFilter(TokenService tokenService, @Lazy UserDetailsService userDetailsService) {
         this.tokenService = tokenService;
-        this.userService = userService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Se o usuário ainda não estiver autenticado
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Busca os detalhes do usuário no banco.
-                UserDetails userDetails = this.userService.loadUserByUsername(userEmail);
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
                 // Valida se o token é original e não expirou.
                 if (tokenService.isTokenValid(jwt)) {
@@ -78,3 +78,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

@@ -1,12 +1,9 @@
 package br.edu.ifpb.explorae.gamification.service;
-import br.edu.ifpb.explorae.gamification.dto.XpHistoryResponseDTO;
 
 import br.edu.ifpb.explorae.gamification.dto.XpHistoryResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import br.edu.ifpb.explorae.gamification.dto.XpHistoryResponseDTO;
 
 import java.util.List;
 import java.util.UUID;
