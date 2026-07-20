@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import br.edu.ifpb.explorae.gamification.dto.BadgeResponseDTO;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users/me/preferences")
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class TravelPreferenceController {
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<java.util.List<String>>> getMyPreferences(
-            @AuthenticationPrincipal User principal) {
+            @AuthenticationPrincipal(expression = "user") User principal) {
 
         java.util.List<String> interests = travelPreferenceService.getPreferences(principal.getId());
 
@@ -28,13 +31,13 @@ public class TravelPreferenceController {
     }
 
     @PutMapping
-    public ResponseEntity<StandardResponseDTO<Void>> updateMyPreferences(
+    public ResponseEntity<StandardResponseDTO<List<BadgeResponseDTO>>> updateMyPreferences(
             @Valid @RequestBody TravelPreferenceRequestDTO dto,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal(expression = "user") User currentUser) {
 
-        travelPreferenceService.updatePreferences(currentUser.getId(), dto);
+        List<BadgeResponseDTO> unlockedBadges = travelPreferenceService.updatePreferences(currentUser.getId(), dto);
 
         return ResponseEntity.ok(
-                StandardResponseDTO.success("Preferências atualizadas com sucesso", null));
+                StandardResponseDTO.success("Preferências atualizadas com sucesso", unlockedBadges));
     }
 }

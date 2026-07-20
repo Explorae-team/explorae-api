@@ -12,6 +12,7 @@ const preferenceService = {
       return { 
         success: true, 
         data: response.data.data,
+        unlockedBadges: response.data.data,
         message: response.data.message 
       };
     } catch (error) {

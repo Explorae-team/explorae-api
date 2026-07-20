@@ -1,5 +1,5 @@
 module.exports = {
   plugins: {
-    "nativewind/postcss": {},
+    "tailwindcss": {},
   },
 };

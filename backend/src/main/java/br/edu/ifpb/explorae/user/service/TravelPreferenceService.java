@@ -7,6 +7,9 @@ import br.edu.ifpb.explorae.gamification.event.PreferenceCompletedEvent;
 import br.edu.ifpb.explorae.user.repository.CategoryRepository;
 import br.edu.ifpb.explorae.user.repository.TravelPreferenceRepository;
 import br.edu.ifpb.explorae.user.repository.UserRepository;
+import br.edu.ifpb.explorae.gamification.dto.BadgeResponseDTO;
+import br.edu.ifpb.explorae.gamification.mapper.BadgeMapper;
+import br.edu.ifpb.explorae.gamification.service.BadgeUnlockTracker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ public class TravelPreferenceService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final BadgeUnlockTracker badgeUnlockTracker;
+    private final BadgeMapper badgeMapper;
 
     @Transactional(readOnly = true)
     public List<String> getPreferences(UUID userId) {
@@ -41,11 +46,15 @@ public class TravelPreferenceService {
     }
 
     @Transactional
-    public void updatePreferences(UUID userId, TravelPreferenceRequestDTO dto) {
+    public List<BadgeResponseDTO> updatePreferences(UUID userId, TravelPreferenceRequestDTO dto) {
+        badgeUnlockTracker.clear();
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        boolean isFirstTime = travelPreferenceRepository.findByUser(user).isEmpty();
+        boolean isFirstTime = travelPreferenceRepository.findByUser(user)
+                .map(p -> p.getInterests() == null || p.getInterests().isEmpty())
+                .orElse(true);
 
         TravelPreference preference = travelPreferenceRepository.findByUser(user)
                 .orElse(new TravelPreference());
@@ -53,6 +62,7 @@ public class TravelPreferenceService {
         if (preference.getUser() == null) {
             preference.setUser(user);
         }
+        user.setTravelPreference(preference);
 
         if (dto.interests() != null) {
             java.util.List<Category> categories = categoryRepository
@@ -64,8 +74,10 @@ public class TravelPreferenceService {
 
         travelPreferenceRepository.save(preference);
 
-        if (isFirstTime) {
+        if (dto.interests() != null && !dto.interests().isEmpty()) {
             eventPublisher.publishEvent(new PreferenceCompletedEvent(userId));
         }
+
+        return badgeMapper.toBadgeDTOList(badgeUnlockTracker.getAndClear());
     }
 }

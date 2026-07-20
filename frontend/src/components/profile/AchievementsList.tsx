@@ -22,20 +22,6 @@ export default function AchievementsList() {
 
   const badges = user?.badges || [];
 
-  if (badges.length === 0) {
-    return (
-      <View className="mt-8">
-        <Text className="text-xl font-bold tracking-tight text-on-surface mb-4">Minhas Medalhas</Text>
-        <View className="bg-surface-container p-6 rounded-2xl items-center border border-on-background/5">
-          <MaterialIcons name="emoji-events" size={48} color="#fd6c2820" />
-          <Text className="text-on-surface-variant text-center mt-2 font-sans">
-            Você ainda não conquistou medalhas. Comece a explorar para ganhar!
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <View className="mt-8">
       <View className="flex-row justify-between items-center mb-6">
@@ -44,6 +30,22 @@ export default function AchievementsList() {
           <Text className="text-tertiary text-xs font-bold uppercase tracking-widest">Ver Tudo</Text>
         </TouchableOpacity>
       </View>
+
+      {badges.length === 0 ? (
+        <TouchableOpacity 
+          onPress={() => router.push('/dashboard/badges')}
+          activeOpacity={0.8}
+          className="bg-surface-container p-6 rounded-2xl items-center border border-on-background/5"
+        >
+          <MaterialIcons name="emoji-events" size={48} color="#fd6c2820" />
+          <Text className="text-on-surface-variant text-center mt-2 font-sans">
+            Você ainda não conquistou medalhas. Comece a explorar para ganhar!
+          </Text>
+          <Text className="text-tertiary text-xs font-bold uppercase tracking-widest mt-3">
+            Ver galeria de conquistas
+          </Text>
+        </TouchableOpacity>
+      ) : (
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={Platform.OS === 'web'} 
@@ -84,6 +86,7 @@ export default function AchievementsList() {
           </TouchableOpacity>
         ))}
       </ScrollView>
+      )}
 
       <BadgeDetailModal
         visible={!!selectedBadge}

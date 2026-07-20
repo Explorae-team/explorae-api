@@ -3,7 +3,7 @@ import '../styles/global.css';
 
 import { Platform, ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useGlobalSearchParams } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { MaterialCommunityIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
@@ -19,6 +19,8 @@ function InitialLayout() {
     ...MaterialIcons.font,
   });
   const segments = useSegments();
+  const searchParams = useGlobalSearchParams();
+  const isEditMode = searchParams.mode === 'edit';
   const [isMounted, setIsMounted] = React.useState(false);
   const router = useRouter();
 
@@ -51,12 +53,12 @@ function InitialLayout() {
         // Se tentar acessar auth ou a raiz ou a tela de preferências (fora de modo edit), manda para dashboard
         const isPreferencesInExplore = currentGroup === '(explore)' && segments[1] === 'preferences';
         
-        if (currentGroup === '(auth)' || currentGroup === undefined || (isPreferencesInExplore && !segments.includes('edit'))) {
+        if (currentGroup === '(auth)' || currentGroup === undefined || (isPreferencesInExplore && !isEditMode)) {
           router.replace('/(explore)/dashboard');
         }
       }
     }
-  }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isMounted]);
+  }, [isAuthenticated, user?.hasPreferences, isLoading, segments, isEditMode, isMounted]);
 
   if (isLoading) {
     return (

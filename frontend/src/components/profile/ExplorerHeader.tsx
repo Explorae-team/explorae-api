@@ -22,7 +22,13 @@ export default function ExplorerHeader() {
         elevation: 10,
       }}
     >
-      <TouchableOpacity onPress={() => router.back()} className="p-2 rounded-full bg-surface-bright/10">
+      <TouchableOpacity 
+        onPress={() => {
+          if (router.canGoBack()) router.back();
+          else router.replace('/dashboard');
+        }} 
+        className="p-2 rounded-full bg-surface-bright/10"
+      >
         <MaterialIcons name="arrow-back" size={24} color={colors.primary} />
       </TouchableOpacity>
       <Text className="font-sans font-black text-lg text-on-primary-container tracking-tight">Explorer Profile</Text>

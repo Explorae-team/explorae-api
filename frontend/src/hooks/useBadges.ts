@@ -36,9 +36,6 @@ export function useBadges() {
   const fetchData = useCallback(async (silent = false) => {
     try {
       if (!silent) setIsLoading(true);
-      
-      // Atualiza o estado do perfil/preferências do usuário atualizado
-      await updateUserPreferences();
 
       const [badgesRes, challengesRes] = await Promise.all([
         api.get('/api/v1/badges'),

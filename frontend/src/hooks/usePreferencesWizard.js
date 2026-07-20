@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ONBOARDING_STEPS } from '../constants/onboarding';
-import preferenceService from '../services/preferenceService';
+import { useCelebration } from '../contexts/BadgeCelebrationContext';
 
 export function usePreferencesWizard(user, logout, updateUserPreferences, isEditMode) {
   const router = useRouter();
+  const { triggerCelebration } = useCelebration();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,11 +65,19 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     }
   };
 
+  const safeGoBack = (fallback = '/dashboard') => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(fallback);
+    }
+  };
+
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else if (isEditMode) {
-      router.back();
+      safeGoBack('/settings');
     } else {
       logout();
     }
@@ -94,8 +103,11 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
 
     if (result.success) {
       await updateUserPreferences();
+      if (result.unlockedBadges && result.unlockedBadges.length > 0) {
+        triggerCelebration(result.unlockedBadges);
+      }
       if (isEditMode) {
-        router.back();
+        safeGoBack('/settings');
       } else {
         router.replace('/dashboard');
       }

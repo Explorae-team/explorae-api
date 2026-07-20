@@ -20,7 +20,7 @@ public class UserGamificationController {
 
     @GetMapping
     public ResponseEntity<StandardResponseDTO<java.util.List<XpHistoryResponseDTO>>> getXpHistory(
-            @AuthenticationPrincipal User principal) {
+            @AuthenticationPrincipal(expression = "user") User principal) {
         
         return ResponseEntity.ok(StandardResponseDTO.success(
             "Histórico de XP recuperado com sucesso", 

@@ -70,6 +70,10 @@ public class AttractionSearchService {
                 })
                 .collect(Collectors.toList());
 
+        if (pageable.isUnpaged()) {
+            return new PageImpl<>(filtered, pageable, filtered.size());
+        }
+
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), filtered.size());
 
