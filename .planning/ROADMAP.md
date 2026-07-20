@@ -23,3 +23,11 @@
 
 ## Wave 4: Ajuste de Testes e Estabilidade
 - [x] **Phase 5**: [SDGEU-REF-USER-5] Ajustar suite de testes automatizados e validar ausência de regressões no backend.
+
+## Wave 5: Callouts e Ações do Mapa
+- [ ] **Phase 6**: [SDGEU-158-4] Desenvolver Callout customizado de atração ao clicar no Marcador
+- [ ] **Phase 7**: [SDGEU-158-5] Integrar filtros dinâmicos de categoria e distância no mapa
+- [ ] **Phase 8**: [SDGEU-158-6] Testes Unitários de Renderização e Simulação de Localização no Mapa
+
+## Wave 6: Apresentação Institucional
+- [ ] **Phase 9**: Pitch Video Remotion (Marketing Startup Premium)
