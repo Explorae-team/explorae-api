@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ONBOARDING_STEPS } from '../constants/onboarding';
-import preferenceService from '../services/preferenceService';
+import { getCategories, getPreferences, updatePreferences } from '../services/preferenceService';
 
 export function usePreferencesWizard(user, logout, updateUserPreferences, isEditMode) {
   const router = useRouter();
@@ -15,7 +15,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
 
   useEffect(() => {
     const fetchCats = async () => {
-      const result = await preferenceService.getCategories();
+      const result = await getCategories();
       if (result.success) {
         setCategories(result.data);
       }
@@ -26,7 +26,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   useEffect(() => {
     if (isEditMode) {
       const fetchPrefs = async () => {
-        const result = await preferenceService.getPreferences();
+        const result = await getPreferences();
         if (result.success) {
           setSelectedIds(result.data);
         }
@@ -92,7 +92,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     }
 
     setIsSubmitting(true);
-    const result = await preferenceService.updatePreferences(selectedIds);
+    const result = await updatePreferences(selectedIds);
     setIsSubmitting(false);
 
     if (result.success) {

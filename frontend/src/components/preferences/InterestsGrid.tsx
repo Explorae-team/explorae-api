@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import InterestCard from './InterestCard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import preferenceService from '../../services/preferenceService';
+import { getCategories } from '../../services/preferenceService';
 
 interface Category {
   id: string;
@@ -26,7 +26,7 @@ export default function InterestsGrid({ selectedIds, onToggle, pillarFilter }: I
   const fetchCategories = async () => {
     setLoading(true);
     setError(null);
-    const result = await preferenceService.getCategories();
+    const result = await getCategories();
     if (result.success) {
       setCategories(result.data);
     } else {

@@ -4,7 +4,6 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import InterestsGrid from '../components/preferences/InterestsGrid';
-import preferenceService from '../services/preferenceService';
 import WizardProgressBar from '../components/wizard/WizardProgressBar';
 import WizardHeader from '../components/wizard/WizardHeader';
 import WizardFooter from '../components/wizard/WizardFooter';
