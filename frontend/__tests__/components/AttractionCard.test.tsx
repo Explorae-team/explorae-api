@@ -2,13 +2,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { AttractionCard } from '../../src/components/dashboard/AttractionCard';
 
-// Mock expo-image
-jest.mock('expo-image', () => {
-  const { View } = require('react-native');
-  return {
-    Image: View,
-  };
-});
+// No expo-image mock needed
+
 
 describe('AttractionCard', () => {
   const defaultProps = {

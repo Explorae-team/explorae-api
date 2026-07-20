@@ -32,22 +32,37 @@ O **Exploraê** é um guia turístico inteligente e gamificado que oferece rotei
 
 ## 🚀 Como Rodar o Projeto
 
-### 🐳 Setup Rápido com Docker (Banco de Dados)
-A aplicação conta com um arquivo `docker-compose.yml` para instanciar o banco PostgreSQL de desenvolvimento localmente:
+### 🔌 Banco de Dados (PostgreSQL)
 
-```bash
-docker compose up -d
-```
+O arquivo `docker-compose.yml` na raiz é configurado para deploy via Coolify. Para desenvolvimento local, você tem duas opções:
 
-### ☕ Rodando o Backend
+#### Opção A: Sem Docker (Usando banco em memória H2)
+A forma mais rápida de rodar o backend. Utiliza o banco de dados H2 em memória, criando e populando as tabelas automaticamente via Liquibase:
 1. Navegue até a pasta do backend:
    ```bash
    cd backend
    ```
-2. Crie ou configure as variáveis de ambiente no arquivo `.env` (use `.env.example` como guia).
-3. Inicie o servidor Spring Boot:
+2. Inicie o Spring Boot com o profile `local`:
    ```bash
-   ./mvnw spring-boot:run
+   # No Windows (PowerShell):
+   .\mvnw spring-boot:run -Dspring-boot.run.profiles=local
+   
+   # No Linux/WSL:
+   ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+   ```
+
+#### Opção B: Usando Docker CLI (PostgreSQL real)
+Se você prefere testar com o banco PostgreSQL completo via Docker:
+1. Suba o container oficial do Postgres:
+   ```bash
+   docker run --name explorae-postgres -p 5432:5432 -e POSTGRES_DB=explorae_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:15
+   ```
+   *(Nota: Se o Docker CLI do seu WSL estiver configurado para escutar via TCP, lembre-se de configurar a variável `export DOCKER_HOST=tcp://127.0.0.1:2375` antes).*
+2. Com o banco ativo, configure o arquivo `backend/.env` com as credenciais.
+3. Inicie o servidor normalmente:
+   ```bash
+   cd backend
+   .\mvnw spring-boot:run
    ```
 
 ### 📱 Rodando o Frontend (Expo)

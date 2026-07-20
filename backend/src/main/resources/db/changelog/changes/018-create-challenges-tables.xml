@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="018-create-challenges-tables" author="explorae-team">
+        <!-- Tabela de Desafios -->
+        <createTable tableName="challenges">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="xp_reward" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coins_reward" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Tabela de Progresso dos Desafios -->
+        <createTable tableName="user_challenge_progress">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_challenge_progress_user" referencedTableName="users" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="challenge_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_challenge_progress_challenge" referencedTableName="challenges" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="current_value" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Constraint de unicidade composta para impedir duplicados -->
+        <addUniqueConstraint tableName="user_challenge_progress" columnNames="user_id, challenge_id" constraintName="uq_user_challenge"/>
+    </changeSet>
+
+    <changeSet id="018-seed-new-badges" author="explorae-team">
+        <!-- Maratonista Badge -->
+        <insert tableName="badges">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1a1"/>
+            <column name="name" value="MARATONISTA"/>
+            <column name="description" value="Concluiu 5 desafios diários."/>
+            <column name="category" value="JORNADA"/>
+            <column name="icon_url" value="/uploads/badges/maratonista.png"/>
+        </insert>
+
+        <!-- Desbravador Verde Badge -->
+        <insert tableName="badges">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1a2"/>
+            <column name="name" value="DESBRAVADOR_VERDE"/>
+            <column name="description" value="Avaliou 3 atrações na categoria Natureza."/>
+            <column name="category" value="EXPLORACAO"/>
+            <column name="icon_url" value="/uploads/badges/desbravador_verde.png"/>
+        </insert>
+        
+        <!-- Explorador Veterano Badge -->
+        <insert tableName="badges">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1a3"/>
+            <column name="name" value="EXPLORADOR_VETERANO"/>
+            <column name="description" value="Atingiu o nível 5 de explorador."/>
+            <column name="category" value="JORNADA"/>
+            <column name="icon_url" value="/uploads/badges/explorador_veterano.png"/>
+        </insert>
+
+        <!-- Lenda Urbana Badge -->
+        <insert tableName="badges">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1a4"/>
+            <column name="name" value="LENDA_URBANA"/>
+            <column name="description" value="Atingiu o nível 10 de explorador."/>
+            <column name="category" value="JORNADA"/>
+            <column name="icon_url" value="/uploads/badges/lenda_urbana.png"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="018-update-desbravador-verde-description" author="explorae-team">
+        <update tableName="badges">
+            <column name="description" value="Avaliou 3 atrações na categoria Aventura."/>
+            <where>name = 'DESBRAVADOR_VERDE'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

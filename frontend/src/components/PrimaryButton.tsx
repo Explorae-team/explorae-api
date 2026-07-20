@@ -20,7 +20,7 @@ export default function PrimaryButton({
     <TouchableOpacity
       disabled={loading || props.disabled}
       activeOpacity={0.8}
-      className={`bg-[#F2641F] py-5 rounded-2xl shadow-xl items-center ${className} ${loading || props.disabled ? 'opacity-70' : ''}`}
+      className={`bg-accent py-5 rounded-2xl shadow-xl items-center ${className} ${loading || props.disabled ? 'opacity-70' : ''}`}
       {...props}
     >
       <View className="flex-row items-center justify-center gap-3">

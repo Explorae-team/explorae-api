@@ -11,6 +11,7 @@ export const updatePreferences = async (interests) => {
     return { 
       success: true, 
       data: response.data.data,
+      unlockedBadges: response.data.data,
       message: response.data.message 
     };
   } catch (error) {

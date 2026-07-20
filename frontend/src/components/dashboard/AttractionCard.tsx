@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, Image, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 interface AttractionCardProps {
@@ -19,7 +20,6 @@ interface AttractionCardProps {
   onFavoritePress?: () => void;
 }
 
-// Tokens de Cor do Design System Exploraê
 const colors = {
   surfaceContainerHigh: '#002e3c',
   surfaceBright: '#0d3e4e',
@@ -47,16 +47,47 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
   onPress,
   onFavoritePress,
 }) => {
-  // --- VARIANT: COMPACT (Used in horizontal carousels) ---
+  const defaultFallback = 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500';
+  const [imgUri, setImgUri] = useState(imageUrl || defaultFallback);
+
+  useEffect(() => {
+    if (imageUrl) {
+      setImgUri(imageUrl);
+    } else {
+      setImgUri(defaultFallback);
+    }
+  }, [imageUrl]);
+  // Variante compacta para carrosséis horizontais
   if (variant === 'compact') {
     return (
       <Pressable 
         onPress={onPress}
-        style={{ backgroundColor: colors.surfaceContainerHigh }}
+        style={{ 
+          backgroundColor: colors.surfaceContainerHigh,
+          ...Platform.select({
+            ios: {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+            },
+            android: {
+              elevation: 2,
+            },
+            web: {
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            }
+          } as any)
+        }}
         className="rounded-xl overflow-hidden border border-white/5 w-40"
       >
         <View className="h-28 w-full">
-          <Image source={{ uri: imageUrl }} resizeMode="cover" className="w-full h-full" />
+          <Image 
+            source={{ uri: imgUri }} 
+            resizeMode="cover" 
+            className="w-full h-full" 
+            onError={() => setImgUri(defaultFallback)}
+          />
           <View className="absolute top-2 right-2 bg-black/40 rounded-full p-1">
             <MaterialIcons name="star" size={10} color={colors.tertiary} />
           </View>
@@ -69,22 +100,37 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
     );
   }
 
-  // --- VARIANT: DEFAULT (Full premium layout for vertical feed) ---
+  // Variante padrão para o feed vertical principal
   return (
     <Pressable 
       onPress={onPress}
-      style={{ backgroundColor: colors.surfaceContainerHigh }}
-      className="rounded-2xl overflow-hidden shadow-2xl border border-transparent"
+      style={{ 
+        backgroundColor: colors.surfaceContainerHigh,
+        ...Platform.select({
+          ios: {
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+          },
+          android: {
+            elevation: 4,
+          },
+          web: {
+            boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
+          }
+        } as any)
+      }}
+      className="rounded-2xl overflow-hidden border border-white/5"
     >
-      {/* SECTION 1: HERO IMAGE */}
       <View className="h-40 w-full relative">
         <Image 
-          source={{ uri: imageUrl || 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=500' }} 
+          source={{ uri: imgUri }} 
           resizeMode="cover" 
           className="w-full h-full" 
+          onError={() => setImgUri(defaultFallback)}
         />
         
-        {/* Category Badge (Top-Left) */}
         <View 
           style={{ backgroundColor: colors.surfaceBright + 'CC' }} // 80% opacity
           className="absolute top-3 left-3 px-3 py-1 rounded-full flex-row items-center space-x-1.5 shadow-sm"
@@ -98,7 +144,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </Text>
         </View>
 
-        {/* Favorite Button (Top-Right) */}
         <Pressable 
           onPress={onFavoritePress}
           testID="favorite-button"
@@ -112,7 +157,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           />
         </Pressable>
 
-        {/* Status Badges (Top-Left - Below Category) */}
         <View className="absolute top-12 left-3 flex-col space-y-1.5">
           {isPopular && (
             <View 
@@ -142,9 +186,7 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
         </View>
       </View>
 
-      {/* SECTION 2: CONTENT AREA (padding: 16px, gap: 8px) */}
       <View className="p-4 flex-col">
-        {/* Metadata Row (Rating & Distance) */}
         <View className="flex-row items-center space-x-4 mb-2">
           <View className="flex-row items-center space-x-1">
             <MaterialIcons name="star" size={14} color={colors.tertiary} />
@@ -161,7 +203,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </View>
         </View>
 
-        {/* Title + Tagline */}
         <View className="mb-2">
           <Text 
             numberOfLines={2} 
@@ -179,7 +220,6 @@ export const AttractionCard: React.FC<AttractionCardProps> = ({
           </Text>
         </View>
 
-        {/* Tags Row */}
         <View className="flex-row flex-wrap gap-2 mt-1">
           {tags.slice(0, 3).map((tag, index) => (
             <View 

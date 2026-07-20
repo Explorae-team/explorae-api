@@ -7,6 +7,7 @@ interface LogoProps {
   variant?: 'main';
   width?: number;
   height?: number;
+  textColor?: string;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -20,10 +21,11 @@ export { CompassIcon };
 export const Logo: React.FC<LogoProps> = ({ 
   width = 120, 
   height = 120,
+  textColor,
   style 
 }) => {
   const size = Math.min(width, height);
-  return <LogoWithText size={size} style={style} />;
+  return <LogoWithText size={size} textColor={textColor} style={style} />;
 };
 
 export default Logo;

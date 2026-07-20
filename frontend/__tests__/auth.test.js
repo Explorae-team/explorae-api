@@ -109,6 +109,12 @@ describe('AuthContext Integration (SDGEU-21)', () => {
       if (key === 'user_data') return Promise.resolve(JSON.stringify(mockUser));
       return Promise.resolve(null);
     });
+    
+    api.get.mockResolvedValue({
+      data: {
+        data: mockUser
+      }
+    });
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -121,6 +127,8 @@ describe('AuthContext Integration (SDGEU-21)', () => {
   });
 
   it('deve limpar storage no logout', async () => {
+    SecureStore.getItemAsync.mockResolvedValue(null);
+    
     const { result } = renderHook(() => useAuth(), { wrapper });
 
     await act(async () => {

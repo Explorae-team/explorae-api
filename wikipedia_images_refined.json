@@ -1,0 +1,422 @@
+{
+    "Farol do Cabo Branco": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Joao_Pessoa_Paraiba_Farol_do_Cabo_Branco2.jpg",
+        "method": "search_fallback"
+    },
+    "Praia de Tambaú": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Centro_Hist%C3%B3rico_de_Jo%C3%A3o_Pessoa.jpg",
+        "method": "search_fallback"
+    },
+    "Centro Cultural São Francisco": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/e/e4/JoaoPessoa_ConventoSaoFrancisco.JPG",
+        "method": "search_fallback"
+    },
+    "Parque Solon de Lucena": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Lagoa_Jampa.jpg",
+        "method": "exact_title"
+    },
+    "Mercado de Artesanato Paraibano": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Jacaré": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Piscinas Naturais do Seixas": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Estação Cabo Branco": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Coqueirinho": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Tambaba": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Ilha de Areia Vermelha": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Hotel Globo": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Bica (Parque Arruda Câmara)": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Bessa": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Feirinha de Tambaú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Cabo Branco": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Casa da Pólvora": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Tabatinga": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia Bela": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mosteiro de São Bento": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Centro Histórico (Praça Antenor Navarro)": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Amor": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Carapibus": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Ponta de Campina": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Intermares": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Jardim Botânico Benjamin Maranhão": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Planetário do Espaço Cultural": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Restaurante Mangai": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Bar do Cuscuz": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Skybar Tour Geneve": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mercado Público de Mangabeira": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Largo de São Frei Pedro Gonçalves": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Catedral Metropolitana de Nossa Senhora das Neves": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Barra de Gramame": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Ladeira da Borborema": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja de Nossa Senhora do Carmo": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja da Misericórdia": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Manaíra": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Seixas": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia da Penha": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Jacarapé": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Sol": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Camboinha": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia do Poço": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Areia Dourada": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia Formosa": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Miramar": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Jacumã": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Barra de Graú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Pitimbu": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Lucena": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Ponta de Lucena": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praia de Camaçari": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Picaozinho.jpg",
+        "method": "search_fallback"
+    },
+    "Igreja de Nossa Senhora da Guia": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/9/97/Capela_de_Nossa_Senhora_da_Guia_%281RC_7922%29.jpg",
+        "method": "exact_title"
+    },
+    "Forte de Santa Catarina": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/8/85/Interior_do_Forte_Cabedelo_-_Jo%C3%A3o_Pessoa.jpg",
+        "method": "exact_title"
+    },
+    "Santuário de Nossa Senhora da Penha": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praça João Pessoa": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praça Pedro Américo": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praça Venâncio Neiva": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praça da Independência": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/7/75/Pra%C3%A7a_da_Independ%C3%AAncia%2C_Jo%C3%A3o_Pessoa_%28PB%29.jpg",
+        "method": "exact_title"
+    },
+    "Teatro Santa Roza": {
+        "image": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Teatro_Santa_Roza.jpg",
+        "method": "search_fallback"
+    },
+    "Casarão dos Azulejos": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Academia Paraibana de Letras": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Palácio da Redenção": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Casa do Artista Popular": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Museum of Sacred Art of Paraíba": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja de Santa Terezinha": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mirante do Dedo de Deus": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Canyon de Coqueirinho": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Bosque dos Sonhos": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque das Três Ruas": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Ecológico Sanhauá": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Parahyba I": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Parahyba II": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Parahyba III": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Lovina Beach Club": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Restaurante Canoa dos Camarões": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Gulliver Mar": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Restaurante NAU Frutos do Mar": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Orama Rooftop": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Quintal do Cuscuz": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Boteco Cabo Branco": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Praiano Bar": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Lovina Ponta de Campina": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Shopping Manaíra": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Shopping Mangabeira": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Centro de Turismo de Tambaú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mercado Público da Torre": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mercado Público de Tambaú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Galeria de Artesanato da orla": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Sereia de Carapibus": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Ponta do Seixas": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mirante de Tambaba": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Paróquia Santo Antônio de Pádua": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja Nossa Senhora do Rosário": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja de São Bento": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Igreja de São Francisco": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Ecológico Bosque dos Sonhos": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Canyon do Coqueirinho": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Castelo da Princesa": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mirante Sky Beach": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Parque Três Ruas": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Centro Turístico de Tambaú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Mercado de Artesanato de Tambaú": {
+        "image": null,
+        "method": "not_found"
+    },
+    "Estação das Artes": {
+        "image": null,
+        "method": "not_found"
+    }
+}

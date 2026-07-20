@@ -1,5 +1,6 @@
 package br.edu.ifpb.explorae.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import br.edu.ifpb.explorae.api.security.RateLimitFilter;
 
 import java.util.List;
 
@@ -28,12 +28,13 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final br.edu.ifpb.explorae.api.security.RateLimitFilter rateLimitFilter;
+    @Value("${cors.allowed.origins:*}")
+    private String allowedOrigins;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, RateLimitFilter rateLimitFilter) {
+    private final JwtAuthenticationFilter jwtAuthFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -63,9 +64,6 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         // Qualquer outra porta: Só entra quem estiver autenticado.
                         .anyRequest().authenticated())
-                // O filtro de Rate Limit vem primeiro para evitar processamento inútil de
-                // ataques.
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 // O filtro JWT valida o Token.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -89,10 +87,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Em produção, use o link do frontend no lugar do "*"
-        configuration.setAllowedOrigins(List.of("*")); 
+        if ("*".equals(allowedOrigins)) {
+            // Se for "*", usamos allowedOriginPatterns para suportar credenciais e cabeçalhos de forma flexível
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            // Caso contrário, dividimos as origens configuradas por vírgula
+            configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        }
+        
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // Permitir envio de headers de autenticação (Authorization)
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); 

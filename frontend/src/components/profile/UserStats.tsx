@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
-import api from '../../services/api';
-import storage from '../../utils/storage';
+import { userService } from '../../services/userService';
+import { ProgressBar, calculateLevelProgress } from '../common/ProgressBar';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function UserStats() {
-  const { user, updateProfile } = useAuth() as any;
+  const { user, updateProfile, updateUserPreferences } = useAuth() as any;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [tempName, setTempName] = useState(user?.name || '');
-  const [tempBio, setTempBio] = useState(user?.bio || '');
-
+  const [tempName, setTempName] = useState(user?.name || 'Explorador Anônimo');
+  const [tempBio, setTempBio] = useState(user?.bio || 'Sempre pronto para a próxima aventura!');
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
+ 
   const userName = user?.name || 'Explorador Anônimo';
   const bio = user?.bio || 'Sempre pronto para a próxima aventura!';
   const level = user?.level || 1;
   const xp = user?.xp || 0;
   const levelName = user?.levelName || `Explorador Nível ${level}`;
-
+ 
   const handleToggleEdit = () => {
     if (!isEditing) {
-      setTempName(user?.name || '');
-      setTempBio(user?.bio || '');
+      setTempName(user?.name || 'Explorador Anônimo');
+      setTempBio(user?.bio || 'Sempre pronto para a próxima aventura!');
     }
     setIsEditing(!isEditing);
   };
@@ -53,77 +55,74 @@ export default function UserStats() {
   };
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão negada', 'Precisamos de permissão para acessar suas fotos.');
-      return;
-    }
+    console.log('[pickImage] Function triggered');
+    try {
+      console.log('[pickImage] Checking permissions...');
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log('[pickImage] Permission status:', status);
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Precisamos de permissão para acessar suas fotos.');
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
+      console.log('[pickImage] Launching image library...');
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+      console.log('[pickImage] ImagePicker result:', JSON.stringify(result));
 
-    if (!result.canceled) {
-      uploadImage(result.assets[0].uri);
+      if (!result.canceled) {
+        console.log('[pickImage] Uploading image with URI:', result.assets[0].uri);
+        uploadImage(result.assets[0].uri);
+      } else {
+        console.log('[pickImage] Selection canceled by user');
+      }
+    } catch (error: any) {
+      console.error('[pickImage] Error opening gallery:', error);
+      Alert.alert('Erro', `Não foi possível abrir a galeria: ${error.message || error}`);
     }
   };
 
   const uploadImage = async (uri: string) => {
+    console.log('[uploadImage] Uploading image...', uri);
     setIsSaving(true);
     try {
-      const formData = new FormData();
-      const filename = uri.split('/').pop() || 'avatar.jpg';
-      const type = 'image/jpeg';
+      const result = await userService.uploadAvatar(uri);
+      console.log('[uploadImage] Upload result:', JSON.stringify(result));
 
-      if (Platform.OS === 'web') {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        formData.append('file', blob, filename);
-      } else {
-        // @ts-ignore
-        formData.append('file', { uri, name: filename, type });
-      }
+      if (!result.success) throw new Error(result.message || 'Falha no upload');
 
-      const token = await storage.getItem('auth_token');
-      const response = await fetch(`${api.defaults.baseURL}/api/v1/users/me/avatar`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Falha no upload');
+      await updateUserPreferences();
+      setAvatarVersion(Date.now());
 
       Alert.alert('Sucesso', 'Foto atualizada!');
     } catch (error: any) {
-      Alert.alert('Erro', 'Não foi possível salvar a foto.');
+      console.error('[uploadImage] Error during upload:', error);
+      Alert.alert('Erro', error.message || 'Não foi possível salvar a foto.');
     } finally {
       setIsSaving(false);
     }
   };
 
   const getTierColor = (xp: number) => {
-    if (xp < 1000) return '#CD7F32'; // Bronze/Cobre
-    if (xp < 2000) return '#C0C0C0'; // Prata
-    if (xp < 3000) return '#FFD700'; // Ouro
-    return '#40E0D0'; // Platina/Turquesa
+    if (xp < 1000) return '#CD7F32';
+    if (xp < 2000) return '#C0C0C0';
+    if (xp < 3000) return '#FFD700';
+    return '#40E0D0';
   };
 
   const tierColor = getTierColor(xp);
 
   const avatarUrl = user?.photoUrl 
-    ? (user.photoUrl.startsWith('http') ? user.photoUrl : `${API_URL}${user.photoUrl}`)
+    ? (user.photoUrl.startsWith('http') 
+        ? `${user.photoUrl}${user.photoUrl.includes('?') ? '&' : '?'}v=${avatarVersion}` 
+        : `${API_URL}${user.photoUrl}?v=${avatarVersion}`)
     : null;
 
-  const levelStartXp = (level - 1) * 100;
-  const nextLevelXp = level * 100;
-  const currentLevelProgress = xp - levelStartXp;
-  
-  const progressPercentage = Math.min(Math.max((currentLevelProgress / 100) * 100, 0), 100);
+  const { progressXp, xpNeededForThisLevel, progressPercentage } = calculateLevelProgress(xp, level);
 
   return (
     <View className="items-center mt-6">
@@ -131,11 +130,23 @@ export default function UserStats() {
         {/* Borda dinâmica baseada no tier de XP */}
         <TouchableOpacity 
           testID="avatar-touchable"
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           onPress={pickImage}
           disabled={isSaving}
-          className="w-32 h-32 rounded-full shadow-xl items-center justify-center overflow-hidden"
-          style={{ backgroundColor: tierColor }}
+          style={{
+            width: 128,
+            height: 128,
+            borderRadius: 64,
+            backgroundColor: tierColor,
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4.65,
+            elevation: 8,
+          }}
         >
           <View className="w-[124px] h-[124px] rounded-full bg-on-primary-container items-center justify-center">
             <View className="w-[118px] h-[118px] rounded-full bg-surface items-center justify-center">
@@ -149,10 +160,6 @@ export default function UserStats() {
                   <MaterialIcons name="person" size={64} color={tierColor} />
                 </View>
               )}
-              {/* Overlay de Câmera */}
-              <View className="absolute inset-0 bg-black/20 items-center justify-center rounded-full opacity-0 hover:opacity-100">
-                 <MaterialIcons name="camera-alt" size={24} color="white" />
-              </View>
             </View>
           </View>
           {isSaving && (
@@ -161,12 +168,22 @@ export default function UserStats() {
             </View>
           )}
         </TouchableOpacity>
+        
+        {/* Floating level badge on bottom-right */}
         <View 
           className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full border-2 border-surface flex-row items-center space-x-1 shadow-lg"
           style={{ backgroundColor: tierColor }}
         >
           <MaterialIcons name="military-tech" size={16} color="#422d00" />
           <Text className="text-on-tertiary font-black">{level}</Text>
+        </View>
+
+        {/* Floating camera/edit badge on bottom-left */}
+        <View 
+          className="absolute -bottom-1 -left-1 p-2 rounded-full border-2 border-surface shadow-lg"
+          style={{ backgroundColor: colors.surfaceContainer }}
+        >
+          <MaterialIcons name="camera-alt" size={14} color={colors.primary} />
         </View>
       </View>
 
@@ -179,8 +196,10 @@ export default function UserStats() {
               onChangeText={setTempName}
               placeholder="Nome"
               maxLength={100}
-              className="text-3xl font-black text-on-surface tracking-tight text-center w-full border-b border-tertiary pb-1"
+              className="text-3xl font-black tracking-tight text-center w-full border-b border-tertiary pb-1"
               autoFocus
+              style={{ color: colors.onSurface }}
+              placeholderTextColor={colors.outline}
             />
             <View className="w-full mt-4">
               <TextInput
@@ -190,8 +209,14 @@ export default function UserStats() {
                 placeholder="Sua bio (até 150 caracteres)"
                 maxLength={150}
                 multiline
-                className="text-on-surface-variant font-medium text-center border border-on-surface/10 rounded-xl p-3"
-                style={{ minHeight: 80, textAlignVertical: 'top' }}
+                className="font-medium text-center border border-on-surface/10 rounded-xl p-3 w-full"
+                style={{ 
+                  minHeight: 80, 
+                  textAlignVertical: 'top', 
+                  color: colors.onSurfaceVariant,
+                  backgroundColor: colors.surfaceContainer
+                }}
+                placeholderTextColor={colors.outline}
               />
               <Text className="text-[10px] text-on-surface-variant text-right mt-1">
                 {tempBio.length}/150
@@ -220,7 +245,7 @@ export default function UserStats() {
                 disabled={isSaving}
                 className="bg-surface-container-highest px-6 py-2 rounded-full flex-row items-center space-x-2"
               >
-                <MaterialIcons name="close" size={18} color="#fd6c28" />
+                <MaterialIcons name="close" size={18} color={colors.primary} />
                 <Text className="text-primary font-bold">Cancelar</Text>
               </TouchableOpacity>
             </View>
@@ -234,7 +259,7 @@ export default function UserStats() {
                 onPress={handleToggleEdit} 
                 className="ml-2 bg-surface-container p-1 rounded-full"
               >
-                <MaterialIcons name="edit" size={18} color="#fd6c28" />
+                <MaterialIcons name="edit" size={18} color={colors.primary} />
               </TouchableOpacity>
             </View>
             <Text className="text-tertiary font-bold text-xs uppercase tracking-widest mt-1">{levelName}</Text>
@@ -244,23 +269,16 @@ export default function UserStats() {
       </View>
 
 
-      <View 
-        className="w-full mt-8 bg-surface-container-highest rounded-full h-4 overflow-hidden relative"
-        style={{
-          boxShadow: `0px 0px 10px ${tierColor}`,
-          elevation: 5,
-        }}
-      >
-        <View
-          className="absolute top-0 left-0 h-full rounded-full"
-          style={{ width: `${progressPercentage}%`, backgroundColor: tierColor }}
-        />
-      </View>
-
-      <View className="w-full flex-row justify-between mt-2 px-1">
-        <Text className="text-xs font-bold text-tertiary uppercase tracking-widest" style={{ color: tierColor }}>{currentLevelProgress} XP</Text>
-        <Text className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">100 XP</Text>
-      </View>
+      <ProgressBar
+        progressPercentage={progressPercentage}
+        variant="premium"
+        fillColor={tierColor}
+        style={{ marginTop: 32 }}
+        label="XP ATUAL"
+        labelColor={tierColor}
+        currentValue={progressXp}
+        targetValue={xpNeededForThisLevel}
+      />
     </View>
   );
 }

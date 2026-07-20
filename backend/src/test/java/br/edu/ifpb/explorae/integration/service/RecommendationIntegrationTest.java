@@ -1,17 +1,17 @@
 package br.edu.ifpb.explorae.integration.service;
 
-import br.edu.ifpb.explorae.api.dto.AttractionResponseDTO;
-import br.edu.ifpb.explorae.domain.attraction.Attraction;
-import br.edu.ifpb.explorae.domain.attraction.UserInteraction;
-import br.edu.ifpb.explorae.domain.user.Category;
-import br.edu.ifpb.explorae.domain.user.TravelPreference;
-import br.edu.ifpb.explorae.domain.user.User;
-import br.edu.ifpb.explorae.repository.AttractionRepository;
-import br.edu.ifpb.explorae.repository.CategoryRepository;
-import br.edu.ifpb.explorae.repository.TravelPreferenceRepository;
-import br.edu.ifpb.explorae.repository.UserInteractionRepository;
-import br.edu.ifpb.explorae.repository.UserRepository;
-import br.edu.ifpb.explorae.service.AttractionService;
+import br.edu.ifpb.explorae.attraction.dto.AttractionResponseDTO;
+import br.edu.ifpb.explorae.attraction.domain.Attraction;
+import br.edu.ifpb.explorae.attraction.domain.UserInteraction;
+import br.edu.ifpb.explorae.user.domain.Category;
+import br.edu.ifpb.explorae.user.domain.TravelPreference;
+import br.edu.ifpb.explorae.user.domain.User;
+import br.edu.ifpb.explorae.attraction.repository.AttractionRepository;
+import br.edu.ifpb.explorae.user.repository.CategoryRepository;
+import br.edu.ifpb.explorae.user.repository.TravelPreferenceRepository;
+import br.edu.ifpb.explorae.attraction.repository.UserInteractionRepository;
+import br.edu.ifpb.explorae.user.repository.UserRepository;
+import br.edu.ifpb.explorae.attraction.service.AttractionServiceFacade;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RecommendationIntegrationTest {
 
     @Autowired
-    private AttractionService attractionService;
+    private AttractionServiceFacade attractionService;
 
     @Autowired
     private UserRepository userRepository;

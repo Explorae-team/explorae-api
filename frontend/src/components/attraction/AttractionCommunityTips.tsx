@@ -1,10 +1,16 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, Image, Modal, SafeAreaView, Pressable, useWindowDimensions } from 'react-native';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { colors } from '../../constants/colors';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080';
 
 interface Review {
   userName?: string;
+  userPhotoUrl?: string;
   content: string;
+  rating?: number;
+  photoUrl?: string;
 }
 
 interface AttractionCommunityTipsProps {
@@ -15,14 +21,27 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
   return (
     <View className="mt-12 bg-white rounded-[40px] p-8">
       <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-xl font-black text-[#003646]">Dicas da Galera</Text>
+        <Text className="text-xl font-black text-explora-blue">Dicas da Galera</Text>
         {reviews && reviews.length > 0 && (
           <View className="flex-row">
-            {reviews.slice(0, 3).map((_, i) => (
-              <View key={i} className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-gray-300" />
-            ))}
+            {reviews.slice(0, 3).map((review, i) => {
+              const avatarUrl = review.userPhotoUrl 
+                ? (review.userPhotoUrl.startsWith('http') ? review.userPhotoUrl : `${API_URL}${review.userPhotoUrl}`)
+                : null;
+              return avatarUrl ? (
+                <Image 
+                  key={i} 
+                  source={{ uri: avatarUrl }} 
+                  className="w-8 h-8 rounded-full border-2 border-white -ml-2" 
+                />
+              ) : (
+                <View key={i} className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-gray-300 items-center justify-center">
+                  <MaterialCommunityIcons name="account" size={14} color={colors.exploraBlue} />
+                </View>
+              );
+            })}
             {reviews.length > 3 && (
-              <View className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-[#F2641F] items-center justify-center">
+              <View className="w-8 h-8 rounded-full border-2 border-white -ml-2 bg-accent items-center justify-center">
                 <Text className="text-[10px] text-white font-bold">+{reviews.length - 3}</Text>
               </View>
             )}
@@ -37,10 +56,13 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
               key={index} 
               author={review.userName || '@explorador'} 
               text={review.content} 
+              rating={review.rating}
+              userPhotoUrl={review.userPhotoUrl}
+              photoUrl={review.photoUrl}
             />
           ))
         ) : (
-          <Text className="text-[#003646]/50 italic text-sm">
+          <Text className="text-explora-blue/50 italic text-sm">
             Nenhuma dica ainda. Seja o primeiro a explorar e comentar!
           </Text>
         )}
@@ -49,14 +71,90 @@ export default function AttractionCommunityTips({ reviews }: AttractionCommunity
   );
 }
 
-const Comment = ({ author, text }: { author: string; text: string }) => (
-  <View className="flex-row gap-4">
-    <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center">
-       <MaterialCommunityIcons name="account" size={20} color="#003646" />
+const Comment = ({ author, text, rating, userPhotoUrl, photoUrl }: { author: string; text: string; rating?: number; userPhotoUrl?: string; photoUrl?: string }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
+
+  const avatarUrl = userPhotoUrl 
+    ? (userPhotoUrl.startsWith('http') ? userPhotoUrl : `${API_URL}${userPhotoUrl}`)
+    : null;
+
+  const reviewPhotoUrl = photoUrl 
+    ? (photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`)
+    : null;
+
+  return (
+    <View className="flex-row gap-4">
+      {avatarUrl ? (
+        <Image 
+          source={{ uri: avatarUrl }} 
+          className="w-10 h-10 rounded-full border border-white/10" 
+        />
+      ) : (
+        <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center">
+           <MaterialCommunityIcons name="account" size={20} color={colors.exploraBlue} />
+        </View>
+      )}
+      <View className="flex-1">
+        <View className="flex-row justify-between items-center">
+          <Text className="font-bold text-explora-blue text-sm">{author}</Text>
+          {rating !== undefined && (
+            <View className="flex-row gap-0.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <MaterialIcons 
+                  key={star} 
+                  name={star <= rating ? "star" : "star-border"} 
+                  size={14} 
+                  color={colors.exploraGold} 
+                />
+              ))}
+            </View>
+          )}
+        </View>
+        <Text className="text-explora-blue/70 text-sm mt-1 leading-5">{text}</Text>
+        {reviewPhotoUrl && (
+          <>
+            <Pressable onPress={() => setIsModalVisible(true)}>
+              <Image 
+                source={{ uri: reviewPhotoUrl }} 
+                className="w-full h-44 rounded-2xl mt-3" 
+                resizeMode="cover"
+              />
+            </Pressable>
+
+            <Modal
+              visible={isModalVisible}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => setIsModalVisible(false)}
+            >
+              <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999 }}>
+                <SafeAreaView style={{ flex: 1 }}>
+                  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Pressable
+                      style={{ position: 'absolute', top: 30, right: 30, zIndex: 10000, padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 }}
+                      onPress={() => setIsModalVisible(false)}
+                    >
+                      <MaterialCommunityIcons name="close" size={30} color={colors.primary} />
+                    </Pressable>
+
+                    <Pressable
+                      onPress={() => setIsModalVisible(false)}
+                      style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <Image
+                        source={{ uri: reviewPhotoUrl }}
+                        style={{ width: windowWidth, height: '100%' }}
+                        resizeMode="contain"
+                      />
+                    </Pressable>
+                  </View>
+                </SafeAreaView>
+              </View>
+            </Modal>
+          </>
+        )}
+      </View>
     </View>
-    <View className="flex-1">
-      <Text className="font-bold text-[#003646] text-sm">{author}</Text>
-      <Text className="text-[#003646]/70 text-sm mt-1 leading-5">{text}</Text>
-    </View>
-  </View>
-);
+  );
+};

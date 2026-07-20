@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="021-create-rewards-tables" author="explorae-team">
+        <!-- Tabela de Parceiros -->
+        <createTable tableName="partners">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contact_info" type="VARCHAR(255)"/>
+            <column name="photo_url" type="VARCHAR(255)"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Tabela de Recompensas -->
+        <createTable tableName="rewards">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="partner_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_reward_partner" referencedTableName="partners" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cost_in_coins" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stock" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(255)"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Tabela de Vouchers -->
+        <createTable tableName="vouchers">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_voucher_user" referencedTableName="users" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="reward_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_voucher_reward" referencedTableName="rewards" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="redeemed_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="021-seed-initial-partners-and-rewards" author="explorae-team">
+        <!-- Parceiro 1: Café Centro Histórico -->
+        <insert tableName="partners">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1b1"/>
+            <column name="name" value="Café Centro Histórico"/>
+            <column name="description" value="O melhor café expresso e quitutes tradicionais no coração da cidade antiga."/>
+            <column name="contact_info" value="contato@cafecentrohistorico.com.br"/>
+            <column name="photo_url" value="/uploads/partners/cafe_partner.png"/>
+            <column name="is_active" value="true"/>
+        </insert>
+
+        <!-- Recompensa 1.1 (Café) -->
+        <insert tableName="rewards">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1c1"/>
+            <column name="partner_id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1b1"/>
+            <column name="name" value="Expresso Duplo Premium"/>
+            <column name="description" value="Troque suas moedas por um delicioso expresso duplo moído na hora."/>
+            <column name="type" value="PRODUCT"/>
+            <column name="cost_in_coins" value="100"/>
+            <column name="stock" value="50"/>
+            <column name="image_url" value="/uploads/rewards/expresso_duplo.png"/>
+            <column name="is_active" value="true"/>
+        </insert>
+
+        <!-- Recompensa 1.2 (Café) -->
+        <insert tableName="rewards">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1c2"/>
+            <column name="partner_id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1b1"/>
+            <column name="name" value="Combo Tarde de Sabores"/>
+            <column name="description" value="1 Café Coado + 1 Fatia de Bolo de Rolo Tradicional."/>
+            <column name="type" value="EXPERIENCE"/>
+            <column name="cost_in_coins" value="250"/>
+            <column name="stock" value="20"/>
+            <column name="image_url" value="/uploads/rewards/combo_tarde.png"/>
+            <column name="is_active" value="true"/>
+        </insert>
+
+        <!-- Parceiro 2: Aventura e Trilhas JP -->
+        <insert tableName="partners">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1b2"/>
+            <column name="name" value="Aventura e Trilhas JP"/>
+            <column name="description" value="Especialistas em ecoturismo, passeios de buggy e trilhas ecológicas na Paraíba."/>
+            <column name="contact_info" value="contato@aventurajp.com.br"/>
+            <column name="photo_url" value="/uploads/partners/trilha_partner.png"/>
+            <column name="is_active" value="true"/>
+        </insert>
+
+        <!-- Recompensa 2.1 (Aventura) -->
+        <insert tableName="rewards">
+            <column name="id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1c3"/>
+            <column name="partner_id" value="fa42e742-b06c-482a-9e0f-d4b9b6e8f1b2"/>
+            <column name="name" value="Desconto de R$ 50 no Passeio de Buggy"/>
+            <column name="description" value="Ganhe R$ 50 de desconto na reserva do passeio completo pelas praias do litoral sul."/>
+            <column name="type" value="DISCOUNT"/>
+            <column name="cost_in_coins" value="500"/>
+            <column name="stock" value="15"/>
+            <column name="image_url" value="/uploads/rewards/buggy_desconto.png"/>
+            <column name="is_active" value="true"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

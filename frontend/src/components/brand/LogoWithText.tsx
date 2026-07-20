@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { CompassIcon } from './CompassIcon';
+import { colors } from '../../constants/colors';
 
 interface LogoWithTextProps {
   size?: number; // Altura geral recomendada do componente (ex: 80, 100, 120)
+  textColor?: string; // Cor customizada opcional para o texto "Explora"
   style?: StyleProp<ViewStyle>;
 }
 
@@ -17,6 +19,7 @@ interface LogoWithTextProps {
  */
 export const LogoWithText: React.FC<LogoWithTextProps> = ({ 
   size = 100,
+  textColor,
   style 
 }) => {
   // Fatores de escala dinâmicos com base no tamanho fornecido
@@ -43,7 +46,7 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
 
       {/* 2. Bloco de Texto Unificado (Garante baseline perfeito e evita desalinhamento vertical) */}
       <View style={styles.textWrapper}>
-        <Text style={[styles.textBase, { fontSize, lineHeight: fontSize * 1.25 }]}>
+        <Text style={[styles.textBase, { fontSize, lineHeight: fontSize * 1.25 }, textColor ? { color: textColor } : null]}>
           Explora
           <Text style={styles.textE}>e</Text>
         </Text>
@@ -66,16 +69,13 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
             viewBox="0 0 100 90"
             style={{ overflow: 'visible' }}
           >
-            {/* Metade Esquerda (Laranja Base / Claro) */}
             <Path 
               d="M 50 0 L 0 90 L 50 90 L 50 55 L 25 70 L 50 30 Z" 
-              fill="#F37640" 
+              fill={colors.brandOrangeLight} 
             />
-            
-            {/* Metade Direita (Laranja Escuro - Sombra) */}
             <Path 
               d="M 50 0 L 50 30 L 75 70 L 50 55 L 50 90 L 100 90 Z" 
-              fill="#DF6430" 
+              fill={colors.brandOrangeDark} 
             />
           </Svg>
         </View>
@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
   textBase: {
     fontFamily: 'System', // Excelente renderização e alinhamento cross-platform
     fontWeight: '900',
-    color: '#0E566A',
+    color: colors.brandBlueLight,
     letterSpacing: -1,
   },
   textE: {
-    color: '#F37640',
+    color: colors.brandOrangeLight,
   },
   accentWrapper: {
     position: 'absolute',

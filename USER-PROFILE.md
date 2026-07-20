@@ -42,3 +42,5 @@ Este documento foi gerado automaticamente através da análise comportamental e 
 1. **Vá Direto ao Ponto:** Em diagnósticos de erros ou relatórios de progresso, mostre o arquivo, a linha correspondente e o código sugerido em formato diff sem textões teóricos longos.
 2. **Respeite o Ambiente:** Ao executar comandos ou propor scripts no Windows, considere restrições locais de permissão do PowerShell (use Bypass e cmd-wrappers quando necessário).
 3. **Mantenha os Comentários Focados:** Escreva comentários apenas para explicar decisões de arquitetura e "porquês" de negócios no código-fonte, sem redundâncias textuais.
+4. **Ideação Estruturada (/grill-me):** Prefira conduzir alinhamentos de design arquitetural por meio de perguntas objetivas com opções e recomendações claras. Ele responde de forma rápida e assertiva a propostas de design bem-fundamentadas.
+5. **Pragmatismo em Descartes/Rollbacks:** Ao descartar trabalhos ou reverter branches, aja de forma enérgica e definitiva. Interrompa processos ativos travando arquivos e limpe toda a árvore de trabalho (`git reset --hard` e `git clean -xdf`) sem hesitação para entregar um estado 100% puro e sem resíduos.

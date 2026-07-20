@@ -1,21 +1,35 @@
-# State - Sprint 04
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-06-13T15:51:14.177Z"
+---
+
+# State - Sprint 06
 
 ## Context
-Iniciando a Sprint 04 do Exploraê. O catálogo de atrações, feed principal, filtros e recomendações inteligentes estão 100% integrados e validados no frontend e backend. Agora o foco é a experiência geo-referenciada com o Mapa Interativo de Atrações.
+
+Iniciando a Sprint 06 do Exploraê, focada inteiramente na refatoração e conformidade com os princípios SOLID no módulo `user` do backend. Atualmente, o módulo possui alta responsabilidade acumulada na classe `UserService` (God Service sem interface contratual) e no controller, com injeções diretas e validações misturadas. Essa sprint organizará a arquitetura do módulo para torná-lo flexível e limpo para as próximas extensões.
 
 ## Current Phase
-- **Active**: Phase 1 - [SDGEU-158-1] Integrar React Native Maps e configurar permissões de Mapa
-- **Status**: ⌛ Ready to discuss.
+
+- **Active**: Phase 4 - [SDGEU-REF-USER-4] Limpar a classe de entidade `User` (JPA Entity), isolando validações e mapeamentos.
+- **Status**: ⌛ Ready to plan.
 
 ## Recent Progress
-- [X] Conclusão da Sprint 03 com entrega do catálogo, feed paginado, carrossel de recomendações baseadas no perfil do usuário e geolocalização multiplataforma com fallbacks de João Pessoa.
-- [X] Cobertura completa de testes automatizados unitários e de integração no frontend e backend.
+
+- [X] Phase 1 concluída: Criação de interfaces de contrato `UserService` e `AuthService` (LSP/DIP).
+- [X] Phase 2 concluída: Segregação da lógica agregada de perfil e gamificação para `UserProfileService` (SRP).
+- [X] Phase 3 concluída: Desacoplamento do `UserController` com injeções separadas para preferências e gamificação (SRP).
 
 ## Session Continuity
-- **Last session**: 2026-05-20
-- **Stopped at**: Sprint 03 milestone closed and archived.
+
+- **Last session**: 2026-06-13
+- **Stopped at**: Sprint 05 closed and Sprint 06 (refactor_backend) initialized.
 - **Resume file**: .planning/ROADMAP.md
 
 ## Notes
-- Garantir compatibilidade do React Native Maps no Native e fallback para Web.
-- Configurar corretamente as chaves e APIs do Google Maps / Apple Maps.
+
+- Garantir que a criação das interfaces de serviço não quebre as dependências do Spring Security (como o `UserDetailsService` do `UserService`).
+- Preservar a consistência das transações (`@Transactional`) nas novas implementações.

@@ -3,15 +3,22 @@ import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ONBOARDING_STEPS } from '../constants/onboarding';
 import { getCategories, getPreferences, updatePreferences } from '../services/preferenceService';
+import { useCelebration } from '../contexts/BadgeCelebrationContext';
 
 export function usePreferencesWizard(user, logout, updateUserPreferences, isEditMode) {
   const router = useRouter();
+  const { triggerCelebration } = useCelebration();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
 
   const stepInfo = ONBOARDING_STEPS[currentStep];
+  
+  const currentPillar = stepInfo?.pillar;
+  const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
+  const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
+  const isNextDisabled = pillarCategories.length > 0 && !hasSelection;
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -44,11 +51,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
   };
 
   const handleNext = () => {
-    const currentPillar = stepInfo?.pillar;
-    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
-    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
-
-    if (pillarCategories.length > 0 && !hasSelection) {
+    if (isNextDisabled) {
       Alert.alert(
         'Exploração sob Medida',
         'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
@@ -63,22 +66,26 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     }
   };
 
+  const safeGoBack = (fallback = '/dashboard') => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(fallback);
+    }
+  };
+
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else if (isEditMode) {
-      router.back();
+      safeGoBack('/settings');
     } else {
       logout();
     }
   };
 
   const handleFinish = async () => {
-    const currentPillar = stepInfo?.pillar;
-    const pillarCategories = categories.filter(cat => cat.parentCategory === currentPillar);
-    const hasSelection = pillarCategories.some(cat => selectedIds.includes(cat.slug));
-
-    if (pillarCategories.length > 0 && !hasSelection) {
+    if (isNextDisabled) {
       Alert.alert(
         'Exploração sob Medida',
         'Por favor, selecione pelo menos um interesse nesta categoria para continuarmos a montar suas recomendações.'
@@ -97,8 +104,11 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
 
     if (result.success) {
       await updateUserPreferences();
+      if (result.unlockedBadges && result.unlockedBadges.length > 0) {
+        triggerCelebration(result.unlockedBadges);
+      }
       if (isEditMode) {
-        router.back();
+        safeGoBack('/settings');
       } else {
         router.replace('/dashboard');
       }
@@ -113,6 +123,7 @@ export function usePreferencesWizard(user, logout, updateUserPreferences, isEdit
     isSubmitting,
     stepInfo,
     categories,
+    isNextDisabled,
     handleToggleInterest,
     handleNext,
     handleBack

@@ -22,4 +22,15 @@
     <include file="db/changelog/changes/015-create-categories-table.xml"/>
     <include file="db/changelog/changes/016-add-detailed-categories.xml"/>
     <include file="db/changelog/changes/017-create-user-interactions-table.xml"/>
+    <include file="db/changelog/changes/018-create-challenges-tables.xml"/>
+    <include file="db/changelog/changes/019-add-coins-to-xp-history.xml"/>
+    
+    <include file="db/changelog/changes/020-add-photo-to-attraction-reviews.xml"/>
+    <include file="db/changelog/changes/021-update-attractions-coordinates.xml"/>
+    <include file="db/changelog/changes/021-create-rewards-tables.xml"/>
+    <include file="db/changelog/changes/022-add-expires-at-to-vouchers.xml"/>
+    <include file="db/changelog/changes/023-add-used-at-to-vouchers.xml"/>
+    <include file="db/changelog/changes/024-seed-enriched-and-new-attractions.xml"/>
+    <include file="db/changelog/changes/025-cleanup-invalid-cities.xml"/>
+    <include file="db/changelog/changes/026-fix-fk-travel-preferences.xml"/>
 </databaseChangeLog>

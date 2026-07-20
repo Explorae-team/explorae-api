@@ -1,18 +1,21 @@
-# Requirements - Sprint 04
+# Requirements - Sprint 06 (Refatoração do Módulo User)
 
 ## Overview
-A Sprint 04 focará no desenvolvimento do Mapa Interativo de Atrações e na exibição em tempo real de atrações turísticas com base no raio de geolocalização do usuário, integrando rotas e cálculo de distância preciso.
+A Sprint 06 focará na aplicação estrita dos princípios SOLID (SRP, OCP, LSP, ISP e DIP) no módulo `user` do backend (Spring Boot), visando desacoplar a camada de serviços com interfaces e implementações segregadas, estruturar controllers sem lógica de negócio residual e limpar a entidade de domínio JPA de acoplamentos externos.
 
 ## User Stories
 
-### [SDGEU-158] Mapa Interativo de Atrações
-**Descrição**: Como um explorador, desejo visualizar as atrações em um mapa interativo em tempo real para encontrar pontos de interesse próximos a mim de forma geo-referenciada.
+### [SDGEU-REF-USER] Refatoração SOLID do Módulo User
+**Descrição**: Como arquiteto/desenvolvedor de software, desejo refatorar o módulo de Usuário (User) para que o código siga as boas práticas do SOLID, melhorando a manutenibilidade, testabilidade e desacoplamento do sistema.
 
 - **Requisitos Funcionais**:
-  - [ ] Integrar biblioteca de mapas multiplataforma (React Native Maps).
-  - [ ] Renderizar pins customizados por categoria no mapa.
-  - [ ] Permitir filtrar os pins no mapa por categoria e avaliação.
+  - [ ] **Introdução de Interfaces de Serviço (LSP/DIP):** Criar interfaces e implementações concretas (ex: `UserService` e `UserServiceImpl`, `AuthService` e `AuthServiceImpl`, etc.). Garantir que controllers e outros componentes dependam das abstrações (interfaces), facilitando mocks em testes.
+  - [ ] **Segregação de Responsabilidades (SRP/ISP):** Dividir as responsabilidades do `UserService` que atua como God Service. Extrair a lógica de gamificação, perfil agregado e controle de preferências para serviços coesos (ex: `UserProfileService`, `UserPreferenceService`).
+  - [ ] **Limpeza de Controllers (SRP):** Refatorar o `UserController` para atuar puramente como camada de recepção e resposta HTTP, delegando qualquer validação complexa ou regra de negócio para a camada de serviços. Impedir o uso direto de Repositórios e injeções impróprias de outras features.
+  - [ ] **Desacoplamento da Entidade de Domínio (OCP):** Limpar a classe de domínio `User` (JPA Entity), isolando validações de DTOs (Bean Validation) e transferindo lógicas de apresentação/negócio secundárias para componentes adequados.
+  - [ ] **Suite de Testes Integrais:** Ajustar todos os testes unitários e de integração existentes no backend para refletirem as novas estruturas, garantindo que não existam regressões no fluxo de login, cadastro, perfil e gamificação.
 - **Critérios de Aceite**:
-  - [ ] Exibe a localização em tempo real do dispositivo no mapa.
-  - [ ] Ao clicar em um pin, exibe um mini-card de atração (Callout) contendo foto, nome e rating, com atalho para tela de detalhes completos.
-  - [ ] Carrega automaticamente novos pins ao arrastar/mover o centro geográfico do mapa (Lazy Loading espacial).
+  - [ ] O backend compila sem erros.
+  - [ ] Todos os serviços do módulo `user` possuem interfaces expostas como seus respectivos contratos.
+  - [ ] As responsabilidades de perfil/autenticação/gamificação estão claramente distribuídas.
+  - [ ] A cobertura de testes automatizados é mantida e todos os 49+ testes JUnit de backend passam com sucesso.

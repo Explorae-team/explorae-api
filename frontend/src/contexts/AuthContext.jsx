@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import storage from '../utils/storage';
 import { supabase } from '../services/supabase';
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     loadStoredData();
   }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
       const response = await api.post('/api/v1/auth/login', { email, password });
       
@@ -67,9 +67,9 @@ export const AuthProvider = ({ children }) => {
         message: error.response?.data?.message || 'Erro de conexão com o servidor' 
       };
     }
-  };
+  }, []);
 
-  const register = async (formData) => {
+  const register = useCallback(async (formData) => {
     try {
       // 1. Tenta cadastrar o usuário no Supabase Auth para habilitar recuperação de senha e OAuth
       try {
@@ -97,9 +97,9 @@ export const AuthProvider = ({ children }) => {
         message: error.response?.data?.message || 'Erro ao realizar cadastro' 
       };
     }
-  };
+  }, []);
 
-  const updateUserPreferences = async () => {
+  const updateUserPreferences = useCallback(async () => {
     try {
       const response = await api.get('/api/v1/users/me');
       const userData = response.data.data;
@@ -108,9 +108,9 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Erro ao atualizar dados do usuário:', error);
     }
-  };
+  }, []);
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = useCallback(async (profileData) => {
     try {
       const response = await api.put('/api/v1/users/me', profileData);
       const userData = response.data.data;
@@ -124,9 +124,9 @@ export const AuthProvider = ({ children }) => {
         message: error.response?.data?.message || 'Erro ao atualizar perfil' 
       };
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await storage.removeItem('auth_token');
       await storage.removeItem('user_data');
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Erro ao deslogar:', error);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ 

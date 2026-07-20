@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="020-update-attractions-coordinates" author="explorae-team">
+        
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1475"/>
+            <column name="longitude" valueNumeric="-34.7969"/>
+            <where>id = 'f179bc95-a027-51ff-ad00-b0465d4da467'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1147"/>
+            <column name="longitude" valueNumeric="-34.8225"/>
+            <where>id = 'bf124eb8-f59e-5b8e-b731-726df87325fe'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1128"/>
+            <column name="longitude" valueNumeric="-34.8858"/>
+            <where>id = '3a150918-39d6-5122-b1c9-e1433588b747'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1214"/>
+            <column name="longitude" valueNumeric="-34.8789"/>
+            <where>id = '989b484d-ed7d-5ca0-8de1-b7fbbd78ba1f'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1172"/>
+            <column name="longitude" valueNumeric="-34.8286"/>
+            <where>id = 'c9ccb7c1-3196-5360-87fa-78bcab146150'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.0394"/>
+            <column name="longitude" valueNumeric="-34.8431"/>
+            <where>id = 'f9e53706-d68f-530d-ba98-c442980a2f9a'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1555"/>
+            <column name="longitude" valueNumeric="-34.7889"/>
+            <where>id = 'ba3ba978-dbc6-5495-a048-073f152d7d8e'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1472"/>
+            <column name="longitude" valueNumeric="-34.8014"/>
+            <where>id = 'b0fa6402-eb8f-5376-b29c-4b0ddf8d9608'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.3206"/>
+            <column name="longitude" valueNumeric="-34.8136"/>
+            <where>id = 'b3d062d7-bf0b-5cea-87a7-bf0f196c26a7'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.3614"/>
+            <column name="longitude" valueNumeric="-34.7961"/>
+            <where>id = '21a27ec3-a376-5d9a-a5a7-85f4503710fb'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.0119"/>
+            <column name="longitude" valueNumeric="-34.8256"/>
+            <where>id = '85c129ef-d047-5b0c-933f-bef8154c2ff5'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1139"/>
+            <column name="longitude" valueNumeric="-34.8894"/>
+            <where>id = 'ad43072f-d032-5e19-b58d-19ec75fb9091'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1219"/>
+            <column name="longitude" valueNumeric="-34.8731"/>
+            <where>id = '5dbfb4f3-6754-5fd0-a09c-f99d2723dab3'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.0864"/>
+            <column name="longitude" valueNumeric="-34.8281"/>
+            <where>id = '6379829c-bd32-59c3-8660-3ae988cf1dd7'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1158"/>
+            <column name="longitude" valueNumeric="-34.8239"/>
+            <where>id = '32d412af-e1e1-533e-bb84-ecda84edefa3'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.1294"/>
+            <column name="longitude" valueNumeric="-34.8197"/>
+            <where>id = 'a7dd459f-e20f-578e-b55a-7fbd5680412a'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.115"/>
+            <column name="longitude" valueNumeric="-34.8881"/>
+            <where>id = '77a49037-59f3-5248-8838-e9e34f7a462f'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.3006"/>
+            <column name="longitude" valueNumeric="-34.8156"/>
+            <where>id = '92c69289-4c3f-5107-bab2-ba89f6f5a48b'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.4614"/>
+            <column name="longitude" valueNumeric="-34.8231"/>
+            <where>id = '887865c3-063c-5ff2-a787-d48867ba377c'</where>
+        </update>
+
+        <update tableName="attractions">
+            <column name="latitude" valueNumeric="-7.113"/>
+            <column name="longitude" valueNumeric="-34.887"/>
+            <where>id = 'f7399052-1eca-5561-9c05-ab29b5c84db4'</where>
+        </update>
+        
+    </changeSet>
+
+</databaseChangeLog>
