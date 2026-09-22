@@ -11,8 +11,21 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.explorae.site",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://tghcscavkszzvycuqfmq.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_W3rAde9-eSrgFCM2d4c3Kw_A1mCmwaW",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBcnwdrAL94apaTVSwVusYrMwZDNImravk"
       }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.explorae.site",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://tghcscavkszzvycuqfmq.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_W3rAde9-eSrgFCM2d4c3Kw_A1mCmwaW",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBcnwdrAL94apaTVSwVusYrMwZDNImravk"
+      }
+    }
   }
 }

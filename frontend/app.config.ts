@@ -4,7 +4,7 @@ export default {
     slug: "explorae-app",
     extra: {
       eas: {
-        projectId: "e371e387-26ef-47db-b2d1-4ba332b85cf2"
+        projectId: "94cc8e6f-2b34-4c79-aa5f-73e43e85d6a5"
       }
     },
     scheme: "explorae", // <-- Mesclado da main
