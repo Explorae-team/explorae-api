@@ -29,7 +29,8 @@ export default {
       },
       permissions: [ // <-- Da sua branch
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
       ],
       config: { // <-- Da sua branch
         googleMaps: {
@@ -60,6 +61,12 @@ export default {
       "expo-router",
       "expo-font",
       "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          cameraPermission: "O Exploraê precisa de acesso à câmera para ler QR Codes de vouchers."
+        }
+      ],
       [
         "expo-image-picker",
         {
