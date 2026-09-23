@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/explorae-user-service.iml" filepath="$PROJECT_DIR$/.idea/explorae-user-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/explorae-api.iml" filepath="$PROJECT_DIR$/.idea/explorae-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend/explorae-user-service.iml" filepath="$PROJECT_DIR$/backend/explorae-user-service.iml" />
     </modules>
   </component>
 </project>

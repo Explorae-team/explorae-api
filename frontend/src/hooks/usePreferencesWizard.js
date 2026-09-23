@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ONBOARDING_STEPS } from '../constants/onboarding';
 import { useCelebration } from '../contexts/BadgeCelebrationContext';
+import preferenceService from '../services/preferenceService';
 
 export function usePreferencesWizard(user, logout, updateUserPreferences, isEditMode) {
   const router = useRouter();
