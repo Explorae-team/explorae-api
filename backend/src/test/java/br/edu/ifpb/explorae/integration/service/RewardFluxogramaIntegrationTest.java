@@ -27,42 +27,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * NÍVEL DE TESTE: INTEGRAÇÃO (Integration Testing)
- * TÉCNICA: Teste Baseado em Fluxograma / Caminho Básico (Basis Path Testing - McCabe, 1976)
- *
- * OBJETO SOB TESTE (SUT): RewardService.redeemReward(userId, rewardId)
- * ESCOPO DA INTEGRAÇÃO: Orquestração entre RewardService, UserRepository, RewardRepository,
- *                       VoucherRepository e mecanismo de transações JPA/Hibernate.
- *
- * MODELAGEM DO GRAFO DE FLUXO DE CONTROLE (CFG):
- * Nós (N = 11):
- *  - Nó 1: Início e busca do usuário no banco (userRepository.findById)
- *  - Nó 2: [Exceção 1] Usuário não encontrado -> Lança ResourceNotFoundException
- *  - Nó 3: Usuário encontrado -> Busca recompensa no banco (rewardRepository.findById)
- *  - Nó 4: [Exceção 2] Recompensa não encontrada -> Lança ResourceNotFoundException
- *  - Nó 5: Recompensa encontrada -> Avalia Predicado de Ativação (!reward.getIsActive())
- *  - Nó 6: [Exceção 3] Indisponível/Esgotada -> Lança BusinessException
- *  - Nó 7: Ativa == true -> Avalia Predicado de Estoque (reward.getStock() <= 0)
- *  - Nó 8: Estoque > 0 -> Avalia Predicado de Saldo (user.getCoins() < reward.getCostInCoins())
- *  - Nó 9: [Exceção 4] Saldo insuficiente -> Lança BusinessException (Garante Rollback)
- *  - Nó 10: Saldo suficiente -> Débito de moedas, decremento de estoque e persistência do voucher
- *  - Nó 11: Retorno com DTO de Sucesso (Commit da transação)
- *
- * MÉTRICA DE MCCABE:
- * Arestas (E) = 15, Nós (N) = 11, Componentes (P) = 1
- * Nós Predicados (P_nodes) = 5 (Nó 1, Nó 3, Nó 5, Nó 7, Nó 8)
- * Complexidade Ciclomática V(G) = E - N + 2P = 15 - 11 + 2(1) = 6
- * ou V(G) = P_nodes + 1 = 5 + 1 = 6
- *
- * CONJUNTO BASE DE CAMINHOS INDEPENDENTES (6 Casos de Teste):
- * - CB1: 1 -> 2                                           (Usuário inexistente)
- * - CB2: 1 -> 3 -> 4                                      (Recompensa inexistente)
- * - CB3: 1 -> 3 -> 5 -> 6                                 (Recompensa inativa)
- * - CB4: 1 -> 3 -> 5 -> 7 -> 6                            (Recompensa com estoque zerado)
- * - CB5: 1 -> 3 -> 5 -> 7 -> 8 -> 9                       (Saldo insuficiente / Rollback)
- * - CB6: 1 -> 3 -> 5 -> 7 -> 8 -> 10 -> 11                (Caminho feliz / Transação completa)
- */
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
