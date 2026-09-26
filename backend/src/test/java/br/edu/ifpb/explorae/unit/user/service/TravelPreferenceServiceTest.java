@@ -38,6 +38,12 @@ class TravelPreferenceServiceTest {
     @Mock
     private br.edu.ifpb.explorae.user.repository.CategoryRepository categoryRepository;
 
+    @Mock
+    private br.edu.ifpb.explorae.gamification.service.BadgeUnlockTracker badgeUnlockTracker;
+
+    @Mock
+    private br.edu.ifpb.explorae.gamification.mapper.BadgeMapper badgeMapper;
+
     @InjectMocks
     private TravelPreferenceService travelPreferenceService;
 
@@ -61,16 +67,15 @@ class TravelPreferenceServiceTest {
     }
 
     @Test
-    @DisplayName("Não deve disparar evento se já possuir preferências")
-    void shouldNotPublishEventIfAlreadyHasPreferences() {
+    @DisplayName("Não deve disparar evento se lista de interesses for vazia")
+    void shouldNotPublishEventIfInterestsIsEmpty() {
         // GIVEN
         UUID userId = UUID.randomUUID();
         User user = User.builder().id(userId).build();
         TravelPreference existingPref = new TravelPreference();
-        TravelPreferenceRequestDTO dto = new TravelPreferenceRequestDTO(List.of("Cultura"));
+        TravelPreferenceRequestDTO dto = new TravelPreferenceRequestDTO(List.of());
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        // Simula que já existem preferências
         when(travelPreferenceRepository.findByUser(user)).thenReturn(Optional.of(existingPref));
 
         // WHEN
