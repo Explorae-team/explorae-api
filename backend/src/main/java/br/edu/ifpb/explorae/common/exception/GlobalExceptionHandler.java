@@ -36,7 +36,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardResponseDTO<Map<String, String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors()
-                .stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+                .stream().collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existing, replacement) -> existing));
         
         log.warn("Erro de validação: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -66,6 +69,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StandardResponseDTO<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(StandardResponseDTO.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<StandardResponseDTO<Void>> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        log.warn("Corpo da requisição inválido ou JSON malformado: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(StandardResponseDTO.error("Corpo da requisição inválido ou JSON malformado."));
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<StandardResponseDTO<Void>> handleMethodArgumentTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+        log.warn("Parâmetro de requisição com tipo incompatível: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(StandardResponseDTO.error("Parâmetro inválido na URL: " + ex.getName()));
     }
 
     @ExceptionHandler(Exception.class)
