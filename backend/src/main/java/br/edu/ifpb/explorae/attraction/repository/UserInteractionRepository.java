@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,5 +18,12 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
     long countDistinctAttractionsByUserIdAndInteractionType(
             @Param("userId") UUID userId,
             @Param("interactionType") String interactionType
+    );
+
+    boolean existsByUserIdAndAttractionIdAndInteractionTypeAndCreatedAtAfter(
+            UUID userId,
+            UUID attractionId,
+            String interactionType,
+            LocalDateTime after
     );
 }
