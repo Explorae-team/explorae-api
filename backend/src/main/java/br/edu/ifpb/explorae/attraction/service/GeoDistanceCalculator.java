@@ -30,13 +30,15 @@ public class GeoDistanceCalculator {
         double latDistance = Math.toRadians(end.latitude() - start.latitude());
         double lonDistance = Math.toRadians(end.longitude() - start.longitude());
 
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+        // Na fórmula de Haversine, representa o quadrado da metade da corda esférica
+        double chordLengthSquared = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(start.latitude())) * Math.cos(Math.toRadians(end.latitude()))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        // Representa a distância angular (ângulo central em radianos) subtendida no centro da Terra
+        double angularDistanceInRadians = 2 * Math.atan2(Math.sqrt(chordLengthSquared), Math.sqrt(1 - chordLengthSquared));
 
-        return EARTH_RADIUS_METERS * c;
+        return EARTH_RADIUS_METERS * angularDistanceInRadians;
     }
 
     /**
